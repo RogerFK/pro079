@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pro079", "QuitaCadaver\pro079.csproj", "{B9FBF509-2FA5-4A68-907C-A1A016225EC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pro079", "pro079\pro079.csproj", "{B9FBF509-2FA5-4A68-907C-A1A016225EC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
