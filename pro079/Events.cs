@@ -76,14 +76,14 @@ namespace pro079
 									bool noTesla = true;
 									foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
 									{
-										if (Vector.Distance(ev.Player.Scp079Data.Camera, tesla.Position) < 8.0f)
+										if (Vector.Distance(ev.Player.Scp079Data.Camera, tesla.Position) < 6.0f)
 										{
 											
 											if (tesla.TriggerDistance > 0)
 											{
 												ev.Player.Scp079Data.AP -= 50;
-												ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
-												ev.Player.Scp079Data.Exp += (10.0f/ev.Player.Scp079Data.Level);
+												//ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
+												//ev.Player.Scp079Data.Exp += (10.0f/ev.Player.Scp079Data.Level);
 												Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
 												noTesla = false;
 												break;
@@ -152,8 +152,8 @@ namespace pro079
 											}
 											ev.Player.Scp079Data.AP -= 80;
 											PluginManager.Manager.Server.Map.AnnounceNtfEntrance(int.Parse(args[3]), int.Parse(args[2]), args[1][0]);
-											ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-											ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
+											//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+											//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
 											Timing.Run(CooldownCassie(25.0f));
 										}
 										else
@@ -207,15 +207,15 @@ namespace pro079
 										}
 										if (dummy == null) ev.Player.SendConsoleMessage("No hay MTFs vivos. Mandando como \"unknown\"", "white");
 										PluginManager.Manager.Server.Map.AnnounceScpKill(scp, dummy);
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
+										//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
 										Timing.Run(CooldownCassie(15.0f));
 									}
 									else if (args[2] == "unknown")
 									{
 										PluginManager.Manager.Server.Map.AnnounceScpKill(scp, null);
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
+										//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
 										Timing.Run(CooldownCassie(15.0f));
 									}
 									else if (args[2] == "tesla")
@@ -227,8 +227,8 @@ namespace pro079
 										}
 										string scpNum = String.Join(" ", cutre);
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Successfully Terminated by automatic security systems");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
+										//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
 										Timing.Run(CooldownCassie(15.0f));
 									}
 									else if (args[2] == "decont")
@@ -240,8 +240,8 @@ namespace pro079
 										}
 										string scpNum = String.Join(" ", cutre);
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Lost in Decontamination Sequence");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
+										//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
 										Timing.Run(CooldownCassie(15.0f));
 									}
 								}
