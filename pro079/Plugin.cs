@@ -34,11 +34,10 @@ namespace pro079
 		public override void Register()
 		{
 			// Register Command(s)
-			this.AddEventHandler(typeof(IEventHandlerCallCommand), new ComandoManeador(this), Smod2.Events.Priority.Lowest);
-			AddEventHandler(typeof(IEventHandlerPlayerDie), new ComandoManeador(this));
-			AddEventHandler(typeof(IEventHandlerSetRole), new ComandoManeador(this));
-
-			this.AddCommand("prueba079", new Prueba(this));
+			this.AddEventHandler(typeof(IEventHandlerCallCommand), new Pro79Handlers(this), Smod2.Events.Priority.Lowest);
+			AddEventHandler(typeof(IEventHandlerSetRole), new Pro79Handlers(this));
+			//AddEventHandler(typeof(IEventHandlerPlayerDie), new Pro79Handlers(this)); //no sé por qué no funciona :pepeshrug:
+			//AddEventHandler(typeof(IEventHandlerDisconnect), new Pro79Handlers(this));
 			Timing.Init(this);
 		}
 	}
