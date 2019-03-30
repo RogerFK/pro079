@@ -38,6 +38,7 @@ namespace pro079
 			AddEventHandler(typeof(IEventHandlerSetRole), new Pro79Handlers(this));
 			//AddEventHandler(typeof(IEventHandlerPlayerDie), new Pro79Handlers(this)); //no sé por qué no funciona :pepeshrug:
 			//AddEventHandler(typeof(IEventHandlerDisconnect), new Pro79Handlers(this));
+			AddCommand("debug079", new DebugMode(this));
 			Timing.Init(this);
 		}
 	}
