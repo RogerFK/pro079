@@ -19,6 +19,7 @@ namespace pro079
 		public static bool cooldownGenerator = false;
 		public static bool cooldownCassieGeneral = false;
 		public static bool infoCooldown = false;
+		public static bool cooldownMTF = false;
 
 		private static void MandaAyuda(Player player)
 		{
@@ -30,7 +31,7 @@ namespace pro079
 			"Si mandas .079 gen 5, activarás la secuencia para fingir que estás siendo contenido\n" +
 			".079 scp <###> <motivo> - Manda un mensaje de muerte de SCP con el número, el motivo puede ser: unknown, tesla, mtf, decont\n" +
 			".079 suicidio - Sobrecarga los generadores para morir cuando quedes tú solo" +
-			".079 info - Manda la gente que queda viva, junto a los SCP y los clase D y científicos" +
+			".079 info - Manda la gente que queda viva, junto a los SCP y los clase D y científicos"
 			//".079 cont106 - Manda el audio de recontención de SCP 106"
 			, "white");
 		}
@@ -136,6 +137,11 @@ namespace pro079
 						switch (args[0])
 						{
 							case "mtf":
+								if (cooldownMTF)
+								{
+									ev.ReturnMessage = ("Tienes que esperar antes de volver a usar el comando MTF");
+									return;
+								}
 								if (ev.Player.Scp079Data.Level >= 1)
 								{
 									if (ev.Player.Scp079Data.AP >= 80)
@@ -161,7 +167,8 @@ namespace pro079
 											PluginManager.Manager.Server.Map.AnnounceNtfEntrance(int.Parse(args[3]), int.Parse(args[2]), args[1][0]);
 											ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 											ev.Player.Scp079Data.Exp += (2.8f * (ev.Player.Scp079Data.Level + 1));
-											Timing.Run(CooldownCassie(25.0f));
+											Timing.Run(CooldownCassie(20.0f));
+											Timing.Run(CooldownMTF(60.0f));
 											ev.ReturnMessage = "Comando lanzado.";
 											return;
 										}
@@ -243,7 +250,7 @@ namespace pro079
 								}
 								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 								ev.Player.Scp079Data.Exp += (5.0f * (ev.Player.Scp079Data.Level + 1));
-								Timing.Run(CooldownCassie(15.0f));
+								Timing.Run(CooldownCassie(20.0f));
 								ev.ReturnMessage = "Comando lanzado.";
 								return;
 							case "gen":
@@ -375,9 +382,12 @@ namespace pro079
 				try{ if (room.ZoneType == ZoneType.HCZ) room.FlickerLights(); }
 				catch { }
 			}
+			foreach(Smod2.API.Door door in PluginManager.Manager.Server.Map.GetDoors()){
+				
+			}
 			if (cosilla)
 			{
-				PluginManager.Manager.Server.Map.AnnounceScpKill("079", null);
+				PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 Contained Successfully");
 			}
 		}
 
@@ -387,6 +397,13 @@ namespace pro079
 			yield return 70.3f;
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 			Timing.Run(FakeKillPC(true));
+		}
+
+		public static IEnumerable<float> CooldownMTF(float time)
+		{
+			cooldownMTF = true;
+			yield return time;
+			cooldownMTF = false;
 		}
 
 		public void OnSetRole(PlayerSetRoleEvent ev)
