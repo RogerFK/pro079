@@ -1,21 +1,15 @@
-using Smod2.Commands;
+using scp4aiur;
+using Smod2;
+using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
-using Smod2.API;
-using UnityEngine;
-using UnityEngine.Networking;
-using System.Linq;
-using System.Threading.Tasks;
-using Smod2;
-using System.Text.RegularExpressions;
-using System;
 using System.Collections.Generic;
-using scp4aiur;
-using Smod2.EventSystem.Events;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace pro079
 {
-	class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole//, IEventHandlerDisconnect, IEventHandlerPlayerDie
+	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole
 	{
 		private readonly pro079 plugin;
 		public Pro79Handlers(pro079 plugin)
@@ -24,18 +18,22 @@ namespace pro079
 		}
 		public static bool cooldownGenerator = false;
 		public static bool cooldownCassieGeneral = false;
+		public static bool infoCooldown = false;
+		public static bool cooldownMTF = false;
 
 		private static void MandaAyuda(Player player)
 		{
 			player.SendConsoleMessage("Estos son los comandos que tienes disponibles:\n" +
 			".079 - Muestra este mensaje de ayuda\n" +
-			".079 te - Desactiva la tesla de la habitaciÛn en la que est·s durante 8 segundos (50 puntos)\n" +
-			".079 mtf <letra> <numero> <scp-vivos> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un n˙mero falso de SCPs con vida, o el actual si no (100 puntos, nivel 2)\n" +
+			".079 te - Desactiva la tesla de la habitaci√≥n en la que est√°s durante 8 segundos (50 puntos)\n" +
+			".079 mtf <letra> <numero> <scp-vivos> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un n√∫mero falso de SCPs con vida, o el actual si no (100 puntos, nivel 2)\n" +
 			".079 gen [1-5] - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte\n" +
-			"Si mandas .079 gen 5, activar·s la secuencia para fingir que est·s siendo contenido\n" +
-			".079 scp <###> <motivo> - Manda un mensaje de muerte de SCP con el n˙mero, el motivo puede ser: unknown, tesla, mtf, decont\n" +
-			".079 suicidio - Sobrecarga los generadores para morir cuando quedes t˙ solo",
-			"white");
+			"Si mandas .079 gen 5, activar√°s la secuencia para fingir que est√°s siendo contenido\n" +
+			".079 scp <###> <motivo> - Manda un mensaje de muerte de SCP con el n√∫mero, el motivo puede ser: unknown, tesla, mtf, decont\n" +
+			".079 suicidio - Sobrecarga los generadores para morir cuando quedes t√∫ solo" +
+			".079 info - Manda la gente que queda viva, junto a los SCP y los clase D y cient√≠ficos"
+			//".079 cont106 - Manda el audio de recontenci√≥n de SCP 106"
+			, "white");
 		}
 
 		public void OnCallCommand(PlayerCallCommandEvent ev)
@@ -64,6 +62,7 @@ namespace pro079
 					if (args.Length == 0)
 					{
 						MandaAyuda(ev.Player);
+						ev.ReturnMessage = "";
 					}
 					else if (args.Length == 1)
 					{
@@ -75,29 +74,39 @@ namespace pro079
 									bool noTesla = true;
 									foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
 									{
-										if (Vector.Distance(ev.Player.Scp079Data.Camera, tesla.Position) < 6.0f)
+										if (Vector.Distance(ev.Player.Scp079Data.Camera, tesla.Position) < 8.0f)
 										{
-											
 											if (tesla.TriggerDistance > 0)
 											{
 												ev.Player.Scp079Data.AP -= 50;
-												//ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
-												//ev.Player.Scp079Data.Exp += (10.0f/ev.Player.Scp079Data.Level);
+												ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
+												ev.Player.Scp079Data.Exp += (10.0f / (ev.Player.Scp079Data.Level + 1)); //ignore these
 												Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
 												noTesla = false;
+												ev.ReturnMessage = "Tesla desactivada.";
 												break;
 											}
-											else ev.Player.SendConsoleMessage("Esta Tesla est· desactivada.", "white");
+											else
+											{
+												ev.ReturnMessage = ("Esta Tesla est√° desactivada.");
+											}
 										}
 									}
-									if (noTesla == true) ev.Player.SendConsoleMessage("No est·s cerca de una Tesla.", "white");
+									if (noTesla == true)
+									{
+										ev.ReturnMessage = ("No est√°s cerca de una Tesla.");
+									}
 								}
-								else ev.Player.SendConsoleMessage("No tienes suficiente energÌa (necesitas 50).", "white");
+								else
+								{
+									ev.ReturnMessage = ("No tienes suficiente energ√≠a (necesitas 50).");
+								}
+
 								return;
 							case "suicidio":
 								if ((PluginManager.Manager.Server.Round.Stats.Zombies + PluginManager.Manager.Server.Round.Stats.SCPAlive) != 1)
 								{
-									ev.Player.SendConsoleMessage("No puedes suicidarte cuando hay m·s SCP vivos", "white");
+									ev.ReturnMessage = ("No puedes suicidarte cuando hay m√°s SCP vivos");
 									return;
 								}
 								PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
@@ -105,16 +114,16 @@ namespace pro079
 								ev.Player.Kill(DamageType.NUKE);
 								return;
 							case "mtf":
-								ev.Player.SendConsoleMessage("Uso: .079 mtf (p) (5) (4), dir· que Papa-5 viene y quedan 4 SCP");
+								ev.ReturnMessage = ("Uso: .079 mtf (p) (5) (4), dir√° que Papa-5 viene y quedan 4 SCP");
 								return;
 							case "scp":
-								ev.Player.SendConsoleMessage("Uso: .079 scp (173) (unknown)");
+								ev.ReturnMessage = ("Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont)");
 								return;
 							case "gen":
-								ev.Player.SendConsoleMessage("Uso: .079 gen (1) - Sonar· que hay 1 generador activado");
+								ev.ReturnMessage = ("Uso: .079 gen (1-5) - Sonar√° que hay 1 generador activado");
 								return;
 							default:
-								ev.Player.SendConsoleMessage("Comando no reconocido. Usa .079 para ayuda", "white");
+								ev.ReturnMessage = ("Comando no reconocido. Usa .079 para ayuda");
 								return;
 						}
 					}
@@ -122,15 +131,20 @@ namespace pro079
 					{
 						if (cooldownCassieGeneral)
 						{
-							ev.Player.SendConsoleMessage("Tienes que esperar antes de volver a usar un comando que requiera a cassie", "white");
+							ev.ReturnMessage = ("Tienes que esperar antes de volver a usar un comando que requiera a cassie");
 							return;
 						}
 						switch (args[0])
 						{
 							case "mtf":
-								if (ev.Player.Scp079Data.AP >= 80)
+								if (cooldownMTF)
 								{
-									if (ev.Player.Scp079Data.Level >= 1)
+									ev.ReturnMessage = ("Tienes que esperar antes de volver a usar el comando MTF");
+									return;
+								}
+								if (ev.Player.Scp079Data.Level >= 1)
+								{
+									if (ev.Player.Scp079Data.AP >= 80)
 									{
 										if (args.Length == 4)
 										{
@@ -140,160 +154,186 @@ namespace pro079
 												int.Parse(args[2]);
 												if (!char.IsLetter(args[1][0]))
 												{
-													ev.Player.SendConsoleMessage("Uso: .079 mtf (p) (5) (4), dir· que Papa-5 viene y quedan 4 SCP");
+													ev.ReturnMessage = ("Uso: .079 mtf (p) (5) (4), dir√° que Papa-5 viene y quedan 4 SCP");
 													return;
 												}
 											}
 											catch
 											{
-												ev.Player.SendConsoleMessage("Uso: .079 mtf (p) (5) (4), dir· que Papa-5 viene y quedan 4 SCP");
+												ev.ReturnMessage = ("Uso: .079 mtf (p) (5) (4), dir√° que Papa-5 viene y quedan 4 SCP");
 												return;
 											}
 											ev.Player.Scp079Data.AP -= 80;
 											PluginManager.Manager.Server.Map.AnnounceNtfEntrance(int.Parse(args[3]), int.Parse(args[2]), args[1][0]);
-											//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-											//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
-											Timing.Run(CooldownCassie(25.0f));
+											ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+											ev.Player.Scp079Data.Exp += (2.8f * (ev.Player.Scp079Data.Level + 1));
+											Timing.Run(CooldownCassie(20.0f));
+											Timing.Run(CooldownMTF(60.0f));
+											ev.ReturnMessage = "Comando lanzado.";
+											return;
 										}
 										else
 										{
-											ev.Player.SendConsoleMessage("Uso: .079 mtf (p) (5) (4), dir· que Papa-5 viene y quedan 4 SCP");
+											ev.ReturnMessage = ("Uso: .079 mtf (p) (5) (4), dir√° que Papa-5 viene y quedan 4 SCP");
 										}
+
 									}
-									else ev.Player.SendConsoleMessage("No tienes suficiente nivel", "white");
+									else
+									{
+										ev.ReturnMessage = ("No tienes suficiente energ√≠a.");
+									}
 								}
-								else ev.Player.SendConsoleMessage("No tienes suficiente energÌa.", "white");
+								else
+								{
+									ev.ReturnMessage = ("No tienes suficiente nivel");
+								}
 
 								return;
-
 							case "scp":
 								if (args.Length >= 3)
 								{
-
-									if (args[1].Length > 3)
+									string[] scpList = new string[5]
 									{
-										ev.Player.SendConsoleMessage("No puedes poner m·s de 3 caracteres - Uso: .079 scp (173) (unknown)");
+										"173", "096", "106", "049", "939"
+									};
+									if (!scpList.Contains(args[1]))
+									{
+										ev.ReturnMessage = ("Pon un SCP que exista - Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont)");
 										return;
 									}
-									string scp;
-									switch (args[1].Length)
+									string scpNum = string.Join(" ", args[1].ToCharArray());
+									switch (args[2])
 									{
-										case 1:
-											scp = "00" + args[1];
-											break;
-										case 2:
-											scp = "0" + args[1];
-											break;
-										default:
-											scp = args[1];
-											break;
-									}
-									if (args[2] == "mtf")
-									{
-										Player dummy = null;
-										List<Role> mtf = new List<Role>
+										case "mtf":
+											Player dummy = null;
+											List<Role> mtf = new List<Role>
 										{
 											Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER
 										};
-
-										foreach (Player player in PluginManager.Manager.Server.GetPlayers())
-										{
-											if (mtf.Contains(player.TeamRole.Role))
+											foreach (Player player in PluginManager.Manager.Server.GetPlayers())
 											{
-												dummy = player;
-												break;
+												if (mtf.Contains(player.TeamRole.Role))
+												{
+													dummy = player;
+													break;
+												}
 											}
-										}
-										if (dummy == null) ev.Player.SendConsoleMessage("No hay MTFs vivos. Mandando como \"unknown\"", "white");
-										PluginManager.Manager.Server.Map.AnnounceScpKill(scp, dummy);
-										//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
-										Timing.Run(CooldownCassie(15.0f));
-									}
-									else if (args[2] == "unknown")
-									{
-										PluginManager.Manager.Server.Map.AnnounceScpKill(scp, null);
-										//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
-										Timing.Run(CooldownCassie(15.0f));
-									}
-									else if (args[2] == "tesla")
-									{
-										string[] cutre = new string[20];
-										for (int i = 0; i < scp.Length; i++)
-										{
-											cutre[i] = scp[i].ToString();
-										}
-										string scpNum = String.Join(" ", cutre);
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Successfully Terminated by automatic security systems");
-										//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
-										Timing.Run(CooldownCassie(15.0f));
-									}
-									else if (args[2] == "decont")
-									{
-										string[] cutre = new string[20];
-										for (int i = 0; i < scp.Length; i++)
-										{
-											cutre[i] = scp[i].ToString();
-										}
-										string scpNum = String.Join(" ", cutre);
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Lost in Decontamination Sequence");
-										//ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										//ev.Player.Scp079Data.Exp += (5.0f / ev.Player.Scp079Data.Level);
-										Timing.Run(CooldownCassie(15.0f));
+											if (dummy == null)
+											{
+												ev.Player.SendConsoleMessage("No hay MTFs vivos. Mandando como \"unknown\"", "red");
+											}
+
+											PluginManager.Manager.Server.Map.AnnounceScpKill(args[1], dummy);
+											ev.ReturnMessage = "Comando lanzado.";
+											break;
+										case "unknown":
+											PluginManager.Manager.Server.Map.AnnounceScpKill(args[1], null);
+											ev.ReturnMessage = "Comando lanzado.";
+											break;
+										case "tesla":
+											PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Successfully Terminated by automatic security systems");
+											ev.ReturnMessage = "Comando lanzado.";
+											break;
+										case "decont":
+											PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Lost in Decontamination Sequence");
+											ev.ReturnMessage = "Comando lanzado.";
+											break;
+										default:
+											ev.ReturnMessage = "Pon un SCP que exista - Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont)";
+											return;
 									}
 								}
-								else ev.Player.SendConsoleMessage("Uso: .079 scp (173) (unknown)");
+								else
+								{
+									ev.ReturnMessage = ("Uso: .079 scp (173) (unknown)");
+									return;
+								}
+								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+								ev.Player.Scp079Data.Exp += (5.0f * (ev.Player.Scp079Data.Level + 1));
+								Timing.Run(CooldownCassie(20.0f));
+								ev.ReturnMessage = "Comando lanzado.";
 								return;
 							case "gen":
-								if (cooldownGenerator)
+								if (cooldownGenerator || cooldownCassieGeneral)
 								{
-									ev.Player.SendConsoleMessage("Tienes que esperar antes de volver a usar el comando", "white");
+									ev.ReturnMessage = ("Tienes que esperar antes de volver a usar el comando");
 									return;
 								}
 								if (ev.Player.Scp079Data.Level < 2)
 								{
-									ev.Player.SendConsoleMessage("No tienes suficiente nivel", "white");
+									ev.ReturnMessage = ("No tienes suficiente nivel");
 									return;
 								}
 								switch (args[1])
 								{
 									case "1":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon1");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
 										Timing.Run(CooldownGen(20.0f));
 										Timing.Run(CooldownCassie(10.5f));
+										ev.ReturnMessage = "Comando lanzado.";
 										return;
 									case "2":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
 										Timing.Run(CooldownGen(20.0f));
 										Timing.Run(CooldownCassie(10.5f));
+										ev.ReturnMessage = "Comando lanzado.";
 										return;
 									case "3":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
 										Timing.Run(CooldownGen(20.0f));
 										Timing.Run(CooldownCassie(10.5f));
+										ev.ReturnMessage = "Comando lanzado.";
 										return;
 									case "4":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
 										Timing.Run(CooldownGen(20.0f));
 										Timing.Run(CooldownCassie(10.5f));
+										ev.ReturnMessage = "Comando lanzado.";
 										return;
 									case "5":
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										Timing.Run(Fingir5Gens());
+										ev.Player.Scp079Data.Exp += 80f;
 										Timing.Run(CooldownGen(180.0f));
 										Timing.Run(CooldownCassie(10.5f));
+										ev.ReturnMessage = ("Comando lanzado. Se reproducir√° el mensaje de tu contenci√≥n al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.");
 										return;
 									case "6":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 50f;
 										Timing.Run(CooldownGen(120.0f));
 										Timing.Run(CooldownCassie(10.5f));
 										Timing.Run(FakeKillPC(true));
 										return;
 									default:
-										ev.Player.SendConsoleMessage("Uso: .079 gen 1 - Sonar· que hay 1 generador activado, del 1-5, pon 6 para mandar que has muerto (nivel 3)");
+										ev.ReturnMessage = ("Uso: .079 gen 1 - Sonar√° que hay 1 generador activado, del 1-5, pon 6 para mandar que has muerto (nivel 3)\nEl 5 falsear√° la sequencia completa de contenci√≥n");
 										return;
 								}
+							case "info":
+								ev.Player.Scp079Data.AP = 0;
+								Timing.Run(CooldownInfo(30f));
+								if (infoCooldown)
+								{
+									ev.ReturnMessage = "Tienes que esperar antes de volver a usar el comando info";
+									return;
+								}
+								int humansAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive + PluginManager.Manager.Server.Round.Stats.ScientistsAlive + PluginManager.Manager.Server.Round.Stats.CiAlive + PluginManager.Manager.Server.Round.Stats.NTFAlive;
+								ev.Player.SendConsoleMessage("\nClase D escapados: " + PluginManager.Manager.Server.Round.Stats.ClassDEscaped +
+								"\nCient√≠ficos escapados: " + PluginManager.Manager.Server.Round.Stats.ScientistsEscaped +
+								"\nSCP vivos: " + PluginManager.Manager.Server.Round.Stats.SCPAlive +
+								"\nHumanos vivos: " + humansAlive
+								, "white");
+								ev.ReturnMessage = "";
+								return;
 							default:
 								MandaAyuda(ev.Player);
 								return;
@@ -302,7 +342,7 @@ namespace pro079
 				}
 				else
 				{
-					ev.Player.SendConsoleMessage("°No eres SCP-079!", "red");
+					ev.ReturnMessage = ("¬°No eres SCP-079!");
 				}
 			}
 		}
@@ -313,19 +353,42 @@ namespace pro079
 			yield return 8.0f;
 			tesla.TriggerDistance = current;
 		}
-		public static IEnumerable<float> FakeKillPC(bool cosilla)
+		/* // no usado por estar OP pero podr√≠a ser usado uwu
+		public static IEnumerable<float> OverCharge()
 		{
+			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Warning All Security Personnel Unauthorized Use Of Error Error Error Error pitch_2 error error error error pitch_0.5 error error");
+
 			yield return 7.3f;
 
 			foreach (Room room in PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA))
 			{
-				try
-				{
-					room.FlickerLights();
-				}
+				try { if (room.ZoneType == ZoneType.HCZ) room.FlickerLights(); }
 				catch { }
 			}
-			if (cosilla) PluginManager.Manager.Server.Map.AnnounceScpKill("079", null);
+
+			foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
+			{
+				Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
+			}
+		}
+		*/
+		public static IEnumerable<float> FakeKillPC(bool cosilla)
+		{
+			// falta cerrar puertas
+			yield return 7.3f;
+
+			foreach (Room room in PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA))
+			{
+				try{ if (room.ZoneType == ZoneType.HCZ) room.FlickerLights(); }
+				catch { }
+			}
+			foreach(Smod2.API.Door door in PluginManager.Manager.Server.Map.GetDoors()){
+				
+			}
+			if (cosilla)
+			{
+				PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 Contained Successfully");
+			}
 		}
 
 		public static IEnumerable<float> Fingir5Gens()
@@ -334,6 +397,13 @@ namespace pro079
 			yield return 70.3f;
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 			Timing.Run(FakeKillPC(true));
+		}
+
+		public static IEnumerable<float> CooldownMTF(float time)
+		{
+			cooldownMTF = true;
+			yield return time;
+			cooldownMTF = false;
 		}
 
 		public void OnSetRole(PlayerSetRoleEvent ev)
@@ -350,47 +420,31 @@ namespace pro079
 			yield return time;
 			cooldownGenerator = false;
 		}
-		
+
 		public static IEnumerable<float> CooldownCassie(float time)
 		{
 			cooldownCassieGeneral = true;
 			yield return time;
 			cooldownCassieGeneral = false;
 		}
+
+		public static IEnumerable<float> CooldownInfo(float time)
+		{
+			cooldownCassieGeneral = true;
+			yield return time;
+			cooldownCassieGeneral = false;
+
+		}
+
 		public static IEnumerable<float> DelayBroadcastPC(Player pc)
 		{
 			yield return 0.5f;
 
 			if (pc.TeamRole.Role == Role.SCP_079)
 			{
-				pc.PersonalBroadcast(20, "Presiona — para abrir la consola y usar comandos adicionales como desactivar teslas, fingir la muerte de un SCP...", true);
+				pc.PersonalBroadcast(20, "Presiona √± para abrir la consola y usar comandos adicionales como desactivar teslas, fingir la muerte de un SCP...", true);
 				MandaAyuda(pc);
 			}
 		}
-		/*
-		public void OnPlayerDie(PlayerDeathEvent ev)
-		{
-			//esto seguramente estÈ mal
-			if ((PluginManager.Manager.Server.Round.Stats.Zombies + PluginManager.Manager.Server.Round.Stats.SCPAlive) == 1 && !alreadySent)
-			{
-				foreach(Player player in PluginManager.Manager.Server.GetPlayers(Role.SCP_079))
-				{
-					player.PersonalBroadcast(20, "Pulsa la — y pon \".079 suicidio\" si quieres suicidarte.", false);
-					alreadySent = true;
-				}
-			}
-		}
-
-		public void OnDisconnect(DisconnectEvent ev)
-		{
-			if ((PluginManager.Manager.Server.Round.Stats.Zombies + PluginManager.Manager.Server.Round.Stats.SCPAlive) == 1 && !alreadySent)
-			{
-				foreach (Player player in PluginManager.Manager.Server.GetPlayers(Role.SCP_079))
-				{
-					player.PersonalBroadcast(20, "Pulsa la — y pon \".079 suicidio\" si quieres suicidarte.", false);
-					alreadySent = true;
-				}
-			}
-		}*/
 	}
 }
