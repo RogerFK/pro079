@@ -6,11 +6,13 @@ using Smod2.Events;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace pro079
 {
 	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole
 	{
+		
 		private readonly pro079 plugin;
 		public Pro79Handlers(pro079 plugin)
 		{
@@ -31,15 +33,15 @@ namespace pro079
 			"Si mandas .079 gen 5, activarás la secuencia para fingir que estás siendo contenido\n" +
 			".079 scp <###> <motivo> - Manda un mensaje de muerte de SCP con el número, el motivo puede ser: unknown, tesla, mtf, decont\n" +
 			".079 suicidio - Sobrecarga los generadores para morir cuando quedes tú solo" +
-			".079 info - Manda la gente que queda viva, junto a los SCP y los clase D y científicos"
-			//".079 cont106 - Manda el audio de recontención de SCP 106"
+			".079 info - Manda la gente que queda viva, junto a los SCP y los clase D y científicos" 
+			//+ ".079 cont106 - Manda el audio de recontención de SCP 106" //no implementado porque seguramente no funcione bien, habría que invocar el audio y luego hacer el callrpc
 			, "white");
 		}
 
+		
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
 			string command = ev.Command.ToLower();
-
 			if (command.StartsWith("079"))
 			{
 				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
@@ -326,14 +328,47 @@ namespace pro079
 									ev.ReturnMessage = "Tienes que esperar antes de volver a usar el comando info";
 									return;
 								}
-								int humansAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive + PluginManager.Manager.Server.Round.Stats.ScientistsAlive + PluginManager.Manager.Server.Round.Stats.CiAlive + PluginManager.Manager.Server.Round.Stats.NTFAlive;
-								ev.Player.SendConsoleMessage("\nClase D escapados: " + PluginManager.Manager.Server.Round.Stats.ClassDEscaped +
-								"\nCientíficos escapados: " + PluginManager.Manager.Server.Round.Stats.ScientistsEscaped +
+								string humansAlive = "[Bloqueado hasta nivel 2]";
+								string tiempoDecont = "[Bloqueado hasta nivel 2]";
+								string ScientistsEscaped = "[Bloqueado hasta nivel 3]";
+								string ClassDEscaped = "[Bloqueado hasta nivel 3]";
+								string ClassDAlive = "[Bloqueado hasta nivel 4]";
+								string ScientistsAlive = "[Bloqueado hasta nivel 4]";
+								string MTFAlive = "[Bloqueado hasta nivel 4]";
+								string CiAlive = "[Bloqueado hasta nivel 4]";
+								;
+								if (ev.Player.Scp079Data.Level > 0)
+								{
+									humansAlive = (PluginManager.Manager.Server.Round.Stats.ClassDAlive + PluginManager.Manager.Server.Round.Stats.ScientistsAlive + PluginManager.Manager.Server.Round.Stats.CiAlive + PluginManager.Manager.Server.Round.Stats.NTFAlive).ToString();
+									if (PluginManager.Manager.Server.Map.LCZDecontaminated == true) tiempoDecont = "Ya ha sido descontaminada";
+									else tiempoDecont = (plugin.GetConfigFloat("decontamination_time") -
+										float.Parse(PluginManager.Manager.Server.Round.Duration.ToString())/60.0f).ToString();
+								}
+								if (ev.Player.Scp079Data.Level > 1)
+								{
+									ClassDEscaped = PluginManager.Manager.Server.Round.Stats.ClassDEscaped.ToString();
+									ScientistsEscaped = PluginManager.Manager.Server.Round.Stats.ScientistsEscaped.ToString();
+								}
+								if(ev.Player.Scp079Data.Level > 2)
+								{
+									ClassDAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive.ToString();
+									ScientistsAlive = PluginManager.Manager.Server.Round.Stats.ScientistsAlive.ToString();
+									MTFAlive = PluginManager.Manager.Server.Round.Stats.NTFAlive.ToString();
+									CiAlive = PluginManager.Manager.Server.Round.Stats.CiAlive.ToString();
+								}
+								ev.Player.SendConsoleMessage("\nClase D escapados: "+ ClassDEscaped +
+								"\nCientíficos escapados: " + ScientistsEscaped +
 								"\nSCP vivos: " + PluginManager.Manager.Server.Round.Stats.SCPAlive +
-								"\nHumanos vivos: " + humansAlive
+								"\nHumanos vivos: " + humansAlive +
+								"\nTiempo hasta la descontaminación: " + tiempoDecont +
+								"\n\nClase D vivos: " + ClassDAlive +
+								"\nCientíficos vivos: " + ScientistsAlive +
+								"\nMTF vivos: " + MTFAlive +
+								"\nChaos vivos: " + CiAlive 
 								, "white");
 								ev.ReturnMessage = "";
 								return;
+								
 							default:
 								MandaAyuda(ev.Player);
 								return;
