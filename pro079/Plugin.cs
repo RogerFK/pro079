@@ -3,6 +3,7 @@ using scp4aiur;
 using Smod2;
 using Smod2.API;
 using Smod2.Attributes;
+using Smod2.Config;
 using Smod2.EventHandlers;
 
 namespace pro079
@@ -33,12 +34,9 @@ namespace pro079
 
 		public override void Register()
 		{
-			// Register Command(s)
-			this.AddEventHandler(typeof(IEventHandlerCallCommand), new Pro79Handlers(this), Smod2.Events.Priority.Lowest);
-			AddEventHandler(typeof(IEventHandlerSetRole), new Pro79Handlers(this));
-			//AddEventHandler(typeof(IEventHandlerPlayerDie), new Pro79Handlers(this)); //no sé por qué no funciona :pepeshrug:
-			//AddEventHandler(typeof(IEventHandlerDisconnect), new Pro79Handlers(this));
+			AddEventHandlers(new Pro79Handlers(this));
 			AddCommand("debug079", new DebugMode(this));
+			
 			Timing.Init(this);
 		}
 	}
