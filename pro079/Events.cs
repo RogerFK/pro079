@@ -455,10 +455,9 @@ namespace pro079
 			// falta cerrar puertas
 			yield return 7.3f;
 
-			foreach (Room room in PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA))
+			foreach (Room room in PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ))
 			{
-				try{ if (room.ZoneType == ZoneType.HCZ) room.FlickerLights(); }
-				catch { }
+				room.FlickerLights();
 			}
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 Contained Successfully");
 		}
