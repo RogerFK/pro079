@@ -178,7 +178,7 @@ namespace pro079
 								}
 								ev.Player.SendConsoleMessage(
 								"\nSCP vivos: " + PluginManager.Manager.Server.Round.Stats.SCPAlive +
-								"\nHumanos vivos: " + humansAlive + " | Siguientes MTF/Chaos: " +
+								"\nHumanos vivos: " + humansAlive + " | Siguientes MTF/Chaos: " + MTFtiempo +
 								"\nTiempo hasta la descontaminación: " + tiempoDecont +
 								"\nClase D escapados: " + ClassDEscaped +	" | Científicos escapados: " + ScientistsEscaped +
 								"\nClase D vivos:     " + ClassDAlive +		" | Chaos vivos:           " + CiAlive +
