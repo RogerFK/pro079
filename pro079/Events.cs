@@ -42,6 +42,7 @@ namespace pro079
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
 			string command = ev.Command.ToLower();
+			//this is pasted from PlayerPrefs
 			if (command.StartsWith("079"))
 			{
 				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
@@ -49,7 +50,9 @@ namespace pro079
 
 				for (int i = 1; i < collection.Count; i++)
 				{
-					// If it's wrapped in quotes, 
+					// If the first char (0) and the last one (its length - 1) is ", that is the char (defined by ' ')
+					// that is \" (the \ is to define it's not a quote for a string), then take the substring that
+					// starts from the second character to the second last one. Pretty fucking clever.
 					if (collection[i].Value[0] == '\"' && collection[i].Value[collection[i].Value.Length - 1] == '\"')
 					{
 						args[i - 1] = collection[i].Value.Substring(1, collection[i].Value.Length - 2);
@@ -59,6 +62,8 @@ namespace pro079
 						args[i - 1] = collection[i].Value;
 					}
 				}
+			// end of the paste thx
+			// everything below this is completely hardcoded in Spanish
 				if (ev.Player.TeamRole.Role == Role.SCP_079)
 				{
 					if (args.Length == 0)
