@@ -531,10 +531,10 @@ namespace pro079
                     DeconTime = (float)ev.Value;
                     return;
                 case "minimum_MTF_time_to_spawn":
-                    MinMTF = (float)ev.Value;
+                    MinMTF = (int)ev.Value;
                     return;
                 case "maximum_MTF_time_to_spawn":
-                    MaxMTF = (float)ev.Value;
+                    MaxMTF = (int)ev.Value;
                     return;
                 default:
                     return;
