@@ -35,7 +35,6 @@ namespace pro079
 		public override void Register()
 		{
 			AddEventHandlers(new Pro79Handlers(this));
-			AddCommand("debug079", new DebugMode(this));
 			
 			Timing.Init(this);
 		}
