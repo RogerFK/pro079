@@ -41,73 +41,75 @@ namespace pro079
             //+ ".079 cont106 - Manda el audio de recontención de SCP 106" //no implementado porque seguramente no funcione bien, habría que invocar el audio y luego hacer el callrpc
             , "white");
         }
+		public void OnCallCommand(PlayerCallCommandEvent ev)
+		{
+			string command = ev.Command.ToLower();
+			//this is pasted from PlayerPrefs
+			if (command.StartsWith("079"))
+			{
+				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
+				string[] args = new string[collection.Count - 1];
 
-
-        public void OnCallCommand(PlayerCallCommandEvent ev)
-        {
-            string command = ev.Command.ToLower();
-            if (command.StartsWith("079"))
-            {
-                MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
-                string[] args = new string[collection.Count - 1];
-
-                for (int i = 1; i < collection.Count; i++)
-                {
-                    // If it's wrapped in quotes, 
-                    if (collection[i].Value[0] == '\"' && collection[i].Value[collection[i].Value.Length - 1] == '\"')
-                    {
-                        args[i - 1] = collection[i].Value.Substring(1, collection[i].Value.Length - 2);
-                    }
-                    else
-                    {
-                        args[i - 1] = collection[i].Value;
-                    }
-                }
-                if (ev.Player.TeamRole.Role == Role.SCP_079)
-                {
-                    if (args.Length == 0)
-                    {
-                        MandaAyuda(ev.Player);
-                        ev.ReturnMessage = "";
-                    }
-                    else if (args.Length == 1)
-                    {
-                        switch (args[0])
-                        {
-                            case "te":
-                                if (ev.Player.Scp079Data.AP >= 50 || ev.Player.GetBypassMode())
-                                {
-                                    bool noTesla = true;
-                                    foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
-                                    {
-                                        if (Vector.Distance(ev.Player.Scp079Data.Camera, tesla.Position) < 8.0f)
-                                        {
-                                            if (tesla.TriggerDistance > 0)
-                                            {
-                                                ev.Player.Scp079Data.AP -= 50;
-                                                ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
-                                                ev.Player.Scp079Data.Exp += (10.0f / (ev.Player.Scp079Data.Level + 1)); //ignore these
-                                                Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
-                                                noTesla = false;
-                                                ev.ReturnMessage = "Tesla desactivada.";
-                                                break;
-                                            }
-                                            else
-                                            {
-                                                ev.ReturnMessage = ("Esta Tesla está desactivada.");
-                                            }
-                                        }
-                                    }
-                                    if (noTesla == true)
-                                    {
-                                        ev.ReturnMessage = ("No estás cerca de una Tesla.");
-                                    }
-                                }
-                                else
-                                {
-                                    ev.ReturnMessage = ("No tienes suficiente energía (necesitas 50).");
-                                }
-
+				for (int i = 1; i < collection.Count; i++)
+				{
+					// If the first char (0) and the last one (its length - 1) is ", that is the char (defined by ' ')
+					// that is \" (the \ is to define it's not a quote for a string), then take the substring that
+					// starts from the second character to the second last one. Pretty fucking clever.
+					if (collection[i].Value[0] == '\"' && collection[i].Value[collection[i].Value.Length - 1] == '\"')
+					{
+						args[i - 1] = collection[i].Value.Substring(1, collection[i].Value.Length - 2);
+					}
+					else
+					{
+						args[i - 1] = collection[i].Value;
+					}
+				}
+			// end of the paste thx
+			// everything below this is completely hardcoded in Spanish
+				if (ev.Player.TeamRole.Role == Role.SCP_079)
+				{
+					if (args.Length == 0)
+					{
+						MandaAyuda(ev.Player);
+						ev.ReturnMessage = "";
+					}
+					else if (args.Length == 1)
+					{
+						switch (args[0])
+						{
+							case "te":
+								if (ev.Player.Scp079Data.AP >= 50)
+								{
+									bool noTesla = true;
+									foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
+									{
+										if (Vector.Distance(ev.Player.Scp079Data.Camera, tesla.Position) < 8.0f)
+										{
+											if (tesla.TriggerDistance > 0)
+											{
+												ev.Player.Scp079Data.AP -= 50;
+												ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
+												ev.Player.Scp079Data.Exp += (10.0f / (ev.Player.Scp079Data.Level + 1)); //ignore these
+												Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
+												noTesla = false;
+												ev.ReturnMessage = "Tesla desactivada.";
+												break;
+											}
+											else
+											{
+												ev.ReturnMessage = ("Esta Tesla está desactivada.");
+											}
+										}
+									}
+									if (noTesla == true)
+									{
+										ev.ReturnMessage = ("No estás cerca de una Tesla.");
+									}
+								}
+								else
+								{
+									ev.ReturnMessage = ("No tienes suficiente energía (necesitas 50).");
+								}
                                 return;
                             case "suicidio":
                                 List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
