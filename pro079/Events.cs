@@ -23,8 +23,8 @@ namespace pro079
         public static bool cooldownMTF = false;
         private static bool DeconBool { get; set; }
         private static float DeconTime { get; set; }
-        private static float MinMTF { get; set; }
-        private static float MaxMTF { get; set; }
+        private static int MinMTF { get; set; }
+        private static int MaxMTF { get; set; }
         private static float LastMtfSpawn { get; set; }
 
         private static void MandaAyuda(Player player)
@@ -211,6 +211,7 @@ namespace pro079
                                     }
                                 }
                                 ev.Player.Scp079Data.AP -= 5;
+                                ev.Player.Scp079Data.Exp += 5;
                                 return;
                             default:
                                 ev.ReturnMessage = ("Comando no reconocido. Usa .079 para ayuda");
@@ -478,6 +479,7 @@ namespace pro079
             {
                 room.FlickerLights();
             }
+            yield return 2.4f;
             PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 Contained Successfully");
         }
 
@@ -526,15 +528,14 @@ namespace pro079
                 case "disable_decontamination":
                     DeconBool = (bool)ev.Value;
                     return;
-
                 case "decontamination_time":
                     DeconTime = (float)ev.Value;
                     return;
                 case "minimum_MTF_time_to_spawn":
-                    MinMTF = (float)ev.Value;
+                    MinMTF = (int) ev.Value;
                     return;
                 case "maximum_MTF_time_to_spawn":
-                    MaxMTF = (float)ev.Value;
+                    MaxMTF = (int) ev.Value;
                     return;
                 default:
                     return;
