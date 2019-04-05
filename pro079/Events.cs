@@ -148,15 +148,19 @@ namespace pro079
                                 string tiempoDecont = "[Nivel 2]";
                                 string ScientistsEscaped = "[Nivel 3]";
                                 string ClassDEscaped = "[Nivel 3]";
-                                string ClassDAlive = "[Nivel 3]";
-                                string ScientistsAlive = "[Nivel 3]";
+                                string ClassDAlive = "[Nivel 2]";
+                                string ScientistsAlive = "[Nivel 2]";
                                 string MTFAlive = "[Nivel 3]";
                                 string CiAlive = "[Nivel 3]";
-                                string MTFtiempo = "[Nivel 4]";
+                                string MTFtiempo = "[Nivel 3]";
 
                                 if (ev.Player.Scp079Data.Level > 0 || ev.Player.GetBypassMode())
                                 {
                                     humansAlive = (PluginManager.Manager.Server.Round.Stats.ClassDAlive + PluginManager.Manager.Server.Round.Stats.ScientistsAlive + PluginManager.Manager.Server.Round.Stats.CiAlive + PluginManager.Manager.Server.Round.Stats.NTFAlive).ToString();
+
+                                    ClassDAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive.ToString("00");
+                                    ScientistsAlive = PluginManager.Manager.Server.Round.Stats.ScientistsAlive.ToString("00");
+
                                     if (DeconBool == true)
                                     {
                                         tiempoDecont = "La descontaminación está desactivada";
@@ -175,21 +179,18 @@ namespace pro079
                                     ClassDEscaped = PluginManager.Manager.Server.Round.Stats.ClassDEscaped.ToString("00");
                                     ScientistsEscaped = PluginManager.Manager.Server.Round.Stats.ScientistsEscaped.ToString("00");
 
-                                    ClassDAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive.ToString("00");
-                                    ScientistsAlive = PluginManager.Manager.Server.Round.Stats.ScientistsAlive.ToString("00");
                                     MTFAlive = PluginManager.Manager.Server.Round.Stats.NTFAlive.ToString("00");
                                     CiAlive = PluginManager.Manager.Server.Round.Stats.CiAlive.ToString("00");
-                                }
-                                if (ev.Player.Scp079Data.Level > 2 || ev.Player.GetBypassMode())
-                                {
-                                    if (LastMtfSpawn - PluginManager.Manager.Server.Round.Duration < MinMTF)
+
+                                    if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MinMTF)
                                     {
-                                        MTFtiempo = "entre " + (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " y " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0");
+                                        MTFtiempo = "entre " + (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " segundos y " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " segundos.";
                                     }
-                                    else
+                                    else if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MaxMTF)
                                     {
                                         MTFtiempo = "menos de " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0");
                                     }
+                                    else MTFtiempo = "están reapareciendo / van a reaparecer pronto.";
                                 }
                                 ev.Player.SendConsoleMessage(
                                 "\nSCP vivos: " + PluginManager.Manager.Server.Round.Stats.SCPAlive +
@@ -205,11 +206,11 @@ namespace pro079
                                     ev.ReturnMessage = ev.ReturnMessage + "Generador de " + generator.Room.RoomType.ToString();
                                     if (generator.Engaged)
                                     {
-                                        ev.ReturnMessage = ev.ReturnMessage + " está activado.\n";
+                                        ev.ReturnMessage += " está activado.\n";
                                     }
                                     else
                                     {
-                                        ev.ReturnMessage = ev.ReturnMessage + (generator.HasTablet ? " tiene una tablet y le quedan " : " no tiene tablet y le quedan ") + generator.TimeLeft.ToString("0") + " segundos.\n";
+                                        ev.ReturnMessage += (generator.HasTablet ? " tiene una tablet y le quedan " : " no tiene tablet y le quedan ") + generator.TimeLeft.ToString("0") + " segundos.\n";
                                     }
                                 }
                                 ev.Player.Scp079Data.AP -= 5;
