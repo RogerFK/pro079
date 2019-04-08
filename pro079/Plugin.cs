@@ -31,6 +31,8 @@ namespace pro079
         {
             AddEventHandlers(new Pro79Handlers(this));
 
+            AddConfig(new Smod2.Config.ConfigSetting("p079_broadcast_enable", true, Smod2.Config.SettingType.BOOL, true, ""));
+            AddConfig(new Smod2.Config.ConfigSetting("p079_broadcast_msg", "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", Smod2.Config.SettingType.STRING, true, ""));
             Timing.Init(this);
         }
     }

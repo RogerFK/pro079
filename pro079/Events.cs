@@ -37,7 +37,8 @@ namespace pro079
             "Si mandas .079 gen 5, activarás la secuencia para fingir que estás siendo contenido. gen 6 finge el comando \".079 suicidio\"\n" +
             ".079 scp <###> <motivo> - Manda un mensaje de muerte de SCP con el número, el motivo puede ser: unknown, tesla, mtf, decont (50 de energía)\n" +
             ".079 info - Te dice la gente que queda viva, junto a los SCP y los clase D y científicos (5 de energía)\n" +
-            ".079 suicidio - Sobrecarga los generadores para morir cuando quedes tú solo"
+            ".079 suicidio - Sobrecarga los generadores para morir cuando quedes tú solo" +
+            "\n.079 controles - Muestra ayuda sobre cómo jugar con SCP-079 en general y cosas a tener en cuenta"
             //+ ".079 cont106 - Manda el audio de recontención de SCP 106" //no implementado porque seguramente no funcione bien, habría que invocar el audio y luego hacer el callrpc
             , "white");
         }
@@ -77,6 +78,14 @@ namespace pro079
 					{
 						switch (args[0])
 						{
+                            case "controles":
+                                ev.Player.SendConsoleMessage("TAB (encima del Bloq. Mayus): abre el mapa donde estás.\n" +
+                                    "Espacio: cambia tu modo de cámara entre el modo normal y el modo primera persona.\n" +
+                                    "Teclas de movimiento: muévete a la cámara que indica arriba a la derecha\n" +
+                                    "Para salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras" +
+                                    "\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079");
+                                ev.ReturnMessage = "Para más información y sugerencias, no dudes en entrar en nuestro Discord o preguntar a RogerFK (discord: RogerFK#3679)";
+                                return;
 							case "te":
 								if (ev.Player.Scp079Data.AP >= 50)
 								{
@@ -441,9 +450,13 @@ namespace pro079
 
         public void OnSetRole(PlayerSetRoleEvent ev)
         {
+            if (!plugin.GetConfigBool("p079_broadcast_enable")) return;
+
+            ev.Player.PersonalClearBroadcasts();
             if (ev.Role == Role.SCP_079)
             {
-                ev.Player.PersonalBroadcast(20, "Presiona ñ para abrir la consola y usar comandos adicionales como desactivar teslas, fingir la muerte de un SCP...", true);
+                //ev.Player.PersonalBroadcast(20, "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", true);
+                ev.Player.PersonalBroadcast(20, plugin.GetConfigString("p079_broadcast_msg"), true);
                 MandaAyuda(ev.Player);
             }
         }
