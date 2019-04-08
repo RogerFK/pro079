@@ -4,28 +4,34 @@ using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
 using Smod2.EventSystem.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace pro079
 {
-    internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole, IEventHandlerSetConfig, IEventHandlerPlayerDie, IEventHandlerTeamRespawn
+    internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole, IEventHandlerSetConfig, IEventHandlerPlayerDie, IEventHandlerTeamRespawn, IEventHandlerDoorAccess
     {
         private readonly pro079 plugin;
         public Pro79Handlers(pro079 plugin)
         {
             this.plugin = plugin;
         }
-        public static bool cooldownGenerator = false;
-        public static bool cooldownCassieGeneral = false;
-        public static bool infoCooldown = false;
-        public static bool cooldownMTF = false;
+        private static bool cooldownGenerator = false;
+        private static bool cooldownCassieGeneral = false;
+        private static bool infoCooldown = false;
+        private static bool cooldownMTF = false;
+        private static bool ultDown = false;
+        private static IEnumerable<Room> rooms;
+
         private static bool DeconBool { get; set; }
         private static float DeconTime { get; set; }
         private static int MinMTF { get; set; }
         private static int MaxMTF { get; set; }
         private static float LastMtfSpawn { get; set; }
+        public bool UltDoors { get; private set; }
+        public bool LightsOut { get; private set; }
 
         private static void MandaAyuda(Player player)
         {
@@ -38,8 +44,9 @@ namespace pro079
             ".079 scp <###> <motivo> - Manda un mensaje de muerte de SCP con el número, el motivo puede ser: unknown, tesla, mtf, decont (50 de energía)\n" +
             ".079 info - Te dice la gente que queda viva, junto a los SCP y los clase D y científicos (5 de energía)\n" +
             ".079 suicidio - Sobrecarga los generadores para morir cuando quedes tú solo" +
+            "\n.079 ultimate - Mira los ultimate que tienes disponibles" +
             "\n.079 controles - Muestra ayuda sobre cómo jugar con SCP-079 en general y cosas a tener en cuenta"
-            //+ ".079 cont106 - Manda el audio de recontención de SCP 106" //no implementado porque seguramente no funcione bien, habría que invocar el audio y luego hacer el callrpc
+            //+ ".079 cont106 - Manda el audio de recontención de SCP 106" // idk como hacerlo :pepeshrug:
             , "white");
         }
 		public void OnCallCommand(PlayerCallCommandEvent ev)
@@ -48,7 +55,7 @@ namespace pro079
 			//this is pasted from PlayerPrefs
 			if (command.StartsWith("079"))
 			{
-				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
+                MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
 				string[] args = new string[collection.Count - 1];
 
 				for (int i = 1; i < collection.Count; i++)
@@ -83,7 +90,7 @@ namespace pro079
                                     "Espacio: cambia tu modo de cámara entre el modo normal y el modo primera persona.\n" +
                                     "Teclas de movimiento: muévete a la cámara que indica arriba a la derecha\n" +
                                     "Para salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras" +
-                                    "\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079");
+                                    "\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079", "white");
                                 ev.ReturnMessage = "Para más información y sugerencias, no dudes en entrar en nuestro Discord o preguntar a RogerFK (discord: RogerFK#3679)";
                                 return;
 							case "te":
@@ -225,6 +232,13 @@ namespace pro079
                                 ev.Player.Scp079Data.AP -= 5;
                                 ev.Player.Scp079Data.Exp += 5;
                                 return;
+                            case "ultimate":
+                                if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode()) ev.ReturnMessage = "Para lanzar un ultimate necesitas tier 4";
+                                else ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
+                                        "1. Luces fuera: apaga durante 1 minuto la HCZ y la LCZ (cooldown: 180 segundos)\n" +
+                                        "2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
+                                        "3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord.";
+                                return;
                             default:
                                 ev.ReturnMessage = ("Comando no reconocido. Usa .079 para ayuda");
                                 return;
@@ -239,8 +253,49 @@ namespace pro079
                         }
                         switch (args[0])
                         {
+                            case "ultimate":
+                                if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
+                                {
+                                    ev.ReturnMessage = "Para lanzar un ultimate necesitas tier 4";
+                                    return;
+                                }
+                                if (ultDown)
+                                {
+                                    ev.ReturnMessage = "Debes esperar antes de volver a usar un ultimate.";
+                                    return;
+                                }
+                                try
+                                {
+                                    int.Parse(args[1]);
+                                }
+                                catch
+                                {
+                                    ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
+                                    "1. Luces fuera: apaga durante 1 minuto la HCZ y la LCZ (cooldown: 180 segundos)\n" +
+                                    "2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
+                                    "3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord, si nos gusta, ¡la añadiremos!.";
+                                    return;
+                                }
+                                switch (int.Parse(args[1]))
+                                {
+                                    case 1:
+                                        PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
+                                        Timing.Run(ShamelessTimingRunLights());
+                                        Timing.Run(CooldownUlt(180f));
+                                        return;
+                                    case 2:
+                                        PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
+                                        Timing.Run(Ult2Toggle(30f));
+                                        Timing.Run(CooldownUlt(300f));
+                                        return;
+                                    default:
+                                        ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
+                                        "1. Luces fuera: apaga durante 1 minuto la HCZ y la LCZ (cooldown: 180 segundos)\n" +
+                                        "2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
+                                        "3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord.";
+                                        return;
+                                }
                             case "mtf":
-
                                 if (cooldownMTF && !ev.Player.GetBypassMode())
                                 {
                                     ev.ReturnMessage = ("Tienes que esperar antes de volver a usar el comando MTF");
@@ -317,7 +372,7 @@ namespace pro079
                                             Player dummy = null;
                                             List<Role> mtf = new List<Role>
                                         {
-                                            Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER
+                                            Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER, Role.SCIENTIST
                                         };
                                             foreach (Player player in PluginManager.Manager.Server.GetPlayers())
                                             {
@@ -418,7 +473,7 @@ namespace pro079
                                         ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
                                         Timing.Run(Fingir5Gens());
                                         ev.Player.Scp079Data.Exp += 80f;
-                                        Timing.Run(CooldownGen(180.0f));
+                                        Timing.Run(CooldownGen(220.0f));
                                         Timing.Run(CooldownCassie(10.5f));
                                         ev.ReturnMessage = ("Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.");
                                         return;
@@ -426,7 +481,7 @@ namespace pro079
                                         PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
                                         ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
                                         ev.Player.Scp079Data.Exp += 50f;
-                                        Timing.Run(CooldownGen(120.0f));
+                                        Timing.Run(CooldownGen(160.0f));
                                         Timing.Run(CooldownCassie(10.5f));
                                         Timing.Run(FakeKillPC());
                                         ev.ReturnMessage = "Comando de falsear el suicidio mandado.";
@@ -436,7 +491,7 @@ namespace pro079
                                         return;
                                 }
                             default:
-                                MandaAyuda(ev.Player);
+                                ev.ReturnMessage = ("Comando no reconocido. Usa .079 para ayuda");
                                 return;
                         }
                     }
@@ -451,7 +506,7 @@ namespace pro079
         public void OnSetRole(PlayerSetRoleEvent ev)
         {
             if (!plugin.GetConfigBool("p079_broadcast_enable")) return;
-
+            rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ);
             ev.Player.PersonalClearBroadcasts();
             if (ev.Role == Role.SCP_079)
             {
@@ -491,7 +546,7 @@ namespace pro079
             // falta cerrar puertas
             yield return 7.3f;
 
-            foreach (Room room in PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ))
+            foreach (Room room in rooms)
             {
                 room.FlickerLights();
             }
@@ -507,7 +562,21 @@ namespace pro079
             Timing.Run(FakeKillPC());
         }
 
-        // These 4 functions could be replaced with one that takes a bool as a function parameter, but idk lol
+        public static IEnumerable<float> CooldownUlt(float time)
+        {
+            ultDown = true;
+            yield return time;
+            ultDown = false;
+        }
+
+        private IEnumerable<float> Ult2Toggle(float v)
+        {
+            UltDoors = true;
+            yield return v;
+            UltDoors = false;
+            PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
+        }
+
         public static IEnumerable<float> CooldownMTF(float time)
         {
             cooldownMTF = true;
@@ -536,6 +605,21 @@ namespace pro079
             infoCooldown = false;
 
         }
+
+        private IEnumerable<float> ShamelessTimingRunLights()
+        {
+            yield return 7.8f;
+            float start = PluginManager.Manager.Server.Round.Duration;
+            while (start + 60f > PluginManager.Manager.Server.Round.Duration)
+            {
+                foreach (Room room in rooms)
+                {
+                    room.FlickerLights();
+                }
+                yield return 8f;
+            }
+        }
+
 
         public void OnSetConfig(SetConfigEvent ev)
         {
@@ -577,6 +661,19 @@ namespace pro079
         public void OnTeamRespawn(TeamRespawnEvent ev)
         {
             LastMtfSpawn = PluginManager.Manager.Server.Round.Duration;
+        }
+
+        public void OnDoorAccess(PlayerDoorAccessEvent ev)
+        {
+            if (UltDoors == false || string.IsNullOrWhiteSpace(ev.Door.Permission)) return;
+            else
+            {
+                if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
+                {
+                    ev.Allow = true;
+                }
+                else ev.Allow = false;
+            }
         }
     }
 }
