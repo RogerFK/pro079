@@ -130,7 +130,7 @@ namespace pro079
                             case "suicidio":
                                 List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
                                 int pcs = PCplayers.Count;
-                                if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs == 0)
+                                if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
                                 {
                                     ev.ReturnMessage = ("No puedes suicidarte cuando hay más SCP vivos");
                                     return;
