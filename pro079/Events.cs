@@ -567,6 +567,8 @@ namespace pro079
             ultDown = true;
             yield return time;
             ultDown = false;
+            List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+            foreach (Player player in PCplayers) player.PersonalBroadcast(10, "<color=#85ff4c>Tus ultimates están listas</color>", false);
         }
 
         private IEnumerable<float> Ult2Toggle(float v)
@@ -582,6 +584,8 @@ namespace pro079
             cooldownMTF = true;
             yield return time;
             cooldownMTF = false;
+            List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+            foreach (Player player in PCplayers) player.PersonalBroadcast(5, "<color=#85ff4c>Comando MTF listo</color>", false);
         }
 
         public static IEnumerable<float> CooldownGen(float time)
@@ -589,6 +593,9 @@ namespace pro079
             cooldownGenerator = true;
             yield return time;
             cooldownGenerator = false;
+
+            List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+            foreach (Player player in PCplayers) player.PersonalBroadcast(5, "<color=#85ff4c>Comando generador listo</color>", false);
         }
 
         public static IEnumerable<float> CooldownCassie(float time)
@@ -596,6 +603,9 @@ namespace pro079
             cooldownCassieGeneral = true;
             yield return time;
             cooldownCassieGeneral = false;
+
+            List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+            foreach (Player player in PCplayers) player.PersonalBroadcast(5, "<color=#85ff4c>Comandos de anunciante listos</color>", false);
         }
 
         public static IEnumerable<float> CooldownInfo(float time)
