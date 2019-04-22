@@ -1,6 +1,7 @@
 ﻿using scp4aiur;
 using Smod2;
 using Smod2.Attributes;
+using Smod2.Config;
 
 namespace pro079
 {
@@ -30,9 +31,8 @@ namespace pro079
         public override void Register()
         {
             AddEventHandlers(new Pro79Handlers(this));
-
-            AddConfig(new Smod2.Config.ConfigSetting("p079_broadcast_enable", true, Smod2.Config.SettingType.BOOL, true, ""));
-            AddConfig(new Smod2.Config.ConfigSetting("p079_broadcast_msg", "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", Smod2.Config.SettingType.STRING, true, ""));
+            AddConfig(new ConfigSetting("p079_broadcast_enable", true, true, ""));
+            AddConfig(new ConfigSetting("p079_broadcast_msg", "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", true, ""));
             Timing.Init(this);
         }
     }

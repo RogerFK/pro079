@@ -32,19 +32,17 @@ namespace pro079
 
 		private static void MandaAyuda(Player player)
 		{
-			player.SendConsoleMessage("Estos son los comandos que tienes disponibles:\n" +
-			".079 - Muestra este mensaje de ayuda\n" +
-			".079 te - Desactiva la tesla de la habitación en la que estás durante 10 segundos (20 puntos)\n" +
-			".079 teslas - Desactiva todas las teslas durante 10 segundos (50 puntos)" +
-			".079 mtf <letra> <numero> <scp-vivos> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida (80 de energía, nivel 2)\n" +
-			".079 gen [1-5] - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte (50 de energía, nivel 2)\n" +
-			"Si mandas .079 gen 5, activarás la secuencia para fingir que estás siendo contenido. gen 6 finge el comando \".079 suicidio\"\n" +
-			".079 scp <###> <motivo> - Manda un mensaje de muerte de SCP con el número del SCP (173, 096...), el motivo puede ser: unknown, tesla, mtf, decont (50 de energía)\n" +
-			".079 info - Muestra datos sobre las instalaciones, como los humanos vivos, el tiempo que le falta a los generadores, los humanos que han escapado, los SCP vivos, etc. (5 de energía)\n" +
-			".079 suicidio - Sobrecarga los generadores para morir cuando quedes tú solo" +
-			"\n.079 ultimate - Mira los ultimate que tienes disponibles" +
-			"\n.079 controles - Muestra ayuda sobre cómo jugar con SCP-079 en general y cosas a tener en cuenta"
-			//+ ".079 cont106 - Manda el audio de recontención de SCP 106" // idk como hacerlo :pepeshrug:
+			player.SendConsoleMessage("<b>.079</b> - Muestra este mensaje de ayuda\n" +
+			"<b>.079 te</b> - Desactiva la tesla de la habitación en la que estás durante 10 segundos (20 puntos)\n" +
+			"<b>.079 teslas</b> - Desactiva todas las teslas durante 10 segundos (40 puntos)\n" +
+			"<b>.079 mtf <letra> <numero> <scp-vivos></b> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida (80 de energía, nivel 2)\n" +
+			"<b>.079 gen [1-5]</b> - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte (50 de energía, nivel 2)\n" +
+			"<b>.079 scp <###> <motivo></b> - Manda un mensaje de muerte de SCP con el número del SCP (173, 096...), el motivo puede ser: unknown, tesla, mtf, decont (50 de energía)\n" +
+			"<b>.079 info</b> - Muestra datos sobre las instalaciones (5 de energía)\n" +
+			"<b>.079 suicidio</b> - Sobrecarga los generadores para morir cuando quedes tú solo" +
+			"\n<b>.079 ultimate</b> - Mira los ultimate que tienes disponibles\n" +
+			"<b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta"
+			//+ ".079 cont106 - Manda el audio de recontención de SCP 106" // future update will have it
 			, "white");
 		}
 		public void OnCallCommand(PlayerCallCommandEvent ev)
@@ -78,7 +76,7 @@ namespace pro079
 					if (args.Length == 0)
 					{
 						MandaAyuda(ev.Player);
-						ev.ReturnMessage = "Recuerda: si encuentras algún error ve al discord de World in Chaos a #bugs y avisa a RogerFK";
+						ev.ReturnMessage = "Recuerda: si encuentras algún error ve al discord de World in Chaos a #bugs y avisa a RogerFK#3679. Adicionalmente, puedes mandarme un mensaje privado.";
 					}
 					else if (args.Length == 1)
 					{
@@ -127,17 +125,16 @@ namespace pro079
 								}
 								return;
 							case "teslas":
-								if (ev.Player.Scp079Data.AP <= 50)
+								if (ev.Player.Scp079Data.AP <= 40)
 								{
-									ev.ReturnMessage = "No tienes suficiente energía (necesitas 50).";
+									ev.ReturnMessage = "No tienes suficiente energía (necesitas 40).";
 									return;
 								}
-								ev.Player.Scp079Data.AP -= 50f;
+								ev.Player.Scp079Data.AP -= 40f;
 								foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
 								{
 									if (tesla.TriggerDistance > 0)
 									{
-										ev.Player.Scp079Data.AP -= 50;
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
 										ev.Player.Scp079Data.Exp += 10.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 										Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
@@ -263,7 +260,8 @@ namespace pro079
 									ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
 										"1. Luces fuera: apaga durante 1 minuto la HCZ y la LCZ (cooldown: 180 segundos)\n" +
 										"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
-										"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.";
+										"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
+										+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
 								}
 								return;
 							default:
@@ -276,7 +274,7 @@ namespace pro079
 
 						if (cooldownCassieGeneral && !ev.Player.GetBypassMode() && args[0] != "ultimate")
 						{
-							ev.ReturnMessage = "Tienes que esperar antes de volver a usar un comando que requiera a cassie";
+							ev.ReturnMessage = "Tienes que esperar antes de volver a usar un comando que requiera al anunciante (C.A.S.S.I.E)";
 							return;
 						}
 						switch (args[0])
@@ -304,6 +302,7 @@ namespace pro079
 									"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord, si nos gusta, ¡la añadiremos!.";
 									return;
 								}
+								ev.ReturnMessage = "Ultimate lanzada.";
 								switch (int.Parse(args[1]))
 								{
 									case 1:
@@ -594,6 +593,7 @@ namespace pro079
 			Timing.Run(FakeKillPC());
 		}
 
+		// Cooldowns will probably be substituted with ticks although it wouldn't matter as there'd be a coroutine anyways
 		public static IEnumerable<float> CooldownUlt(float time)
 		{
 			ultDown = true;
@@ -662,7 +662,7 @@ namespace pro079
 
 		private IEnumerable<float> ShamelessTimingRunLights()
 		{
-			yield return 7.8f;
+			yield return 12.1f;
 			float start = PluginManager.Manager.Server.Round.Duration;
 			while (start + 60f > PluginManager.Manager.Server.Round.Duration)
 			{
@@ -673,7 +673,6 @@ namespace pro079
 				yield return 8f;
 			}
 		}
-
 
 		public void OnSetConfig(SetConfigEvent ev)
 		{
@@ -706,7 +705,7 @@ namespace pro079
 				{
 					foreach (Player player in PCplayers)
 					{
-						player.PersonalBroadcast(20, "Pulsa ñ y escribe \".079 suicidio\" para suicidarte.", false);
+						player.PersonalBroadcast(20, "<color=#AA1515>Pulsa ñ y escribe \".079 suicidio\" para suicidarte.</color>", false);
 					}
 				}
 			}
@@ -719,10 +718,8 @@ namespace pro079
 
 		public void OnDoorAccess(PlayerDoorAccessEvent ev)
 		{
-			if (UltDoors == false || string.IsNullOrWhiteSpace(ev.Door.Permission))
-			{
-				return;
-			}
+			if (UltDoors == false || string.IsNullOrWhiteSpace(ev.Door.Permission)) return;
+
 			else
 			{
 				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
