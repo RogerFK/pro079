@@ -258,7 +258,7 @@ namespace pro079
 								else
 								{
 									ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
-										"1. Luces fuera: apaga durante 1 minuto la HCZ y la LCZ (cooldown: 180 segundos)\n" +
+										"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
 										"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
 										"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
 										+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
@@ -297,7 +297,7 @@ namespace pro079
 								catch
 								{
 									ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
-									"1. Luces fuera: apaga durante 1 minuto la HCZ y la LCZ (cooldown: 180 segundos)\n" +
+									"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
 									"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
 									"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord, si nos gusta, ¡la añadiremos!.";
 									return;
@@ -317,7 +317,7 @@ namespace pro079
 										return;
 									default:
 										ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
-										"1. Luces fuera: apaga durante 1 minuto la HCZ y la LCZ (cooldown: 180 segundos)\n" +
+										"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
 										"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
 										"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord.";
 										return;
