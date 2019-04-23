@@ -334,26 +334,28 @@ namespace pro079
 									{
 										if (args.Length == 4)
 										{
-											try
-											{
-												int.Parse(args[3]);
-												int.Parse(args[2]);
-												if (!char.IsLetter(args[1][0]))
-												{
-													ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía";
-													return;
-												}
-											}
-											catch
+											int scpLeft, mtfNum;
+											if (!int.TryParse(args[3], out scpLeft) || !int.TryParse(args[2], out mtfNum))
 											{
 												ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía";
 												return;
 											}
+											if(scpLeft > 5)
+											{
+												ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía\nMaximo de SCPs: 5.";
+												return;
+											}
+											if (!char.IsLetter(args[1][0]))
+											{
+												ev.ReturnMessage = "Uso: .079 mtf (p) <--(LETRA) " + mtfNum + " " + scpLeft + ", dirá que Papa-" + mtfNum + " viene y quedan " + scpLeft + " SCP - 80 de energía";
+												return;
+											}
+
 											ev.Player.Scp079Data.AP -= 80;
-											PluginManager.Manager.Server.Map.AnnounceNtfEntrance(int.Parse(args[3]), int.Parse(args[2]), args[1][0]);
+											PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
 											ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 											ev.Player.Scp079Data.Exp += 2.8f * (ev.Player.Scp079Data.Level + 1);
-											Timing.Run(CooldownCassie(20.0f));
+											Timing.Run(CooldownCassie(30.0f));
 											Timing.Run(CooldownMTF(60.0f));
 											ev.ReturnMessage = "Comando lanzado.";
 											return;
@@ -444,7 +446,7 @@ namespace pro079
 								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 								ev.Player.Scp079Data.AP -= 50;
 								ev.Player.Scp079Data.Exp += 5.0f * (ev.Player.Scp079Data.Level + 1);
-								Timing.Run(CooldownCassie(20.0f));
+								Timing.Run(CooldownCassie(25.0f));
 								return;
 							case "gen":
 								if (ev.Player.Scp079Data.Level < 1 && !ev.Player.GetBypassMode())
@@ -468,32 +470,32 @@ namespace pro079
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon1");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(20.0f));
-										Timing.Run(CooldownCassie(10.5f));
+										Timing.Run(CooldownGen(30.0f));
+										Timing.Run(CooldownCassie(25.5f));
 										ev.ReturnMessage = "Comando (generador 1) lanzado.";
 										return;
 									case "2":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(20.0f));
-										Timing.Run(CooldownCassie(10.5f));
+										Timing.Run(CooldownGen(30.0f));
+										Timing.Run(CooldownCassie(25.5f));
 										ev.ReturnMessage = "Comando (generador 2) lanzado.";
 										return;
 									case "3":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(20.0f));
-										Timing.Run(CooldownCassie(10.5f));
+										Timing.Run(CooldownGen(30.0f));
+										Timing.Run(CooldownCassie(25.5f));
 										ev.ReturnMessage = "Comando (generador 3) lanzado.";
 										return;
 									case "4":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(20.0f));
-										Timing.Run(CooldownCassie(10.5f));
+										Timing.Run(CooldownGen(30.0f));
+										Timing.Run(CooldownCassie(25.5f));
 										ev.ReturnMessage = "Comando (generador 4) lanzado.";
 										return;
 									case "5":
@@ -501,7 +503,7 @@ namespace pro079
 										Timing.Run(Fingir5Gens());
 										ev.Player.Scp079Data.Exp += 80f;
 										Timing.Run(CooldownGen(220.0f));
-										Timing.Run(CooldownCassie(10.5f));
+										Timing.Run(CooldownCassie(15.5f));
 										ev.ReturnMessage = "Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.";
 										return;
 									case "6":
@@ -509,7 +511,7 @@ namespace pro079
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 50f;
 										Timing.Run(CooldownGen(160.0f));
-										Timing.Run(CooldownCassie(10.5f));
+										Timing.Run(CooldownCassie(20.5f));
 										Timing.Run(FakeKillPC());
 										ev.ReturnMessage = "Comando de falsear el suicidio mandado.";
 										return;
