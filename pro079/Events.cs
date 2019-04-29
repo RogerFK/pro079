@@ -47,11 +47,11 @@ namespace pro079
 		}
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
-			ev.ReturnMessage = "Comando desconocido. Escribe .079 para recibir ayuda.";
 			string command = ev.Command.ToLower();
 			//this is pasted from PlayerPrefs
 			if (command.StartsWith("079"))
 			{
+				ev.ReturnMessage = "Comando desconocido. Escribe .079 para recibir ayuda.";
 				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
 				string[] args = new string[collection.Count - 1];
 
