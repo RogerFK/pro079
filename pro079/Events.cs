@@ -12,8 +12,9 @@ namespace pro079
 {
 	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole, IEventHandlerSetConfig, IEventHandlerPlayerDie, IEventHandlerTeamRespawn, IEventHandlerDoorAccess, IEventHandlerWaitingForPlayers
 	{
-		private readonly pro079 plugin;
-		public Pro79Handlers(pro079 plugin)
+		private readonly Pro079 plugin;
+		private List<int> broadcasted = new List<int>();
+		public Pro79Handlers(Pro079 plugin)
 		{
 			this.plugin = plugin;
 		}
@@ -51,7 +52,7 @@ namespace pro079
 			//this is pasted from PlayerPrefs
 			if (command.StartsWith("079"))
 			{
-				ev.ReturnMessage = "Comando desconocido. Escribe .079 para recibir ayuda.";
+				ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
 				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
 				string[] args = new string[collection.Count - 1];
 
@@ -76,19 +77,15 @@ namespace pro079
 					if (args.Length == 0)
 					{
 						MandaAyuda(ev.Player);
-						ev.ReturnMessage = "Recuerda: si encuentras algún error ve al discord de World in Chaos a #bugs y avisa a RogerFK#3679. Adicionalmente, puedes mandarme un mensaje privado.";
+						ev.ReturnMessage = plugin.GetTranslation("bugwarn") + "<Made by RogerFK#3679>";
 					}
 					else if (args.Length == 1)
 					{
 						switch (args[0])
 						{
 							case "controles":
-								ev.Player.SendConsoleMessage("TAB (encima del Bloq. Mayus): abre el mapa donde estás.\n" +
-									"Espacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\n" +
-									"Teclas de movimiento: muévete a la cámara que indica arriba a la derecha\n" +
-									"Para salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras" +
-									"\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079", "white");
-								ev.ReturnMessage = "Para más información y sugerencias, no dudes en entrar en nuestro Discord o preguntar a RogerFK (discord: RogerFK#3679)";
+								ev.Player.SendConsoleMessage(plugin.GetTranslation("controls"), "white");
+								ev.ReturnMessage = "<Made by RogerFK#3679>";
 								return;
 							case "te":
 								if (ev.Player.Scp079Data.AP >= 20)
@@ -538,14 +535,16 @@ namespace pro079
 			{
 				return;
 			}
-
-			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ);
-			ev.Player.PersonalClearBroadcasts();
-			if (ev.Role == Role.SCP_079)
+			
+			if(ev.Role != Role.SCP_079)
 			{
-				//ev.Player.PersonalBroadcast(20, "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", true);
-				ev.Player.PersonalBroadcast(20, plugin.GetConfigString("p079_broadcast_msg"), true);
+				if (broadcasted.Contains(ev.Player.PlayerId)) ev.Player.PersonalClearBroadcasts();
+			}
+			else //if (ev.Role == Role.SCP_079)
+			{
+				ev.Player.PersonalBroadcast(20, plugin.GetTranslation("broadcast_msg"), true);
 				MandaAyuda(ev.Player);
+				if (!broadcasted.Contains(ev.Player.PlayerId)) broadcasted.Add(ev.Player.PlayerId);
 			}
 		}
 
@@ -555,7 +554,7 @@ namespace pro079
 			yield return 10f;
 			tesla.TriggerDistance = current;
 		}
-		/* // no usado por estar OP pero podría ser usado uwu
+		/* // this is fucking op btw
 		public static IEnumerable<float> OverCharge()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Warning All Security Personnel Unauthorized Use Of Error Error Error Error pitch_2 error error error error pitch_1 error");
@@ -616,7 +615,7 @@ namespace pro079
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
 		}
 
-		public static IEnumerable<float> CooldownMTF(float time)
+		private IEnumerable<float> CooldownMTF(float time)
 		{
 			cooldownMTF = true;
 			yield return time;
@@ -624,11 +623,11 @@ namespace pro079
 			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 			foreach (Player player in PCplayers)
 			{
-				player.PersonalBroadcast(5, "<color=#85ff4c>Comando MTF listo</color>", false);
+				player.PersonalBroadcast(5, plugin.GetTranslation("mtfready"), false);
 			}
 		}
 
-		public static IEnumerable<float> CooldownGen(float time)
+		private IEnumerable<float> CooldownGen(float time)
 		{
 			cooldownGenerator = true;
 			yield return time;
@@ -637,11 +636,11 @@ namespace pro079
 			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 			foreach (Player player in PCplayers)
 			{
-				player.PersonalBroadcast(5, "<color=#85ff4c>Comando generador listo</color>", false);
+				player.PersonalBroadcast(5, plugin.GetTranslation("genready"), false);
 			}
 		}
 
-		public static IEnumerable<float> CooldownCassie(float time)
+		private IEnumerable<float> CooldownCassie(float time)
 		{
 			cooldownCassieGeneral = true;
 			yield return time;
@@ -650,7 +649,7 @@ namespace pro079
 			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 			foreach (Player player in PCplayers)
 			{
-				player.PersonalBroadcast(5, "<color=#85ff4c>Comandos de anunciante listos</color>", false);
+				player.PersonalBroadcast(5, plugin.GetTranslation("cassieready"), false);
 			}
 		}
 
@@ -659,9 +658,9 @@ namespace pro079
 			infoCooldown = true;
 			yield return time;
 			infoCooldown = false;
-
 		}
 
+		// straight out pasted from Androx's blackout plugin, turns out that lights are actually turned on after 8 seconds
 		private IEnumerable<float> ShamelessTimingRunLights()
 		{
 			yield return 12.1f;
@@ -707,7 +706,7 @@ namespace pro079
 				{
 					foreach (Player player in PCplayers)
 					{
-						player.PersonalBroadcast(20, "<color=#AA1515>Pulsa ñ y escribe \".079 suicidio\" para suicidarte.</color>", false);
+						player.PersonalBroadcast(10, "<color=#AA1515>Pulsa ñ y escribe \".079 suicidio\" para suicidarte.</color>", false);
 					}
 				}
 			}
@@ -736,6 +735,7 @@ namespace pro079
 		}
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
+			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ);
 			cooldownGenerator = false;
 			cooldownCassieGeneral = false;
 			infoCooldown = false;
