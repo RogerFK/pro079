@@ -1,5 +1,5 @@
 # pro079
-A plugin to enhance playing 079 by giving it some fancy commands to play with
+A plugin to enhance playing 079 by giving it some fancy commands to play with. Currently only in spanish, code included, even if that's a bad practice lmao 🥴
 
 # Configs
 Currently not working.
