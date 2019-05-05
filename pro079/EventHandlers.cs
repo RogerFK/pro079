@@ -96,6 +96,10 @@ namespace pro079
 			{
 				help += '\n' + plugin.GetTranslation("infohelp") + FormatEnergyLevel(plugin.GetConfigInt("p079_info_cost"), 0, energyaux, lvlaux);
 			}
+			if (plugin.GetConfigBool("p079_tips"))
+			{
+				help += '\n' + plugin.GetTranslation("tipshelp") + FormatEnergyLevel(plugin.GetConfigInt("p079_info_cost"), 0, energyaux, lvlaux);
+			}
 
 			return help;
 		}
@@ -565,7 +569,7 @@ namespace pro079
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										Timing.Run(Fingir5Gens());
 										ev.Player.Scp079Data.Exp += 80f;
-										Timing.Run(CooldownGen(220.0f));
+										Timing.Run(CooldownGen(70.3f /*+ pe*/ +30f));
 										Timing.Run(CooldownCassie(15.5f));
 										ev.ReturnMessage = "Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.";
 										return;
@@ -656,12 +660,14 @@ namespace pro079
 		public static IEnumerable<float> Fingir5Gens()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
-			yield return 70.3f;
+			yield return 19.89f + 60f; // this value is fucking shit actually
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 			Timing.Run(FakeKillPC());
 		}
 
-		// Cooldowns will probably be substituted with ticks although it wouldn't matter as there'd be a coroutine anyways
+		/* Cooldowns will probably be substituted with ticks although 
+		 * it wouldn't matter as there'd be a coroutine anyways 
+		 * to tell the player a command is ready */
 		public static IEnumerable<float> CooldownUlt(float time)
 		{
 			ultDown = true;
