@@ -14,6 +14,7 @@ namespace pro079
 	{
 		private readonly Pro079 plugin;
 		private List<int> broadcasted = new List<int>();
+		private string helpFormatted;
 		public Pro79Handlers(Pro079 plugin)
 		{
 			this.plugin = plugin;
@@ -30,12 +31,77 @@ namespace pro079
 		private static int MaxMTF { get; set; }
 		private static float LastMtfSpawn { get; set; }
 		private bool UltDoors = false;
+		private string FormatEnergyLevel(int energy, int level, string energStr, string lvlStr)
+		{
+			string str;
+			if (energy > 0 || level > 1)
+			{
+				str = " (" + (energy > 0 ? energStr.Replace("$energy", energy.ToString()) : "")
+					+ (level > 1 ? ", " + lvlStr.Replace("$lvl", level.ToString()) : "") + ')';
+				return str;
+			}
+			return "";
+		}
+		
+		// This thing below was pasted from here: https://www.c-sharpcorner.com/blogs/first-letter-in-uppercase-in-c-sharp1
+		public static string FirstCharToUpper(string s)
+		{
+			// Check for empty string.
+			if (string.IsNullOrEmpty(s))
+			{
+				return string.Empty;
+			}
+			// Return char and concat substring.  
+			return char.ToUpper(s[0]) + s.Substring(1);
+		}
+		private string FormatHelp()
+		{
+			// Auxiliary stuff so you don't have to get the translations multiple times
+			string help = plugin.GetTranslation("help");
+			string lvlaux = plugin.GetTranslation("level"), energyaux = plugin.GetTranslation("energy");
+			if (plugin.GetConfigBool("p079_tesla"))
+			{
+				string aux = plugin.GetTranslation("teslahelp");
+				help += '\n' + aux.Replace("$sec", plugin.GetConfigInt("p079_tesla_seconds").ToString()) +
+					" (" + energyaux.Replace("$energy", plugin.GetConfigInt("p079_tesla_cost").ToString()) + (plugin.GetConfigInt("p079_tesla_level") > 1 ? ", " + lvlaux.Replace("$lvl", plugin.GetConfigInt("p079_tesla_level").ToString()) : "") + ')';
+				aux = plugin.GetTranslation("teslashelp");
+				help += '\n' + aux.Replace("$sec", plugin.GetConfigInt("p079_tesla_seconds").ToString())
+				+ FormatEnergyLevel(plugin.GetConfigInt("p079_tesla_global_cost"), plugin.GetConfigInt("p079_tesla_level"), energyaux, lvlaux);
+			}
+			if (plugin.GetConfigBool("p079_mtf"))
+			{
+				help += '\n' + plugin.GetTranslation("mtfhelp")
+				+ FormatEnergyLevel(plugin.GetConfigInt("p079_mtf_cost"), plugin.GetConfigInt("p079_mtf_level"), energyaux, lvlaux);
+			}
+			if (plugin.GetConfigBool("p079_chaos"))
+			{
+				help += '\n' + plugin.GetTranslation("chaoshelp")
+				+ FormatEnergyLevel(plugin.GetConfigInt("p079_chaos_cost"), plugin.GetConfigInt("p079_chaos_level"), energyaux, lvlaux);
+			}
+			if (plugin.GetConfigBool("p079_scp"))
+			{
+				help += '\n' + plugin.GetTranslation("scphelp")
+				+ FormatEnergyLevel(plugin.GetConfigInt("p079_scp_cost"), plugin.GetConfigInt("p079_scp_level"), energyaux, lvlaux);
+			}
+			if (plugin.GetConfigBool("p079_suicide"))
+			{
+				help += '\n' + plugin.GetTranslation("suicidehelp");
+			}
+			if (plugin.GetConfigBool("p079_ult"))
+			{
+				help+= '\n' + plugin.GetTranslation("ulthelp")
+				+ FormatEnergyLevel(0, 4, energyaux, lvlaux);
+			}
+			if (plugin.GetConfigBool("p079_info"))
+			{
+				help += '\n' + plugin.GetTranslation("infohelp") + FormatEnergyLevel(plugin.GetConfigInt("p079_info_cost"), 0, energyaux, lvlaux);
+			}
 
-		private static void MandaAyuda(Player player)
+			return help;
+		}
+		private void MandaAyuda(Player player)
 		{
 			player.SendConsoleMessage("<b>.079</b> - Muestra este mensaje de ayuda\n" +
-			"<b>.079 te</b> - Desactiva la tesla de la habitación en la que estás durante 10 segundos (20 puntos)\n" +
-			"<b>.079 teslas</b> - Desactiva todas las teslas durante 10 segundos (40 puntos)\n" +
 			"<b>.079 mtf <letra> <numero> <scp-vivos></b> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida (80 de energía, nivel 2)\n" +
 			"<b>.079 gen [1-5]</b> - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte (50 de energía, nivel 2)\n" +
 			"<b>.079 scp <###> <motivo></b> - Manda un mensaje de muerte de SCP con el número del SCP (173, 096...), el motivo puede ser: unknown, tesla, mtf, decont (50 de energía)\n" +
@@ -76,8 +142,8 @@ namespace pro079
 				{
 					if (args.Length == 0)
 					{
-						MandaAyuda(ev.Player);
-						ev.ReturnMessage = plugin.GetTranslation("bugwarn") + "<Made by RogerFK#3679>";
+						ev.Player.SendConsoleMessage(helpFormatted, "white");
+						ev.ReturnMessage = plugin.GetTranslation("bugwarn") + " <Made by RogerFK#3679>";
 					}
 					else if (args.Length == 1)
 					{
@@ -538,6 +604,7 @@ namespace pro079
 			
 			if(ev.Role != Role.SCP_079)
 			{
+				// Not done in the same IF as it would have to read the List if it's SCP 079 two times
 				if (broadcasted.Contains(ev.Player.PlayerId)) ev.Player.PersonalClearBroadcasts();
 			}
 			else //if (ev.Role == Role.SCP_079)
@@ -736,6 +803,7 @@ namespace pro079
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
 			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ);
+			helpFormatted = FormatHelp();
 			cooldownGenerator = false;
 			cooldownCassieGeneral = false;
 			infoCooldown = false;
