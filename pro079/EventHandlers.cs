@@ -115,10 +115,10 @@ namespace pro079
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
 			string command = ev.Command.ToLower();
-			//this is pasted from PlayerPrefs
 			if (command.StartsWith("079"))
 			{
 				ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
+				//this is pasted from PlayerPrefs https://github.com/probe4aiur/PlayerPreferences/
 				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
 				string[] args = new string[collection.Count - 1];
 
@@ -727,7 +727,11 @@ namespace pro079
 			infoCooldown = false;
 		}
 
-		// straight out pasted from Androx's blackout plugin, turns out that lights are actually turned on after 8 seconds
+		/* pasted and slightly modified from here btw https://github.com/probe4aiur/Blackout
+		 * tbh that's what I was programming myself but then I had to check how many seconds
+		 * the lights were going to be turned off for, so I just actually copied that yield
+		 * thingy I swear to god
+		 */
 		private IEnumerable<float> ShamelessTimingRunLights()
 		{
 			yield return 12.1f;
