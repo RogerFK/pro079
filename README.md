@@ -3,6 +3,7 @@ A plugin to enhance playing 079 by giving it some fancy commands to play with
 
 # Configs
 Currently not working.
+
 | Config Option | Value Type | Default Value | Description |
 |:-----------------------:|:----------:|:-------------------------:|:------------------------------:|
 | pro079_enable | boolean | True | Enables/Disables this plugin |
