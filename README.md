@@ -1,3 +1,5 @@
+## Development of this plugin is delayed until 05/26. I know how to fix most of the bugs and the plugin is hardly done for a complete public release. Also, it's licensed with a GPLv3 license, so don't try anything stupid, do a Pull Request and you'll be happilly credited.
+
 # pro079
 A plugin to enhance playing 079 by giving it some fancy commands to play with. Currently only in spanish, code included, even if that's a bad practice lmao 🥴
 
