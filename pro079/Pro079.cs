@@ -32,7 +32,8 @@ namespace pro079
         public override void Register()
         {
 			this.Info("Loading Pro-079 configs and commands...");
-            AddEventHandlers(new Pro79Handlers(this));
+			float startingTime = UnityEngine.Time.time;
+			AddEventHandlers(new Pro79Handlers(this));
 
 			AddConfig(new ConfigSetting("p079_enable", true, true, "Enables/disables Pro-079"));
 			AddConfig(new ConfigSetting("p079_broadcast_enable", true, true, "Enables a broadcast at the start of the round."));
@@ -67,11 +68,11 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_mtf_level", 2, true, "Minimum level for 079 to fake a MTF message"));
 			AddConfig(new ConfigSetting("p079_mtf_cost", 70, true, "AP cost for 079 to fake a MTF message"));
 
-			AddConfig(new ConfigSetting("p079_chaos", true, true, "Enables/disables Pro-079's fake Chaos messages"));
+			AddConfig(new ConfigSetting("p079_chaos", false, true, "Enables/disables Pro-079's fake Chaos messages"));
 			AddConfig(new ConfigSetting("p079_chaos_cooldown", 50, true, "How many seconds the command will give a cooldown for itself"));
 			AddConfig(new ConfigSetting("p079_chaos_level", 2, true, "Minimum level for 079 to fake a Chaos message"));
 			AddConfig(new ConfigSetting("p079_chaos_cost", 70, true, "AP cost for 079 to fake a Chaos message"));
-
+			AddConfig(new ConfigSetting("p079_chaos_msg", "warning . chaosinsurgency detected in the surface", true, "Message for the chaos command"));
 
 			AddConfig(new ConfigSetting("p079_scp", true, true, "Enables/disables Pro-079's fake SCP death messages"));
 			AddConfig(new ConfigSetting("p079_scp_cooldown", 30, true, "How many seconds the command will give a cooldown for itself"));
@@ -91,7 +92,7 @@ namespace pro079
 			string lang = GetConfigString("p079_lang");
 
 			AddTranslation(new LangSetting("broadcast_msg", "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", "pro079_" + this.GetConfigString("p079_lang")));
-			AddTranslation(new LangSetting("help", "<b>.079</b> - Muestra este mensaje de ayuda\n", "pro079_" + lang));
+			AddTranslation(new LangSetting("help", "<b>.079</b> - Muestra este mensaje de ayuda", "pro079_" + lang));
 
 			AddTranslation(new LangSetting("level", "nivel $lvl", "pro079_" + lang));
 			AddTranslation(new LangSetting("energy", "$ap de energía", "pro079_" + lang));
@@ -122,16 +123,23 @@ namespace pro079
 			AddTranslation(new LangSetting("chaoshelp", "<b>.079 chaos</b> - Anuncia la llegada de Chaos Insurgency", "pro079_" + lang));
 			AddTranslation(new LangSetting(   "tipshelp", "<b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta", "pro079_" + lang));
 			#endregion
+			// This line down below probably causes many issues when creating the file for the first time. Will be changed (or default completely disabled) in the future
 			AddTranslation(new LangSetting("tips", "TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079\n", "pro079_" + this.GetConfigString("p079_lang")));
-
+			
 			AddTranslation(new LangSetting("cassieready", "<color=#85ff4c>Comandos de anunciante listos</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("mtfready", "<color=#85ff4c>Comando MTF listo</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("genready", "<color=#85ff4c>Comando generador listo</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("ready", "listo", "pro079_" + lang));
+			AddTranslation(new LangSetting("success", "Comando lanzado", "pro079_" + lang));
 
+			AddTranslation(new LangSetting("lowlevel", "No tienes suficiente nivel (necesitas $min)", "pro079_" + lang));
+			AddTranslation(new LangSetting("lowmana", "No tienes suficiente AP (necesitas $min)", "pro079_" + lang));
+			//AddTranslation(new LangSetting("minimum", "Mínimo: ", "pro079_" + lang));
+
+			AddTranslation(new LangSetting("disabled", "Este comando está deshabilitado." + "pro079_" + lang));
 			Timing.Init(this);
 
-			this.Info("Done loading!");
+			this.Info("Done loading! Took " + (UnityEngine.Time.time - startingTime).ToString("0.00") + " seconds to complete!");
 		}
     }
 }
