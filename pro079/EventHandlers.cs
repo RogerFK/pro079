@@ -15,6 +15,8 @@ namespace pro079
 		private readonly Pro079 plugin;
 		private List<int> broadcasted = new List<int>();
 		private string helpFormatted;
+		private string success;
+		private readonly string hehe = "lmfao";
 		public Pro79Handlers(Pro079 plugin)
 		{
 			this.plugin = plugin;
@@ -23,6 +25,7 @@ namespace pro079
 		private static bool cooldownCassieGeneral = false;
 		private static bool infoCooldown = false;
 		private static bool cooldownMTF = false;
+		private static bool cooldownChaos = false;
 		private static bool ultDown = false;
 		private static IEnumerable<Room> rooms;
 		private static bool DeconBool { get; set; }
@@ -36,7 +39,7 @@ namespace pro079
 			string str;
 			if (energy > 0 || level > 1)
 			{
-				str = " (" + (energy > 0 ? energStr.Replace("$ap", energy.ToString()) : "")
+				str = " (" + (energy > 0 ? energStr.Replace("$energy", energy.ToString()) : "")
 					+ (level > 1 ? ", " + lvlStr.Replace("$lvl", level.ToString()) : "") + ')';
 				return str;
 			}
@@ -98,12 +101,10 @@ namespace pro079
 			}
 			if (plugin.GetConfigBool("p079_tips"))
 			{
-				help += '\n' + plugin.GetTranslation("tipshelp") + FormatEnergyLevel(plugin.GetConfigInt("p079_info_cost"), 0, energyaux, lvlaux);
+				help += '\n' + plugin.GetTranslation("tipshelp") + FormatEnergyLevel(0, 0, energyaux, lvlaux);
 			}
-
 			return help;
-		}
-		/*
+		}/*
 		private void MandaAyuda(Player player)
 		{
 			player.SendConsoleMessage("<b>.079</b> - Muestra este mensaje de ayuda\n" +
@@ -114,9 +115,10 @@ namespace pro079
 			"<b>.079 suicidio</b> - Sobrecarga los generadores para morir cuando quedes tú solo" +
 			"\n<b>.079 ultimate</b> - Mira los ultimate que tienes disponibles\n" +
 			"<b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta"
-			//+ ".079 cont106 - Manda el audio de recontención de SCP 106" // not happening at all
+			//+ ".079 cont106 - Manda el audio de recontención de SCP 106" // Will never include it, as it would be anything but realistic
 			, "white");
-		}*/
+		}
+		*/
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
 			string command = ev.Command.ToLower();
@@ -152,13 +154,14 @@ namespace pro079
 					}
 					else if (args.Length == 1)
 					{
-						switch (args[0])
+						// Most unclear way to do the switch statement, but anyways it's the most optimized way to do it.
+						switch (SwitchParser.ParseArg(args[0], plugin))
 						{
-							case "controles":
+							case 10: // tipscmd
 								ev.Player.SendConsoleMessage(plugin.GetTranslation("controls"), "white");
 								ev.ReturnMessage = "<Made by RogerFK#3679>";
 								return;
-							case "te":
+							case 1: // teslacmd
 								if (ev.Player.Scp079Data.AP >= 20)
 								{
 									bool noTesla = true;
@@ -192,7 +195,7 @@ namespace pro079
 									ev.ReturnMessage = "No tienes suficiente energía (necesitas 20).";
 								}
 								return;
-							case "teslas":
+							case 2: // teslascmd
 								if (ev.Player.Scp079Data.AP <= 40)
 								{
 									ev.ReturnMessage = "No tienes suficiente energía (necesitas 40).";
@@ -210,7 +213,7 @@ namespace pro079
 								}
 								ev.ReturnMessage = "Teslas desactivadas.";
 								return;
-							case "suicidio":
+							case 7: // suicidecmd
 								List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 								int pcs = PCplayers.Count;
 								if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
@@ -222,16 +225,16 @@ namespace pro079
 								Timing.Run(FakeKillPC());
 								ev.Player.Kill(DamageType.NUKE);
 								return;
-							case "mtf":
+							case 3: // mtfcmd
 								ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía";
 								return;
-							case "scp":
+							case 5: // scpcmd
 								ev.ReturnMessage = "Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - 50 de energía";
 								return;
-							case "gen":
+							case 4: // gencmd
 								ev.ReturnMessage = "Uso: .079 gen (1-5) - Sonará que hay 1 generador activado - 50 de energía";
 								return;
-							case "info":
+							case 6: // infocmd
 								if (ev.Player.Scp079Data.AP < 5 && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = "No tienes suficiente energía (necesitas 5).";
@@ -318,7 +321,7 @@ namespace pro079
 								ev.Player.Scp079Data.AP -= 5;
 								ev.Player.Scp079Data.Exp += 5;
 								return;
-							case "ultimate":
+							case 8: // ultcmd
 								if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = "Para lanzar un ultimate necesitas tier 4.";
@@ -332,8 +335,34 @@ namespace pro079
 										+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
 								}
 								return;
+							case 9: // chaoscmd
+								if (plugin.GetConfigBool("p079_chaos"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
+								if (cooldownCassieGeneral)
+								{
+
+									return;
+								}
+								if(cooldownChaos)
+								if(ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level"))
+								{
+									ev.ReturnMessage = plugin.GetConfigString("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
+									return;
+								}
+								if(ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost"))
+								{
+									ev.ReturnMessage = plugin.GetConfigString("lowmana").Replace("$min", plugin.GetConfigInt("p079_chaos_cost").ToString());
+									return;
+								}
+								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_chaos_cost");
+								PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.GetConfigString("p079_chaos_msg"));
+								ev.ReturnMessage = plugin.GetTranslation("success");
+								return;
 							default:
-								ev.ReturnMessage = "Comando no reconocido. Usa .079 para ayuda";
+								ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
 								return;
 						}
 					}
@@ -815,6 +844,7 @@ namespace pro079
 		{
 			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ);
 			helpFormatted = FormatHelp();
+			success = plugin.GetTranslation("success");
 			cooldownGenerator = false;
 			cooldownCassieGeneral = false;
 			infoCooldown = false;
@@ -822,6 +852,7 @@ namespace pro079
 			ultDown = false;
 			DeconBool = false;
 			UltDoors = false;
+			cooldownChaos = false;
 		}
 	}
 }
