@@ -36,7 +36,7 @@ namespace pro079
 			string str;
 			if (energy > 0 || level > 1)
 			{
-				str = " (" + (energy > 0 ? energStr.Replace("$energy", energy.ToString()) : "")
+				str = " (" + (energy > 0 ? energStr.Replace("$ap", energy.ToString()) : "")
 					+ (level > 1 ? ", " + lvlStr.Replace("$lvl", level.ToString()) : "") + ')';
 				return str;
 			}
@@ -103,6 +103,7 @@ namespace pro079
 
 			return help;
 		}
+		/*
 		private void MandaAyuda(Player player)
 		{
 			player.SendConsoleMessage("<b>.079</b> - Muestra este mensaje de ayuda\n" +
@@ -113,9 +114,9 @@ namespace pro079
 			"<b>.079 suicidio</b> - Sobrecarga los generadores para morir cuando quedes tú solo" +
 			"\n<b>.079 ultimate</b> - Mira los ultimate que tienes disponibles\n" +
 			"<b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta"
-			//+ ".079 cont106 - Manda el audio de recontención de SCP 106" // future update will have it
+			//+ ".079 cont106 - Manda el audio de recontención de SCP 106" // not happening at all
 			, "white");
-		}
+		}*/
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
 			string command = ev.Command.ToLower();
@@ -614,7 +615,7 @@ namespace pro079
 			else //if (ev.Role == Role.SCP_079)
 			{
 				ev.Player.PersonalBroadcast(20, plugin.GetTranslation("broadcast_msg"), true);
-				MandaAyuda(ev.Player);
+				ev.Player.SendConsoleMessage(helpFormatted, "white");
 				if (!broadcasted.Contains(ev.Player.PlayerId)) broadcasted.Add(ev.Player.PlayerId);
 			}
 		}
