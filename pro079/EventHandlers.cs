@@ -15,8 +15,6 @@ namespace pro079
 		private readonly Pro079 plugin;
 		private List<int> broadcasted = new List<int>();
 		private string helpFormatted;
-		private string success;
-		private readonly string hehe = "lmfao";
 		public Pro79Handlers(Pro079 plugin)
 		{
 			this.plugin = plugin;
@@ -39,7 +37,7 @@ namespace pro079
 			string str;
 			if (energy > 0 || level > 1)
 			{
-				str = " (" + (energy > 0 ? energStr.Replace("$energy", energy.ToString()) : "")
+				str = " (" + (energy > 0 ? energStr.Replace("$ap", energy.ToString()) : "")
 					+ (level > 1 ? ", " + lvlStr.Replace("$lvl", level.ToString()) : "") + ')';
 				return str;
 			}
@@ -104,21 +102,8 @@ namespace pro079
 				help += '\n' + plugin.GetTranslation("tipshelp") + FormatEnergyLevel(0, 0, energyaux, lvlaux);
 			}
 			return help;
-		}/*
-		private void MandaAyuda(Player player)
-		{
-			player.SendConsoleMessage("<b>.079</b> - Muestra este mensaje de ayuda\n" +
-			"<b>.079 mtf <letra> <numero> <scp-vivos></b> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida (80 de energía, nivel 2)\n" +
-			"<b>.079 gen [1-5]</b> - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte (50 de energía, nivel 2)\n" +
-			"<b>.079 scp <###> <motivo></b> - Manda un mensaje de muerte de SCP con el número del SCP (173, 096...), el motivo puede ser: unknown, tesla, mtf, decont (50 de energía)\n" +
-			"<b>.079 info</b> - Muestra datos sobre las instalaciones (5 de energía)\n" +
-			"<b>.079 suicidio</b> - Sobrecarga los generadores para morir cuando quedes tú solo" +
-			"\n<b>.079 ultimate</b> - Mira los ultimate que tienes disponibles\n" +
-			"<b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta"
-			//+ ".079 cont106 - Manda el audio de recontención de SCP 106" // Will never include it, as it would be anything but realistic
-			, "white");
 		}
-		*/
+
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
 			string command = ev.Command.ToLower();
@@ -157,10 +142,6 @@ namespace pro079
 						// Most unclear way to do the switch statement, but anyways it's the most optimized way to do it.
 						switch (SwitchParser.ParseArg(args[0], plugin))
 						{
-							case 10: // tipscmd
-								ev.Player.SendConsoleMessage(plugin.GetTranslation("controls"), "white");
-								ev.ReturnMessage = "<Made by RogerFK#3679>";
-								return;
 							case 1: // teslacmd
 								if (ev.Player.Scp079Data.AP >= 20)
 								{
@@ -202,29 +183,18 @@ namespace pro079
 									return;
 								}
 								ev.Player.Scp079Data.AP -= 40f;
+								ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
 								foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
 								{
 									if (tesla.TriggerDistance > 0)
 									{
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
-										ev.Player.Scp079Data.Exp += 10.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 										Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
+										ev.Player.Scp079Data.Exp += 4.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 									}
 								}
 								ev.ReturnMessage = "Teslas desactivadas.";
 								return;
-							case 7: // suicidecmd
-								List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-								int pcs = PCplayers.Count;
-								if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
-								{
-									ev.ReturnMessage = "No puedes suicidarte cuando hay más SCP vivos";
-									return;
-								}
-								PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-								Timing.Run(FakeKillPC());
-								ev.Player.Kill(DamageType.NUKE);
-								return;
+							
 							case 3: // mtfcmd
 								ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía";
 								return;
@@ -321,6 +291,18 @@ namespace pro079
 								ev.Player.Scp079Data.AP -= 5;
 								ev.Player.Scp079Data.Exp += 5;
 								return;
+							case 7: // suicidecmd
+								List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+								int pcs = PCplayers.Count;
+								if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
+								{
+									ev.ReturnMessage = "No puedes suicidarte cuando hay más SCP vivos";
+									return;
+								}
+								PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
+								Timing.Run(FakeKillPC());
+								ev.Player.Kill(DamageType.NUKE);
+								return;
 							case 8: // ultcmd
 								if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
 								{
@@ -336,14 +318,14 @@ namespace pro079
 								}
 								return;
 							case 9: // chaoscmd
-								if (plugin.GetConfigBool("p079_chaos"))
+								if (!plugin.GetConfigBool("p079_chaos"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
 								if (cooldownCassieGeneral)
 								{
-
+									ev.ReturnMessage = plugin.GetTranslation("cassiecd");
 									return;
 								}
 								if(cooldownChaos)
@@ -358,8 +340,14 @@ namespace pro079
 									return;
 								}
 								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_chaos_cost");
+								ev.Player.Scp079Data.Exp += 20f;
 								PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.GetConfigString("p079_chaos_msg"));
 								ev.ReturnMessage = plugin.GetTranslation("success");
+								return;
+							case 10: // tipscmd
+									 //ev.Player.SendConsoleMessage(plugin.GetTranslation("controls"), "white");
+								ev.Player.SendConsoleMessage("TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079\n", "white");
+								ev.ReturnMessage = "<Made by RogerFK#3679>";
 								return;
 							default:
 								ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
@@ -844,7 +832,6 @@ namespace pro079
 		{
 			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ);
 			helpFormatted = FormatHelp();
-			success = plugin.GetTranslation("success");
 			cooldownGenerator = false;
 			cooldownCassieGeneral = false;
 			infoCooldown = false;

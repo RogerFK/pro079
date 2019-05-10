@@ -6,32 +6,32 @@ using Smod2.Lang;
 
 namespace pro079
 {
-    [PluginDetails(
-        author = "RogerFK",
-        name = "Pro 079",
-        description = "Now it's funnier isn't it lol",
-        id = "rogerfk.pro079",
-        version = "1.0",
-        SmodMajor = 3,
-        SmodMinor = 4,
-        SmodRevision = 0
-        )]
+	[PluginDetails(
+		author = "RogerFK",
+		name = "Pro 079",
+		description = "Now it's funnier isn't it lol",
+		id = "rogerfk.pro079",
+		version = "1.0",
+		SmodMajor = 3,
+		SmodMinor = 4,
+		SmodRevision = 0
+		)]
 
-    public class Pro079 : Plugin
-    {
-        public override void OnDisable()
-        {
-            this.Info(this.Details.name + " disabled");
-        }
+	public class Pro079 : Plugin
+	{
+		public override void OnDisable()
+		{
+			Info(Details.name + " disabled");
+		}
 
-        public override void OnEnable()
-        {
-            this.Info(this.Details.name + " enabled");
-        }
+		public override void OnEnable()
+		{
+			Info(Details.name + " enabled");
+		}
 
-        public override void Register()
-        {
-			this.Info("Loading Pro-079 configs and commands...");
+		public override void Register()
+		{
+			Info("Loading Pro-079 configs and commands...");
 			float startingTime = UnityEngine.Time.time;
 			AddEventHandlers(new Pro79Handlers(this));
 
@@ -57,7 +57,7 @@ namespace pro079
 			// Ultimates not configurable yet. Will use a Dictionary for Ult IDs in the future with it's own Ultimate079 class
 			// If you want to help with this, at least point me towards the best way to read other .dlls for custom made Ultimates or to use piping
 			AddConfig(new ConfigSetting("p079_ult", true, true, "Enables/disables Pro-079's fake Chaos messages"));
-			
+
 			AddConfig(new ConfigSetting("p079_suicide", true, true, "Enables/disables 079 to suicide when he is alone. Gives a shit about lone-079, feel free to use it"));
 
 			// From now on, they are just about C.A.S.S.I.E. announcements
@@ -68,7 +68,7 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_mtf_level", 2, true, "Minimum level for 079 to fake a MTF message"));
 			AddConfig(new ConfigSetting("p079_mtf_cost", 70, true, "AP cost for 079 to fake a MTF message"));
 
-			AddConfig(new ConfigSetting("p079_chaos", false, true, "Enables/disables Pro-079's fake Chaos messages"));
+			AddConfig(new ConfigSetting("p079_chaos", true, true, "Enables/disables Pro-079's fake Chaos messages"));
 			AddConfig(new ConfigSetting("p079_chaos_cooldown", 50, true, "How many seconds the command will give a cooldown for itself"));
 			AddConfig(new ConfigSetting("p079_chaos_level", 2, true, "Minimum level for 079 to fake a Chaos message"));
 			AddConfig(new ConfigSetting("p079_chaos_cost", 70, true, "AP cost for 079 to fake a Chaos message"));
@@ -91,7 +91,7 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_lang", "es", true, "Selects the language"));
 			string lang = GetConfigString("p079_lang");
 
-			AddTranslation(new LangSetting("broadcast_msg", "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", "pro079_" + this.GetConfigString("p079_lang")));
+			AddTranslation(new LangSetting("broadcast_msg", "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", "pro079_" + GetConfigString("p079_lang")));
 			AddTranslation(new LangSetting("help", "<b>.079</b> - Muestra este mensaje de ayuda", "pro079_" + lang));
 
 			AddTranslation(new LangSetting("level", "nivel $lvl", "pro079_" + lang));
@@ -101,31 +101,31 @@ namespace pro079
 			AddTranslation(new LangSetting("bugwarn", "Si encuentras algún fallo, avisa a RogerFK#3679", "pro079_" + lang));
 
 			#region Cmds and Help strings
-			AddTranslation(new LangSetting(  "teslacmd", "te", "pro079_" + lang));
-			AddTranslation(new LangSetting( "teslascmd", "teslas", "pro079_" + lang));
-			AddTranslation(new LangSetting(    "mtfcmd", "mtf", "pro079_" + lang));
-			AddTranslation(new LangSetting(    "gencmd", "gen", "pro079_" + lang));
-			AddTranslation(new LangSetting(    "scpcmd", "scp", "pro079_" + lang));
-			AddTranslation(new LangSetting(   "infocmd", "info", "pro079_" + lang));
+			AddTranslation(new LangSetting("teslacmd", "te", "pro079_" + lang));
+			AddTranslation(new LangSetting("teslascmd", "teslas", "pro079_" + lang));
+			AddTranslation(new LangSetting("mtfcmd", "mtf", "pro079_" + lang));
+			AddTranslation(new LangSetting("gencmd", "gen", "pro079_" + lang));
+			AddTranslation(new LangSetting("scpcmd", "scp", "pro079_" + lang));
+			AddTranslation(new LangSetting("infocmd", "info", "pro079_" + lang));
 			AddTranslation(new LangSetting("suicidecmd", "suicidio", "pro079_" + lang));
-			AddTranslation(new LangSetting(    "ultcmd", "ultimate", "pro079_" + lang));
-			AddTranslation(new LangSetting(  "chaoscmd", "chaos", "pro079_" + lang));
-			AddTranslation(new LangSetting(   "tipscmd", "controles", "pro079_" + lang));
+			AddTranslation(new LangSetting("ultcmd", "ultimate", "pro079_" + lang));
+			AddTranslation(new LangSetting("chaoscmd", "chaos", "pro079_" + lang));
+			AddTranslation(new LangSetting("tipscmd", "controles", "pro079_" + lang));
 
-			AddTranslation(new LangSetting(  "teslahelp", "<b>.079 te</b> - Desactiva la tesla de la habitación en la que estás durante $sec segundos", "pro079_" + lang));
-			AddTranslation(new LangSetting( "teslashelp", "<b>.079 teslas</b> - Desactiva todas las teslas durante $sec segundos", "pro079_" + lang));
-			AddTranslation(new LangSetting(    "mtfhelp", "<b>.079 mtf <letra> <numero> <scp-vivos></b> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida", "pro079_" + lang));
-			AddTranslation(new LangSetting(    "genhelp", "<b>.079 gen [1-5]</b> - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte", "pro079_" + lang));
-			AddTranslation(new LangSetting(    "scphelp", "<b>.079 scp <###> <motivo></b> - Manda un mensaje de muerte de SCP con el número del SCP (173, 096...), el motivo puede ser: unknown, tesla, mtf, decont", "pro079_" + lang));
-			AddTranslation(new LangSetting(   "infohelp", "<b>.079 info</b> - Muestra datos sobre las instalaciones", "pro079_" + lang));
+			AddTranslation(new LangSetting("teslahelp", "<b>.079 te</b> - Desactiva la tesla de la habitación en la que estás durante $sec segundos", "pro079_" + lang));
+			AddTranslation(new LangSetting("teslashelp", "<b>.079 teslas</b> - Desactiva todas las teslas durante $sec segundos", "pro079_" + lang));
+			AddTranslation(new LangSetting("mtfhelp", "<b>.079 mtf <letra> <numero> <scp-vivos></b> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida", "pro079_" + lang));
+			AddTranslation(new LangSetting("genhelp", "<b>.079 gen [1-5]</b> - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte", "pro079_" + lang));
+			AddTranslation(new LangSetting("scphelp", "<b>.079 scp <###> <motivo></b> - Manda un mensaje de muerte de SCP con el número del SCP (173, 096...), el motivo puede ser: unknown, tesla, mtf, decont", "pro079_" + lang));
+			AddTranslation(new LangSetting("infohelp", "<b>.079 info</b> - Muestra datos sobre las instalaciones", "pro079_" + lang));
 			AddTranslation(new LangSetting("suicidehelp", "<b>.079 suicidio</b> - Sobrecarga los generadores para morir cuando quedes tú solo", "pro079_" + lang));
-			AddTranslation(new LangSetting(    "ulthelp", "<b>.079 ultimate</b> - Mira los ultimate que tienes disponibles", "pro079_" + lang));
+			AddTranslation(new LangSetting("ulthelp", "<b>.079 ultimate</b> - Mira los ultimate que tienes disponibles", "pro079_" + lang));
 			AddTranslation(new LangSetting("chaoshelp", "<b>.079 chaos</b> - Anuncia la llegada de Chaos Insurgency", "pro079_" + lang));
-			AddTranslation(new LangSetting(   "tipshelp", "<b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta", "pro079_" + lang));
+			AddTranslation(new LangSetting("tipshelp", "<b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta", "pro079_" + lang));
 			#endregion
 			// This line down below probably causes many issues when creating the file for the first time. Will be changed (or default completely disabled) in the future
-			AddTranslation(new LangSetting("tips", "TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079\n", "pro079_" + this.GetConfigString("p079_lang")));
-			
+			//AddTranslation(new LangSetting("tips", "TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079\n", "pro079_" + this.GetConfigString("p079_lang")));
+
 			AddTranslation(new LangSetting("cassieready", "<color=#85ff4c>Comandos de anunciante listos</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("mtfready", "<color=#85ff4c>Comando MTF listo</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("genready", "<color=#85ff4c>Comando generador listo</color>", "pro079_" + lang));
@@ -134,12 +134,14 @@ namespace pro079
 
 			AddTranslation(new LangSetting("lowlevel", "No tienes suficiente nivel (necesitas $min)", "pro079_" + lang));
 			AddTranslation(new LangSetting("lowmana", "No tienes suficiente AP (necesitas $min)", "pro079_" + lang));
+
+			AddTranslation(new LangSetting("cassiecd", "Tienes que esperar antes de volver a usar un comando que requiera al anunciante(C.A.S.S.I.E)", "pro079_" + lang));
 			//AddTranslation(new LangSetting("minimum", "Mínimo: ", "pro079_" + lang));
 
-			AddTranslation(new LangSetting("disabled", "Este comando está deshabilitado." + "pro079_" + lang));
+			AddTranslation(new LangSetting("disabled", "Este comando está deshabilitado.", "pro079_" + lang));
 			Timing.Init(this);
 
-			this.Info("Done loading! Took " + (UnityEngine.Time.time - startingTime).ToString("0.00") + " seconds to complete!");
+			Info("Done loading! Took " + (UnityEngine.Time.time - startingTime).ToString("0.00") + " seconds to complete!");
 		}
-    }
+	}
 }
