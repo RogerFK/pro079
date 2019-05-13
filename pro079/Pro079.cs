@@ -127,6 +127,9 @@ namespace pro079
 			AddTranslation(new LangSetting("mtfuse", "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - $min de energía", "pro079_" + lang));
 			AddTranslation(new LangSetting("mtfmaxscp", "Máximo de SCPs: $max", "pro079_" + lang));
 
+			AddTranslation(new LangSetting("scpuse", "Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - $min de energía", "pro079_" + lang));
+			AddTranslation(new LangSetting("scpexist", "Pon un SCP que exista", "pro079_" + lang));
+			AddTranslation(new LangSetting("scpway", "Pon un método de morir que exista - Uso:", "pro079_" + lang));
 
 			#endregion
 			// This line down below probably causes many issues when creating the file for the first time. Will be changed (or default completely disabled) in the future
@@ -135,6 +138,7 @@ namespace pro079
 			AddTranslation(new LangSetting("cassieready", "<color=#85ff4c>Comandos de anunciante listos</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("mtfready", "<color=#85ff4c>Comando MTF listo</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("genready", "<color=#85ff4c>Comando generador listo</color>", "pro079_" + lang));
+			AddTranslation(new LangSetting("scpready", "<color=#85ff4c>Comando SCP listo</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("ready", "listo", "pro079_" + lang));
 			AddTranslation(new LangSetting("success", "Comando lanzado", "pro079_" + lang));
 

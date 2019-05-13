@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -33,6 +34,8 @@ namespace pro079
 		private static int MaxMTF { get; set; }
 		private static float LastMtfSpawn { get; set; }
 		private bool UltDoors = false;
+		private bool cooldownScp;
+
 		private string FormatEnergyLevel(int energy, int level, string energStr, string lvlStr)
 		{
 			string str;
@@ -278,7 +281,7 @@ namespace pro079
 										PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 2.8f * (ev.Player.Scp079Data.Level + 1);
-										
+
 										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 
@@ -295,11 +298,19 @@ namespace pro079
 									return;
 								}
 							case 5: // scpcmd
-								//this may throw exceptions
-								if (ev.Player.Scp079Data.AP < 50 && !ev.Player.GetBypassMode())
+								if (!ev.Player.GetBypassMode())
 								{
-									ev.ReturnMessage = "No tienes suficiente energía (necesitas 50).";
-									return;
+									if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_scp_level") - 1)
+									{
+										ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_scp_level").ToString());
+										return;
+									}
+
+									if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_scp_cost") && !ev.Player.GetBypassMode())
+									{
+										ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
+										return;
+									}
 								}
 								if (args.Length >= 3)
 								{
@@ -309,7 +320,7 @@ namespace pro079
 									};
 									if (!scpList.Contains(args[1]))
 									{
-										ev.ReturnMessage = "Pon un SCP que exista - Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont)";
+										ev.ReturnMessage = plugin.GetTranslation("scpexist") + " - " + plugin.GetTranslation("scpuse").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
 										return;
 									}
 									string scpNum = string.Join(" ", args[1].ToCharArray());
@@ -352,21 +363,20 @@ namespace pro079
 											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por descontaminación.";
 											break;
 										default:
-											ev.ReturnMessage = "Pon un método de morir que exista - Uso: .079 scp " + args[1] + " (unknown/tesla/mtf/decont)";
+											ev.ReturnMessage = plugin.GetTranslation("scpway") + " .079 scp " + args[1] + " (unknown/tesla/mtf/decont)";
 											return;
 									}
 								}
 								else
 								{
-									ev.ReturnMessage = "Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - 50 de energía";
+									ev.ReturnMessage = plugin.GetTranslation("scpuse").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
 									return;
 								}
 								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-								ev.Player.Scp079Data.AP -= 50;
+								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_scp_cost");
 								ev.Player.Scp079Data.Exp += 5.0f * (ev.Player.Scp079Data.Level + 1);
-								Timing.Run(CooldownCassie(25.0f));
-								return;
-								ev.ReturnMessage = "Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - 50 de energía";
+								Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+								Timing.Run(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
 								return;
 							case 4: // gencmd
 								ev.ReturnMessage = "Uso: .079 gen (1-5) - Sonará que hay 1 generador activado - 50 de energía";
@@ -644,6 +654,21 @@ namespace pro079
 				{
 					ev.ReturnMessage = "¡No eres SCP-079!";
 				}
+			}
+		}
+
+		private IEnumerable<float> CooldownScp(float v)
+		{
+			if(v > 0)
+			{
+				cooldownScp = true;
+				yield return v;
+				List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach(Player pc in pcs)
+				{
+					pc.PersonalBroadcast(5,plugin.GetTranslation("scpready"),false);
+				}
+				cooldownScp = false;
 			}
 		}
 
