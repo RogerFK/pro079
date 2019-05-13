@@ -14,9 +14,8 @@ namespace pro079
 	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole, IEventHandlerSetConfig, IEventHandlerPlayerDie, IEventHandlerTeamRespawn, IEventHandlerDoorAccess, IEventHandlerWaitingForPlayers
 	{
 		private readonly Pro079 plugin;
-		private List<int> broadcasted = new List<int>();
+		private List<int> broadcasted = new List<int>(); // to only clear broadcasts for these players, good practice if you have playerprefs
 		private string helpFormatted;
-		private string success;
 		public Pro79Handlers(Pro079 plugin)
 		{
 			this.plugin = plugin;
@@ -322,8 +321,12 @@ namespace pro079
 										ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_scp_level").ToString());
 										return;
 									}
-
-									if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_scp_cost") && !ev.Player.GetBypassMode())
+									if (cooldownScp)
+									{
+										ev.ReturnMessage = plugin.GetTranslation("cooldown");
+										return;
+									}
+									if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_scp_cost") )
 									{
 										ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
 										return;
@@ -562,18 +565,6 @@ namespace pro079
 								}
 								ev.Player.Scp079Data.AP -= 5;
 								ev.Player.Scp079Data.Exp += 5;
-								return;
-							case 7: // suicidecmd
-								List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-								int pcs = PCplayers.Count;
-								if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
-								{
-									ev.ReturnMessage = "No puedes suicidarte cuando hay más SCP vivos";
-									return;
-								}
-								PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-								Timing.Run(FakeKillPC());
-								ev.Player.Kill(DamageType.NUKE);
 								return;
 							case 8: // ultcmd
 								if (!plugin.GetConfigBool("p079_ult"))
