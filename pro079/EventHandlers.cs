@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using scp4aiur;
+using scp4aiur; // Future update will have this removed
 using Smod2;
 using Smod2.API;
 using Smod2.EventHandlers;
@@ -15,13 +16,13 @@ namespace pro079
 		private readonly Pro079 plugin;
 		private List<int> broadcasted = new List<int>();
 		private string helpFormatted;
+		private string success;
 		public Pro79Handlers(Pro079 plugin)
 		{
 			this.plugin = plugin;
 		}
 		private static bool cooldownGenerator = false;
 		private static bool cooldownCassieGeneral = false;
-		private static bool infoCooldown = false;
 		private static bool cooldownMTF = false;
 		private static bool cooldownChaos = false;
 		private static bool ultDown = false;
@@ -32,6 +33,8 @@ namespace pro079
 		private static int MaxMTF { get; set; }
 		private static float LastMtfSpawn { get; set; }
 		private bool UltDoors = false;
+		private bool cooldownScp;
+
 		private string FormatEnergyLevel(int energy, int level, string energStr, string lvlStr)
 		{
 			string str;
@@ -43,7 +46,7 @@ namespace pro079
 			}
 			return "";
 		}
-		
+
 		// This thing below was pasted from here: https://www.c-sharpcorner.com/blogs/first-letter-in-uppercase-in-c-sharp1
 		public static string FirstCharToUpper(string s)
 		{
@@ -90,7 +93,7 @@ namespace pro079
 			}
 			if (plugin.GetConfigBool("p079_ult"))
 			{
-				help+= '\n' + plugin.GetTranslation("ulthelp")
+				help += '\n' + plugin.GetTranslation("ulthelp")
 				+ FormatEnergyLevel(0, 4, energyaux, lvlaux);
 			}
 			if (plugin.GetConfigBool("p079_info"))
@@ -142,8 +145,27 @@ namespace pro079
 						// Most unclear way to do the switch statement, but anyways it's the most optimized way to do it.
 						switch (SwitchParser.ParseArg(args[0], plugin))
 						{
+							case 10: // tipscmd
+								if (!plugin.GetConfigBool("p079_tips"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
+								ev.Player.SendConsoleMessage(plugin.GetTranslation("controls").Replace("\\n", "\n"), "white");
+								ev.ReturnMessage = "<Made by RogerFK#3679>";
+								return;
 							case 1: // teslacmd
-								if (ev.Player.Scp079Data.AP >= 20)
+								if (!plugin.GetConfigBool("p079_tesla"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
+								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_tesla_level") - 1)
+								{
+									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_tesla_level").ToString());
+									return;
+								}
+								if (ev.Player.Scp079Data.AP >= plugin.GetConfigInt("p079_tesla_cost"))
 								{
 									bool noTesla = true;
 									foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
@@ -152,68 +174,318 @@ namespace pro079
 										{
 											if (tesla.TriggerDistance > 0)
 											{
-												ev.Player.Scp079Data.AP -= 50;
+												ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_tesla_cost");
 												ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
 												ev.Player.Scp079Data.Exp += 10.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 												Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
 												noTesla = false;
-												ev.ReturnMessage = "Tesla desactivada.";
+												ev.ReturnMessage = plugin.GetTranslation("teslasuccess");
 												break;
 											}
 											else
 											{
-												ev.ReturnMessage = "Esta Tesla está desactivada.";
+												ev.ReturnMessage = plugin.GetTranslation("teslaerror");
 											}
 										}
 									}
 									if (noTesla == true)
 									{
-										ev.ReturnMessage = "No estás cerca de una Tesla.";
+										ev.ReturnMessage = plugin.GetTranslation("teslanotclose");
 									}
 								}
 								else
 								{
-									ev.ReturnMessage = "No tienes suficiente energía (necesitas 20).";
+									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_tesla_cost").ToString());
 								}
 								return;
 							case 2: // teslascmd
-								if (ev.Player.Scp079Data.AP <= 40)
+								if (!plugin.GetConfigBool("p079_tesla"))
 								{
-									ev.ReturnMessage = "No tienes suficiente energía (necesitas 40).";
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
-								ev.Player.Scp079Data.AP -= 40f;
-								ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
+								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_tesla_level") - 1 && !ev.Player.GetBypassMode())
+								{
+									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_tesla_level").ToString());
+									return;
+								}
+								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_tesla_global_cost") && !ev.Player.GetBypassMode())
+								{
+									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_tesla_global_cost").ToString());
+									return;
+								}
+								if (!ev.Player.GetBypassMode())
+								{
+									ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_tesla_global_cost");
+								}
+
 								foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
 								{
 									if (tesla.TriggerDistance > 0)
 									{
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
+										ev.Player.Scp079Data.Exp += 5.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 										Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
 										ev.Player.Scp079Data.Exp += 4.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 									}
 								}
-								ev.ReturnMessage = "Teslas desactivadas.";
+								ev.ReturnMessage = plugin.GetTranslation("globaltesla");
 								return;
-							
+							case 7: // suicidecmd
+								if (!plugin.GetConfigBool("p079_suicide"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
+								List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+								int pcs = PCplayers.Count;
+								if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
+								{
+									ev.ReturnMessage = plugin.GetTranslation("cantsuicide");
+									return;
+								}
+								PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
+								Timing.Run(FakeKillPC());
+								ev.Player.Kill(DamageType.NUKE);
+								return;
 							case 3: // mtfcmd
-								ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía";
-								return;
+								if (!plugin.GetConfigBool("p079_mtf"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
+								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_mtf_level") - 1)
+								{
+									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_mtf_level").ToString());
+									return;
+								}
+								if (cooldownCassieGeneral)
+								{
+									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie");
+									return;
+								}
+								if (args.Count() >= 4)
+								{
+									if (cooldownMTF && !ev.Player.GetBypassMode())
+									{
+										ev.ReturnMessage = this.plugin.GetTranslation("cooldown");
+										return;
+									}
+									if (ev.Player.Scp079Data.AP >= plugin.GetConfigInt("p079_mtf_cost") || ev.Player.GetBypassMode())
+									{
+										if (!int.TryParse(args[3], out int scpLeft) || !int.TryParse(args[2], out int mtfNum) || !char.IsLetter(args[1][0]))
+										{
+											ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
+											return;
+										}
+										if (scpLeft > plugin.GetConfigInt("p079_mtf_maxscp"))
+										{
+											ev.ReturnMessage = ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString()) +
+												plugin.GetTranslation("mtfmaxscp").Replace("$max", plugin.GetConfigInt("p079_mtf_maxscp").ToString());
+											return;
+										}
+										if (!ev.Player.GetBypassMode())
+										{
+											ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_mtf_cost");
+											Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+											Timing.Run(CooldownMTF(plugin.GetConfigFloat("p079_mtf_cooldown")));
+										}
+										PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 2.8f * (ev.Player.Scp079Data.Level + 1);
+
+										ev.ReturnMessage = plugin.GetTranslation("success");
+										return;
+
+									}
+									else
+									{
+										ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
+									}
+									return;
+								}
+								else
+								{
+									ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", this.plugin.GetConfigInt("p079_mtf_cost").ToString());
+									return;
+								}
 							case 5: // scpcmd
-								ev.ReturnMessage = "Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - 50 de energía";
+								if (!plugin.GetConfigBool("p079_scp"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
+								if (!ev.Player.GetBypassMode())
+								{
+									if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_scp_level") - 1)
+									{
+										ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_scp_level").ToString());
+										return;
+									}
+
+									if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_scp_cost") && !ev.Player.GetBypassMode())
+									{
+										ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
+										return;
+									}
+								}
+								if (args.Length >= 3)
+								{
+									string[] scpList = new string[5]
+									{
+										"173", "096", "106", "049", "939"
+									};
+									if (!scpList.Contains(args[1]))
+									{
+										ev.ReturnMessage = plugin.GetTranslation("scpexist") + " - " + plugin.GetTranslation("scpuse").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
+										return;
+									}
+									string scpNum = string.Join(" ", args[1].ToCharArray());
+									switch (args[2])
+									{
+										case "mtf":
+											Player dummy = null;
+											List<Role> mtf = new List<Role>
+										{
+											Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER, Role.SCIENTIST
+										};
+											foreach (Player player in PluginManager.Manager.Server.GetPlayers())
+											{
+												if (mtf.Contains(player.TeamRole.Role))
+												{
+													dummy = player;
+													break;
+												}
+											}
+											string matador = "la MTF";
+											if (dummy == null)
+											{
+												ev.Player.SendConsoleMessage("No hay MTFs vivos. Mandando como \"unknown\"", "red");
+												matador = "\"Unknown\" (Chaos o Clase D)";
+											}
+
+											PluginManager.Manager.Server.Map.AnnounceScpKill(args[1], dummy);
+											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por " + matador + ".";
+											break;
+										case "unknown":
+											PluginManager.Manager.Server.Map.AnnounceScpKill(args[1], null);
+											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por \"Unknown\".";
+											break;
+										case "tesla":
+											PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Successfully Terminated by automatic security systems");
+											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por Tesla.";
+											break;
+										case "decont":
+											PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Lost in Decontamination Sequence");
+											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por descontaminación.";
+											break;
+										default:
+											ev.ReturnMessage = plugin.GetTranslation("scpway") + " .079 scp " + args[1] + " (unknown/tesla/mtf/decont)";
+											return;
+									}
+								}
+								else
+								{
+									ev.ReturnMessage = plugin.GetTranslation("scpuse").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
+									return;
+								}
+								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_scp_cost");
+								ev.Player.Scp079Data.Exp += 5.0f * (ev.Player.Scp079Data.Level + 1);
+								Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+								Timing.Run(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
 								return;
 							case 4: // gencmd
-								ev.ReturnMessage = "Uso: .079 gen (1-5) - Sonará que hay 1 generador activado - 50 de energía";
-								return;
+								if (!plugin.GetConfigBool("p079_gen"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
+								if (args.Count() == 1)
+								{
+									ev.ReturnMessage = "Uso: .079 gen (1-5) - Sonará que hay 1 generador activado - 50 de energía";
+									return;
+								}
+								// No need for a double check. The program already knows there are two arguments.
+								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_gen_level") - 1 && !ev.Player.GetBypassMode())
+								{
+									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_gen_level").ToString());
+									return;
+								}
+								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_gen_cost") && !ev.Player.GetBypassMode())
+								{//"p079_gen_cost"
+									ev.ReturnMessage = ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_gen_cost").ToString());
+									return;
+								}
+								if (cooldownGenerator && !ev.Player.GetBypassMode())
+								{
+									ev.ReturnMessage = "Tienes que esperar antes de volver a usar este comando";
+									return;
+								}
+								switch (args[1])
+								{
+									case "1":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon1");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = plugin.GetTranslation("success");
+										return;
+									case "2":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = plugin.GetTranslation("success");
+										return;
+									case "3":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = plugin.GetTranslation("success");
+										return;
+									case "4":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = plugin.GetTranslation("success");
+										return;
+									case "5":
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										Timing.Run(Fake5Gens());
+										ev.Player.Scp079Data.Exp += 80f;
+										Timing.Run(CooldownGen(70.3f + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = plugin.GetTranslation("gen5msg");
+										return;
+									case "6":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 50f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										Timing.Run(FakeKillPC());
+										ev.ReturnMessage = plugin.GetTranslation("gen6msg");
+										return;
+									default:
+										ev.ReturnMessage = "Uso: .079 gen 1 - Sonará que hay 1 generador activado, del 1-5, pon 6 para mandar que has muerto (nivel 3)\nEl 5 falseará la sequencia completa de contención";
+										return;
+								}
 							case 6: // infocmd
+								if (!plugin.GetConfigBool("p079_info"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								if (ev.Player.Scp079Data.AP < 5 && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = "No tienes suficiente energía (necesitas 5).";
-									return;
-								}
-								Timing.Run(CooldownInfo(2.5f));
-								if (infoCooldown)
-								{
-									ev.ReturnMessage = "Tienes que esperar antes de volver a usar el comando info";
 									return;
 								}
 								string humansAlive = "[Nivel 2]";
@@ -304,308 +576,100 @@ namespace pro079
 								ev.Player.Kill(DamageType.NUKE);
 								return;
 							case 8: // ultcmd
-								if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
+								if (!plugin.GetConfigBool("p079_ult"))
 								{
-									ev.ReturnMessage = "Para lanzar un ultimate necesitas tier 4.";
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
+								if (args.Count() == 1)
+								{
+									if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
+									{
+										ev.ReturnMessage = "Para lanzar un ultimate necesitas tier 4.";
+									}
+									else
+									{
+										ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
+											"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
+											"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
+											"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
+											+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
+									}
 								}
 								else
 								{
-									ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
+									if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
+									{
+										ev.ReturnMessage = "Para lanzar un ultimate necesitas tier 4";
+										return;
+									}
+									if (ultDown)
+									{
+										ev.ReturnMessage = "Debes esperar antes de volver a usar un ultimate.";
+										return;
+									}
+									if (!int.TryParse(args[1], out int ult))
+									{
+										ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
 										"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
 										"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
-										"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
-										+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
+										"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord, si nos gusta, ¡la añadiremos!.";
+										return;
+									}
+									ev.ReturnMessage = "Ultimate lanzada.";
+									switch (ult)
+									{
+										case 1:
+											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
+											Timing.Run(ShamelessTimingRunLights());
+											Timing.Run(CooldownUlt(180f));
+											return;
+										case 2:
+											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
+											Timing.Run(Ult2Toggle(30f));
+											Timing.Run(CooldownUlt(300f));
+											return;
+										default:
+											ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
+											"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
+											"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
+											"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord de World in Chaos.";
+											return;
+									}
 								}
+
 								return;
 							case 9: // chaoscmd
-								if (!plugin.GetConfigBool("p079_chaos"))
+								if (plugin.GetConfigBool("p079_chaos"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
 								if (cooldownCassieGeneral)
 								{
-									ev.ReturnMessage = plugin.GetTranslation("cassiecd");
+									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie");
 									return;
 								}
-								if(cooldownChaos)
-								if(ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level"))
+								if (cooldownChaos)
 								{
-									ev.ReturnMessage = plugin.GetConfigString("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
-									return;
+									if (ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level"))
+									{
+										ev.ReturnMessage = plugin.GetConfigString("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
+										return;
+									}
 								}
-								if(ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost"))
+
+								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost"))
 								{
 									ev.ReturnMessage = plugin.GetConfigString("lowmana").Replace("$min", plugin.GetConfigInt("p079_chaos_cost").ToString());
 									return;
 								}
 								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_chaos_cost");
-								ev.Player.Scp079Data.Exp += 20f;
 								PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.GetConfigString("p079_chaos_msg"));
 								ev.ReturnMessage = plugin.GetTranslation("success");
 								return;
-							case 10: // tipscmd
-									 //ev.Player.SendConsoleMessage(plugin.GetTranslation("controls"), "white");
-								ev.Player.SendConsoleMessage("TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079\n", "white");
-								ev.ReturnMessage = "<Made by RogerFK#3679>";
-								return;
 							default:
 								ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
-								return;
-						}
-					}
-					else if (args.Length > 1)
-					{
-
-						if (cooldownCassieGeneral && !ev.Player.GetBypassMode() && args[0] != "ultimate")
-						{
-							ev.ReturnMessage = "Tienes que esperar antes de volver a usar un comando que requiera al anunciante (C.A.S.S.I.E)";
-							return;
-						}
-						switch (args[0])
-						{
-							case "ultimate":
-								if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "Para lanzar un ultimate necesitas tier 4";
-									return;
-								}
-								if (ultDown)
-								{
-									ev.ReturnMessage = "Debes esperar antes de volver a usar un ultimate.";
-									return;
-								}
-								try
-								{
-									int.Parse(args[1]);
-								}
-								catch
-								{
-									ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
-									"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
-									"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
-									"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord, si nos gusta, ¡la añadiremos!.";
-									return;
-								}
-								ev.ReturnMessage = "Ultimate lanzada.";
-								switch (int.Parse(args[1]))
-								{
-									case 1:
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
-										Timing.Run(ShamelessTimingRunLights());
-										Timing.Run(CooldownUlt(180f));
-										return;
-									case 2:
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
-										Timing.Run(Ult2Toggle(30f));
-										Timing.Run(CooldownUlt(300f));
-										return;
-									default:
-										ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
-										"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
-										"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
-										"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord.";
-										return;
-								}
-							case "mtf":
-								if (cooldownMTF && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "Tienes que esperar antes de volver a usar el comando MTF";
-									return;
-								}
-								if (ev.Player.Scp079Data.Level >= 1 || ev.Player.GetBypassMode())
-								{
-									if (ev.Player.Scp079Data.AP >= 80 || ev.Player.GetBypassMode())
-									{
-										if (args.Length == 4)
-										{
-											int scpLeft, mtfNum;
-											if (!int.TryParse(args[3], out scpLeft) || !int.TryParse(args[2], out mtfNum))
-											{
-												ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía";
-												return;
-											}
-											if(scpLeft > 5)
-											{
-												ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía\nMaximo de SCPs: 5.";
-												return;
-											}
-											if (!char.IsLetter(args[1][0]))
-											{
-												ev.ReturnMessage = "Uso: .079 mtf (p) <--(LETRA) " + mtfNum + " " + scpLeft + ", dirá que Papa-" + mtfNum + " viene y quedan " + scpLeft + " SCP - 80 de energía";
-												return;
-											}
-
-											ev.Player.Scp079Data.AP -= 80;
-											PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
-											ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-											ev.Player.Scp079Data.Exp += 2.8f * (ev.Player.Scp079Data.Level + 1);
-											Timing.Run(CooldownCassie(30.0f));
-											Timing.Run(CooldownMTF(60.0f));
-											ev.ReturnMessage = "Comando lanzado.";
-											return;
-										}
-										else
-										{
-											ev.ReturnMessage = "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - 80 de energía";
-										}
-
-									}
-									else
-									{
-										ev.ReturnMessage = "No tienes suficiente energía (necesitas 80).";
-									}
-								}
-								else
-								{
-									ev.ReturnMessage = "No tienes suficiente nivel";
-								}
-
-								return;
-							case "scp":
-								if (ev.Player.Scp079Data.AP < 50 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "No tienes suficiente energía (necesitas 50).";
-									return;
-								}
-								if (args.Length >= 3)
-								{
-									string[] scpList = new string[5]
-									{
-										"173", "096", "106", "049", "939"
-									};
-									if (!scpList.Contains(args[1]))
-									{
-										ev.ReturnMessage = "Pon un SCP que exista - Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont)";
-										return;
-									}
-									string scpNum = string.Join(" ", args[1].ToCharArray());
-									switch (args[2])
-									{
-										case "mtf":
-											Player dummy = null;
-											List<Role> mtf = new List<Role>
-										{
-											Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER, Role.SCIENTIST
-										};
-											foreach (Player player in PluginManager.Manager.Server.GetPlayers())
-											{
-												if (mtf.Contains(player.TeamRole.Role))
-												{
-													dummy = player;
-													break;
-												}
-											}
-											string matador = "la MTF";
-											if (dummy == null)
-											{
-												ev.Player.SendConsoleMessage("No hay MTFs vivos. Mandando como \"unknown\"", "red");
-												matador = "\"Unknown\" (Chaos o Clase D)";
-											}
-
-											PluginManager.Manager.Server.Map.AnnounceScpKill(args[1], dummy);
-											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por " + matador + ".";
-											break;
-										case "unknown":
-											PluginManager.Manager.Server.Map.AnnounceScpKill(args[1], null);
-											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por \"Unknown\".";
-											break;
-										case "tesla":
-											PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Successfully Terminated by automatic security systems");
-											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por Tesla.";
-											break;
-										case "decont":
-											PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Lost in Decontamination Sequence");
-											ev.ReturnMessage = "Comando lanzado (SCP " + args[1] + " matado por descontaminación.";
-											break;
-										default:
-											ev.ReturnMessage = "Pon un método de morir que exista - Uso: .079 scp " + args[1] + " (unknown/tesla/mtf/decont)";
-											return;
-									}
-								}
-								else
-								{
-									ev.ReturnMessage = "Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - 50 de energía";
-									return;
-								}
-								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-								ev.Player.Scp079Data.AP -= 50;
-								ev.Player.Scp079Data.Exp += 5.0f * (ev.Player.Scp079Data.Level + 1);
-								Timing.Run(CooldownCassie(25.0f));
-								return;
-							case "gen":
-								if (ev.Player.Scp079Data.Level < 1 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "No tienes suficiente nivel (nivel 2 o superior)";
-									return;
-								}
-								if (ev.Player.Scp079Data.AP < 50 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "No tienes suficiente energía (necesitas 50).";
-									return;
-								}
-								if (cooldownGenerator && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "Tienes que esperar antes de volver a usar este comando";
-									return;
-								}
-								switch (args[1])
-								{
-									case "1":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon1");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(30.0f));
-										Timing.Run(CooldownCassie(25.5f));
-										ev.ReturnMessage = "Comando (generador 1) lanzado.";
-										return;
-									case "2":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(30.0f));
-										Timing.Run(CooldownCassie(25.5f));
-										ev.ReturnMessage = "Comando (generador 2) lanzado.";
-										return;
-									case "3":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(30.0f));
-										Timing.Run(CooldownCassie(25.5f));
-										ev.ReturnMessage = "Comando (generador 3) lanzado.";
-										return;
-									case "4":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(30.0f));
-										Timing.Run(CooldownCassie(25.5f));
-										ev.ReturnMessage = "Comando (generador 4) lanzado.";
-										return;
-									case "5":
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										Timing.Run(Fingir5Gens());
-										ev.Player.Scp079Data.Exp += 80f;
-										Timing.Run(CooldownGen(70.3f /*+ pe*/ +30f));
-										Timing.Run(CooldownCassie(15.5f));
-										ev.ReturnMessage = "Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.";
-										return;
-									case "6":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 50f;
-										Timing.Run(CooldownGen(160.0f));
-										Timing.Run(CooldownCassie(20.5f));
-										Timing.Run(FakeKillPC());
-										ev.ReturnMessage = "Comando de falsear el suicidio mandado.";
-										return;
-									default:
-										ev.ReturnMessage = "Uso: .079 gen 1 - Sonará que hay 1 generador activado, del 1-5, pon 6 para mandar que has muerto (nivel 3)\nEl 5 falseará la sequencia completa de contención";
-										return;
-								}
-							default:
-								ev.ReturnMessage = "Comando no reconocido. Usa .079 para ayuda";
 								return;
 						}
 					}
@@ -616,24 +680,30 @@ namespace pro079
 				}
 			}
 		}
-
+		
 		public void OnSetRole(PlayerSetRoleEvent ev)
 		{
 			if (!plugin.GetConfigBool("p079_broadcast_enable"))
 			{
 				return;
 			}
-			
-			if(ev.Role != Role.SCP_079)
+
+			if (ev.Role != Role.SCP_079)
 			{
 				// Not done in the same IF as it would have to read the List if it's SCP 079 two times
-				if (broadcasted.Contains(ev.Player.PlayerId)) ev.Player.PersonalClearBroadcasts();
+				if (broadcasted.Contains(ev.Player.PlayerId))
+				{
+					ev.Player.PersonalClearBroadcasts();
+				}
 			}
 			else //if (ev.Role == Role.SCP_079)
 			{
 				ev.Player.PersonalBroadcast(20, plugin.GetTranslation("broadcast_msg"), true);
 				ev.Player.SendConsoleMessage(helpFormatted, "white");
-				if (!broadcasted.Contains(ev.Player.PlayerId)) broadcasted.Add(ev.Player.PlayerId);
+				if (!broadcasted.Contains(ev.Player.PlayerId))
+				{
+					broadcasted.Add(ev.Player.PlayerId);
+				}
 			}
 		}
 
@@ -672,10 +742,10 @@ namespace pro079
 				room.FlickerLights();
 			}
 			yield return 8f;
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 Contained Successfully");
+			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
 		}
 
-		public static IEnumerable<float> Fingir5Gens()
+		public static IEnumerable<float> Fake5Gens()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
 			yield return 19.89f + 60f; // this value is fucking shit actually
@@ -683,78 +753,103 @@ namespace pro079
 			Timing.Run(FakeKillPC());
 		}
 
-		/* Cooldowns will probably be substituted with ticks although 
-		 * it wouldn't matter as there'd be a coroutine anyways 
-		 * to tell the player a command is ready */
-		public static IEnumerable<float> CooldownUlt(float time)
+		/* Cooldowns could be substituted with a coroutine,
+		 * but it wouldn't matter anyways as there will always be
+		 * a coroutine for the broadcast 
+		 
+		 * Also before you ask, no, you can't pass a bool as a reference in C#
+		 * or else I don't know the proper way to do it*/
+		private IEnumerable<float> CooldownScp(float v)
 		{
-			ultDown = true;
-			yield return time;
-			ultDown = false;
-			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-			foreach (Player player in PCplayers)
+			if (v > 0)
 			{
-				player.PersonalBroadcast(10, "<color=#85ff4c>Tus ultimates están listas</color>", false);
+				cooldownScp = true;
+				yield return v;
+				List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player pc in pcs)
+				{
+					pc.PersonalBroadcast(6, plugin.GetTranslation("scpready"), false);
+				}
+				cooldownScp = false;
+			}
+		}
+		private IEnumerable<float> CooldownUlt(float time)
+		{
+			if (time > 0)
+			{
+				ultDown = true;
+				yield return time;
+				ultDown = false;
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player player in PCplayers)
+				{
+					player.PersonalBroadcast(6, plugin.GetTranslation("ultready"), false);
+				} 
 			}
 		}
 
 		private IEnumerable<float> Ult2Toggle(float v)
 		{
-			UltDoors = true;
-			yield return v;
-			UltDoors = false;
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
+			if (v > 0)
+			{
+				UltDoors = true;
+				yield return v;
+				UltDoors = false;
+				PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
+			}
 		}
 
 		private IEnumerable<float> CooldownMTF(float time)
 		{
-			cooldownMTF = true;
-			yield return time;
-			cooldownMTF = false;
-			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-			foreach (Player player in PCplayers)
+			if (time > 0)
 			{
-				player.PersonalBroadcast(5, plugin.GetTranslation("mtfready"), false);
+				cooldownMTF = true;
+				yield return time;
+				cooldownMTF = false;
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player player in PCplayers)
+				{
+					player.PersonalBroadcast(5, plugin.GetTranslation("mtfready"), false);
+				} 
 			}
 		}
 
 		private IEnumerable<float> CooldownGen(float time)
 		{
-			cooldownGenerator = true;
-			yield return time;
-			cooldownGenerator = false;
-
-			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-			foreach (Player player in PCplayers)
+			if (time > 0)
 			{
-				player.PersonalBroadcast(5, plugin.GetTranslation("genready"), false);
+				cooldownGenerator = true;
+				yield return time;
+				cooldownGenerator = false;
+
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player player in PCplayers)
+				{
+					player.PersonalBroadcast(5, plugin.GetTranslation("genready"), false);
+				} 
 			}
 		}
 
 		private IEnumerable<float> CooldownCassie(float time)
 		{
-			cooldownCassieGeneral = true;
-			yield return time;
-			cooldownCassieGeneral = false;
-
-			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-			foreach (Player player in PCplayers)
+			if (time > 0)
 			{
-				player.PersonalBroadcast(5, plugin.GetTranslation("cassieready"), false);
+				cooldownCassieGeneral = true;
+				yield return time;
+				cooldownCassieGeneral = false;
+
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player player in PCplayers)
+				{
+					player.PersonalBroadcast(5, plugin.GetTranslation("cassieready"), false);
+				} 
 			}
 		}
-
-		public static IEnumerable<float> CooldownInfo(float time)
-		{
-			infoCooldown = true;
-			yield return time;
-			infoCooldown = false;
-		}
-
+		
 		/* pasted and slightly modified from here btw https://github.com/probe4aiur/Blackout
 		 * tbh that's what I was programming myself but then I had to check how many seconds
 		 * the lights were going to be turned off for, so I just actually copied that yield
-		 * thingy I swear to god
+		 * thingy I swear to god I'm not just a copy paster (and if I were I would still give proper credit)
 		 */
 		private IEnumerable<float> ShamelessTimingRunLights()
 		{
@@ -814,8 +909,10 @@ namespace pro079
 
 		public void OnDoorAccess(PlayerDoorAccessEvent ev)
 		{
-			if (UltDoors == false || string.IsNullOrWhiteSpace(ev.Door.Permission)) return;
-
+			if (UltDoors == false || string.IsNullOrWhiteSpace(ev.Door.Permission))
+			{
+				return;
+			}
 			else
 			{
 				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
@@ -834,7 +931,6 @@ namespace pro079
 			helpFormatted = FormatHelp();
 			cooldownGenerator = false;
 			cooldownCassieGeneral = false;
-			infoCooldown = false;
 			cooldownMTF = false;
 			ultDown = false;
 			DeconBool = false;
