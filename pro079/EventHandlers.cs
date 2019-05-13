@@ -379,15 +379,88 @@ namespace pro079
 								Timing.Run(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
 								return;
 							case 4: // gencmd
-								ev.ReturnMessage = "Uso: .079 gen (1-5) - Sonará que hay 1 generador activado - 50 de energía";
-								return;
+								if (args.Count() == 1)
+								{
+									ev.ReturnMessage = "Uso: .079 gen (1-5) - Sonará que hay 1 generador activado - 50 de energía";
+									return;
+								}
+								// No need for a double check. The program already knows there are two arguments.
+								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_gen_level") - 1 && !ev.Player.GetBypassMode())
+								{
+									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_gen_level").ToString());
+									return;
+								}
+								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_gen_cost") && !ev.Player.GetBypassMode())
+								{//"p079_gen_cost"
+									ev.ReturnMessage = ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_gen_cost").ToString());
+									return;
+								}
+								if (cooldownGenerator && !ev.Player.GetBypassMode())
+								{
+									ev.ReturnMessage = "Tienes que esperar antes de volver a usar este comando";
+									return;
+								}
+								switch (args[1])
+								{
+									case "1":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon1");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = "Comando (generador 1) lanzado.";
+										return;
+									case "2":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = "Comando (generador 2) lanzado.";
+										return;
+									case "3":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = "Comando (generador 3) lanzado.";
+										return;
+									case "4":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 20f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = "Comando (generador 4) lanzado.";
+										return;
+									case "5":
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										Timing.Run(Fake5Gens());
+										ev.Player.Scp079Data.Exp += 80f;
+										Timing.Run(CooldownGen(70.3f + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										ev.ReturnMessage = plugin.GetTranslation("gen5msg");
+										return;
+									case "6":
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
+										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
+										ev.Player.Scp079Data.Exp += 50f;
+										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										Timing.Run(FakeKillPC());
+										ev.ReturnMessage = plugin.GetTranslation("gen6msg");
+										return;
+									default:
+										ev.ReturnMessage = "Uso: .079 gen 1 - Sonará que hay 1 generador activado, del 1-5, pon 6 para mandar que has muerto (nivel 3)\nEl 5 falseará la sequencia completa de contención";
+										return;
+								}
 							case 6: // infocmd
 								if (ev.Player.Scp079Data.AP < 5 && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = "No tienes suficiente energía (necesitas 5).";
 									return;
 								}
-								Timing.Run(CooldownInfo(2.5f));
 								if (infoCooldown)
 								{
 									ev.ReturnMessage = "Tienes que esperar antes de volver a usar el comando info";
@@ -563,92 +636,6 @@ namespace pro079
 								return;
 						}
 					}
-					else if (args.Length > 1)
-					{
-
-						if (cooldownCassieGeneral && !ev.Player.GetBypassMode() && args[0] != "ultimate")
-						{
-							ev.ReturnMessage = "Tienes que esperar antes de volver a usar un comando que requiera al anunciante (C.A.S.S.I.E)";
-							return;
-						}
-						switch (args[0])
-						{
-							case "gen":
-								if (ev.Player.Scp079Data.Level < 1 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "No tienes suficiente nivel (nivel 2 o superior)";
-									return;
-								}
-								if (ev.Player.Scp079Data.AP < 50 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "No tienes suficiente energía (necesitas 50).";
-									return;
-								}
-								if (cooldownGenerator && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = "Tienes que esperar antes de volver a usar este comando";
-									return;
-								}
-								switch (args[1])
-								{
-									case "1":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon1");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(30.0f));
-										Timing.Run(CooldownCassie(25.5f));
-										ev.ReturnMessage = "Comando (generador 1) lanzado.";
-										return;
-									case "2":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(30.0f));
-										Timing.Run(CooldownCassie(25.5f));
-										ev.ReturnMessage = "Comando (generador 2) lanzado.";
-										return;
-									case "3":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(30.0f));
-										Timing.Run(CooldownCassie(25.5f));
-										ev.ReturnMessage = "Comando (generador 3) lanzado.";
-										return;
-									case "4":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(30.0f));
-										Timing.Run(CooldownCassie(25.5f));
-										ev.ReturnMessage = "Comando (generador 4) lanzado.";
-										return;
-									case "5":
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										Timing.Run(Fingir5Gens());
-										ev.Player.Scp079Data.Exp += 80f;
-										Timing.Run(CooldownGen(70.3f /*+ pe*/ + 30f));
-										Timing.Run(CooldownCassie(15.5f));
-										ev.ReturnMessage = "Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.";
-										return;
-									case "6":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 50f;
-										Timing.Run(CooldownGen(160.0f));
-										Timing.Run(CooldownCassie(20.5f));
-										Timing.Run(FakeKillPC());
-										ev.ReturnMessage = "Comando de falsear el suicidio mandado.";
-										return;
-									default:
-										ev.ReturnMessage = "Uso: .079 gen 1 - Sonará que hay 1 generador activado, del 1-5, pon 6 para mandar que has muerto (nivel 3)\nEl 5 falseará la sequencia completa de contención";
-										return;
-								}
-							default:
-								ev.ReturnMessage = "Comando no reconocido. Usa .079 para ayuda";
-								return;
-						}
-					}
 				}
 				else
 				{
@@ -656,22 +643,7 @@ namespace pro079
 				}
 			}
 		}
-
-		private IEnumerable<float> CooldownScp(float v)
-		{
-			if(v > 0)
-			{
-				cooldownScp = true;
-				yield return v;
-				List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach(Player pc in pcs)
-				{
-					pc.PersonalBroadcast(5,plugin.GetTranslation("scpready"),false);
-				}
-				cooldownScp = false;
-			}
-		}
-
+		
 		public void OnSetRole(PlayerSetRoleEvent ev)
 		{
 			if (!plugin.GetConfigBool("p079_broadcast_enable"))
@@ -736,7 +708,7 @@ namespace pro079
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
 		}
 
-		public static IEnumerable<float> Fingir5Gens()
+		public static IEnumerable<float> Fake5Gens()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
 			yield return 19.89f + 60f; // this value is fucking shit actually
@@ -744,78 +716,103 @@ namespace pro079
 			Timing.Run(FakeKillPC());
 		}
 
-		/* Cooldowns will probably be substituted with ticks although 
-		 * it wouldn't matter as there'd be a coroutine anyways 
-		 * to tell the player a command is ready */
-		public static IEnumerable<float> CooldownUlt(float time)
+		/* Cooldowns could be substituted with a coroutine,
+		 * but it wouldn't matter anyways as there will always be
+		 * a coroutine for the broadcast 
+		 
+		 * Also before you ask, no, you can't pass a bool as a reference in C#
+		 * or else I don't know the proper way to do it*/
+		private IEnumerable<float> CooldownScp(float v)
 		{
-			ultDown = true;
-			yield return time;
-			ultDown = false;
-			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-			foreach (Player player in PCplayers)
+			if (v > 0)
 			{
-				player.PersonalBroadcast(10, "<color=#85ff4c>Tus ultimates están listas</color>", false);
+				cooldownScp = true;
+				yield return v;
+				List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player pc in pcs)
+				{
+					pc.PersonalBroadcast(6, plugin.GetTranslation("scpready"), false);
+				}
+				cooldownScp = false;
+			}
+		}
+		private IEnumerable<float> CooldownUlt(float time)
+		{
+			if (time > 0)
+			{
+				ultDown = true;
+				yield return time;
+				ultDown = false;
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player player in PCplayers)
+				{
+					player.PersonalBroadcast(6, plugin.GetTranslation("ultready"), false);
+				} 
 			}
 		}
 
 		private IEnumerable<float> Ult2Toggle(float v)
 		{
-			UltDoors = true;
-			yield return v;
-			UltDoors = false;
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
+			if (v > 0)
+			{
+				UltDoors = true;
+				yield return v;
+				UltDoors = false;
+				PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
+			}
 		}
 
 		private IEnumerable<float> CooldownMTF(float time)
 		{
-			cooldownMTF = true;
-			yield return time;
-			cooldownMTF = false;
-			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-			foreach (Player player in PCplayers)
+			if (time > 0)
 			{
-				player.PersonalBroadcast(5, plugin.GetTranslation("mtfready"), false);
+				cooldownMTF = true;
+				yield return time;
+				cooldownMTF = false;
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player player in PCplayers)
+				{
+					player.PersonalBroadcast(5, plugin.GetTranslation("mtfready"), false);
+				} 
 			}
 		}
 
 		private IEnumerable<float> CooldownGen(float time)
 		{
-			cooldownGenerator = true;
-			yield return time;
-			cooldownGenerator = false;
-
-			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-			foreach (Player player in PCplayers)
+			if (time > 0)
 			{
-				player.PersonalBroadcast(5, plugin.GetTranslation("genready"), false);
+				cooldownGenerator = true;
+				yield return time;
+				cooldownGenerator = false;
+
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player player in PCplayers)
+				{
+					player.PersonalBroadcast(5, plugin.GetTranslation("genready"), false);
+				} 
 			}
 		}
 
 		private IEnumerable<float> CooldownCassie(float time)
 		{
-			cooldownCassieGeneral = true;
-			yield return time;
-			cooldownCassieGeneral = false;
-
-			List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-			foreach (Player player in PCplayers)
+			if (time > 0)
 			{
-				player.PersonalBroadcast(5, plugin.GetTranslation("cassieready"), false);
+				cooldownCassieGeneral = true;
+				yield return time;
+				cooldownCassieGeneral = false;
+
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				foreach (Player player in PCplayers)
+				{
+					player.PersonalBroadcast(5, plugin.GetTranslation("cassieready"), false);
+				} 
 			}
 		}
-
-		public static IEnumerable<float> CooldownInfo(float time)
-		{
-			infoCooldown = true;
-			yield return time;
-			infoCooldown = false;
-		}
-
+		
 		/* pasted and slightly modified from here btw https://github.com/probe4aiur/Blackout
 		 * tbh that's what I was programming myself but then I had to check how many seconds
 		 * the lights were going to be turned off for, so I just actually copied that yield
-		 * thingy I swear to god
+		 * thingy I swear to god I'm not just a copy paster (and if I were I would still give proper credit)
 		 */
 		private IEnumerable<float> ShamelessTimingRunLights()
 		{

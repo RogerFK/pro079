@@ -82,6 +82,7 @@ namespace pro079
 
 			AddConfig(new ConfigSetting("p079_gen", true, true, "Enables/disables Pro-079's fake SCP death messages"));
 			AddConfig(new ConfigSetting("p079_gen_cooldown", 60f, true, "How many seconds the command will give a cooldown for itself"));
+			AddConfig(new ConfigSetting("p079_gen_cost", 40, true, "Cost for the command"));
 			AddConfig(new ConfigSetting("p079_gen_level", 1, true, "Minimum level for 079 to fake a SCP death message"));
 			AddConfig(new ConfigSetting("p079_gen_penalty", 60f, true, "For how long there will be a penalty after using gen 5 or gen 6"));
 
@@ -136,6 +137,7 @@ namespace pro079
 			AddTranslation(new LangSetting("tips", "TAB (encima del Bloq. Mayus): abre el mapa donde estás.\\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079\\n", "pro079_" + this.GetConfigString("p079_lang")));
 			
 			AddTranslation(new LangSetting("cassieready", "<color=#85ff4c>Comandos de anunciante listos</color>", "pro079_" + lang));
+			AddTranslation(new LangSetting("ultready", "<color=#85ff4c>Tus ultimates están listas</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("mtfready", "<color=#85ff4c>Comando MTF listo</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("genready", "<color=#85ff4c>Comando generador listo</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("scpready", "<color=#85ff4c>Comando SCP listo</color>", "pro079_" + lang));
@@ -156,6 +158,9 @@ namespace pro079
 			AddTranslation(new LangSetting("cooldowncassie", "Espera antes de volver a usar un comando que requiera a C.A.S.S.I.E (anunciante)", "pro079_" + lang));
 
 			AddTranslation(new LangSetting("cantsuicide", "No puedes suicidarte cuando hay más SCP vivos", "pro079_" + lang));
+
+			AddTranslation(new LangSetting("gen5msg", "Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.", "pro079_" + lang));
+			AddTranslation(new LangSetting("gen6msg", "Comando de falsear suicidio lanzado.", "pro079_" + lang));
 			Timing.Init(this);
 
 			this.Info("Done loading! Took " + (UnityEngine.Time.time - startingTime).ToString("0.00") + " seconds to complete!");
