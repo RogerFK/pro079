@@ -698,10 +698,10 @@ namespace pro079
 			}
 		}
 
-		public static IEnumerable<float> DisableTesla(Smod2.API.TeslaGate tesla, float current)
+		private IEnumerable<float> DisableTesla(Smod2.API.TeslaGate tesla, float current)
 		{
 			tesla.TriggerDistance = -1f;
-			yield return 10f;
+			yield return plugin.GetConfigFloat("p079_tesla_seconds");
 			tesla.TriggerDistance = current;
 		}
 		/* // this is fucking op btw
