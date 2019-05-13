@@ -45,7 +45,7 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_tesla_global_cost", 50, true, "AP cost for the teslas command"));
 			AddConfig(new ConfigSetting("p079_tesla_level", 1, true, "Level for the tesla and teslas command"));
 
-			AddConfig(new ConfigSetting("p079_info", true, true, "Enables/disables Pro-079's info functionality"));
+			AddConfig(new ConfigSetting("p079_info", false, true, "Enables/disables Pro-079's info functionality"));
 			AddConfig(new ConfigSetting("p079_info_cost", 5, true, "AP cost for the info command"));
 			AddConfig(new ConfigSetting("p079_info_alive", 1, true, "Minimum level to display the info about how many people are alive"));
 			AddConfig(new ConfigSetting("p079_info_decont", 2, true, "Minimum level to display how many Class D and Scientists are alive"));
@@ -56,7 +56,7 @@ namespace pro079
 
 			// Ultimates not configurable yet. Will use a Dictionary for Ult IDs in the future with it's own Ultimate079 class
 			// If you want to help with this, at least point me towards the best way to read other .dlls for custom made Ultimates or to use piping
-			AddConfig(new ConfigSetting("p079_ult", true, true, "Enables/disables Pro-079's fake Chaos messages"));
+			AddConfig(new ConfigSetting("p079_ult", false, true, "Enables/disables Pro-079's fake Chaos messages"));
 			
 			AddConfig(new ConfigSetting("p079_suicide", true, true, "Enables/disables 079 to suicide when he is alone. Gives a shit about lone-079, feel free to use it"));
 
