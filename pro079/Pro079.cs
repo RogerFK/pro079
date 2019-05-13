@@ -135,7 +135,9 @@ namespace pro079
 			#endregion
 			// This line down below probably causes many issues when creating the file for the first time. Will be changed (or default completely disabled) in the future
 			AddTranslation(new LangSetting("tips", "TAB (encima del Bloq. Mayus): abre el mapa donde estás.\\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079\\n", "pro079_" + this.GetConfigString("p079_lang")));
-			
+
+			AddTranslation(new LangSetting("notscp079", "¡No eres SCP-079!", "pro079_" + lang));
+
 			AddTranslation(new LangSetting("cassieready", "<color=#85ff4c>Comandos de anunciante listos</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("ultready", "<color=#85ff4c>Tus ultimates están listas</color>", "pro079_" + lang));
 			AddTranslation(new LangSetting("mtfready", "<color=#85ff4c>Comando MTF listo</color>", "pro079_" + lang));

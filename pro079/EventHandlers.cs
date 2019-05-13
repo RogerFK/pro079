@@ -23,7 +23,6 @@ namespace pro079
 		}
 		private static bool cooldownGenerator = false;
 		private static bool cooldownCassieGeneral = false;
-		private static bool infoCooldown = false;
 		private static bool cooldownMTF = false;
 		private static bool cooldownChaos = false;
 		private static bool ultDown = false;
@@ -160,10 +159,20 @@ namespace pro079
 						switch (SwitchParser.ParseArg(args[0], plugin))
 						{
 							case 10: // tipscmd
+								if (!plugin.GetConfigBool("p079_tips"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								ev.Player.SendConsoleMessage(plugin.GetTranslation("controls").Replace("\\n", "\n"), "white");
 								ev.ReturnMessage = "<Made by RogerFK#3679>";
 								return;
 							case 1: // teslacmd
+								if (!plugin.GetConfigBool("p079_tesla"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_tesla_level") - 1)
 								{
 									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_tesla_level").ToString());
@@ -203,6 +212,11 @@ namespace pro079
 								}
 								return;
 							case 2: // teslascmd
+								if (!plugin.GetConfigBool("p079_tesla"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_tesla_level") - 1 && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_tesla_level").ToString());
@@ -230,6 +244,11 @@ namespace pro079
 								ev.ReturnMessage = plugin.GetTranslation("globaltesla");
 								return;
 							case 7: // suicidecmd
+								if (!plugin.GetConfigBool("p079_suicide"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 								int pcs = PCplayers.Count;
 								if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
@@ -242,6 +261,11 @@ namespace pro079
 								ev.Player.Kill(DamageType.NUKE);
 								return;
 							case 3: // mtfcmd
+								if (!plugin.GetConfigBool("p079_mtf"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_mtf_level") - 1)
 								{
 									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_mtf_level").ToString());
@@ -298,6 +322,11 @@ namespace pro079
 									return;
 								}
 							case 5: // scpcmd
+								if (!plugin.GetConfigBool("p079_scp"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								if (!ev.Player.GetBypassMode())
 								{
 									if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_scp_level") - 1)
@@ -379,6 +408,11 @@ namespace pro079
 								Timing.Run(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
 								return;
 							case 4: // gencmd
+								if (!plugin.GetConfigBool("p079_gen"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								if (args.Count() == 1)
 								{
 									ev.ReturnMessage = "Uso: .079 gen (1-5) - Sonará que hay 1 generador activado - 50 de energía";
@@ -408,7 +442,7 @@ namespace pro079
 										ev.Player.Scp079Data.Exp += 20f;
 										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
 										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = "Comando (generador 1) lanzado.";
+										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "2":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
@@ -416,7 +450,7 @@ namespace pro079
 										ev.Player.Scp079Data.Exp += 20f;
 										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
 										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = "Comando (generador 2) lanzado.";
+										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "3":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
@@ -424,7 +458,7 @@ namespace pro079
 										ev.Player.Scp079Data.Exp += 20f;
 										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
 										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = "Comando (generador 3) lanzado.";
+										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "4":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
@@ -432,7 +466,7 @@ namespace pro079
 										ev.Player.Scp079Data.Exp += 20f;
 										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
 										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = "Comando (generador 4) lanzado.";
+										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "5":
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
@@ -456,14 +490,14 @@ namespace pro079
 										return;
 								}
 							case 6: // infocmd
+								if (!plugin.GetConfigBool("p079_info"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								if (ev.Player.Scp079Data.AP < 5 && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = "No tienes suficiente energía (necesitas 5).";
-									return;
-								}
-								if (infoCooldown)
-								{
-									ev.ReturnMessage = "Tienes que esperar antes de volver a usar el comando info";
 									return;
 								}
 								string humansAlive = "[Nivel 2]";
@@ -542,10 +576,13 @@ namespace pro079
 								ev.Player.Scp079Data.Exp += 5;
 								return;
 							case 8: // ultcmd
+								if (!plugin.GetConfigBool("p079_ult"))
+								{
+									ev.ReturnMessage = plugin.GetTranslation("disabled");
+									return;
+								}
 								if (args.Count() == 1)
 								{
-
-
 									if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
 									{
 										ev.ReturnMessage = "Para lanzar un ultimate necesitas tier 4.";
@@ -596,7 +633,7 @@ namespace pro079
 											ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
 											"1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
 											"2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n" +
-											"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord.";
+											"3. ... ¡Añade tu propia aquí! Tan solo tienes que ponerlo en #sugerencias-debates en el Discord de World in Chaos.";
 											return;
 									}
 								}
@@ -610,7 +647,7 @@ namespace pro079
 								}
 								if (cooldownCassieGeneral)
 								{
-
+									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie");
 									return;
 								}
 								if (cooldownChaos)
@@ -895,7 +932,6 @@ namespace pro079
 			success = plugin.GetTranslation("success");
 			cooldownGenerator = false;
 			cooldownCassieGeneral = false;
-			infoCooldown = false;
 			cooldownMTF = false;
 			ultDown = false;
 			DeconBool = false;
