@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using scp4aiur; // Future update will have this removed
 using Smod2;
 using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
 using Smod2.EventSystem.Events;
+using MEC;
 
 namespace pro079
 {
@@ -176,7 +176,7 @@ namespace pro079
 												ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_tesla_cost");
 												ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
 												ev.Player.Scp079Data.Exp += 10.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
-												Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
+												Timing.RunCoroutine(DisableTesla(tesla, tesla.TriggerDistance));
 												noTesla = false;
 												ev.ReturnMessage = plugin.GetTranslation("teslasuccess");
 												break;
@@ -224,7 +224,7 @@ namespace pro079
 									{
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
 										ev.Player.Scp079Data.Exp += 5.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
-										Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
+										Timing.RunCoroutine(DisableTesla(tesla, tesla.TriggerDistance));
 										ev.Player.Scp079Data.Exp += 4.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 									}
 								}
@@ -244,7 +244,7 @@ namespace pro079
 									return;
 								}
 								PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-								Timing.Run(FakeKillPC());
+								Timing.RunCoroutine(FakeKillPC());
 								ev.Player.Kill(DamageType.NUKE);
 								return;
 							case 3: // mtfcmd
@@ -286,8 +286,8 @@ namespace pro079
 										if (!ev.Player.GetBypassMode())
 										{
 											ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_mtf_cost");
-											Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-											Timing.Run(CooldownMTF(plugin.GetConfigFloat("p079_mtf_cooldown")));
+											Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+											Timing.RunCoroutine(CooldownMTF(plugin.GetConfigFloat("p079_mtf_cooldown")));
 										}
 										PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
@@ -395,8 +395,8 @@ namespace pro079
 								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_scp_cost");
 								ev.Player.Scp079Data.Exp += 5.0f * (ev.Player.Scp079Data.Level + 1);
-								Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-								Timing.Run(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
+								Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+								Timing.RunCoroutine(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
 								return;
 							case 4: // gencmd
 								if (!plugin.GetConfigBool("p079_gen"))
@@ -431,49 +431,49 @@ namespace pro079
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon1");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "2":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "3":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "4":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "5":
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										Timing.Run(Fake5Gens());
+										Timing.RunCoroutine(Fake5Gens());
 										ev.Player.Scp079Data.Exp += 80f;
-										Timing.Run(CooldownGen(70.3f + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										Timing.RunCoroutine(CooldownGen(70.3f + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 										ev.ReturnMessage = plugin.GetTranslation("gen5msg");
 										return;
 									case "6":
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 50f;
-										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										Timing.Run(FakeKillPC());
+										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
+										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+										Timing.RunCoroutine(FakeKillPC());
 										ev.ReturnMessage = plugin.GetTranslation("gen6msg");
 										return;
 									default:
@@ -612,13 +612,13 @@ namespace pro079
 									{
 										case 1:
 											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
-											Timing.Run(ShamelessTimingRunLights());
-											Timing.Run(CooldownUlt(180f));
+											Timing.RunCoroutine(ShamelessTimingRunLights());
+											Timing.RunCoroutine(CooldownUlt(180f));
 											return;
 										case 2:
 											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
-											Timing.Run(Ult2Toggle(30f));
-											Timing.Run(CooldownUlt(300f));
+											Timing.RunCoroutine(Ult2Toggle(30f));
+											Timing.RunCoroutine(CooldownUlt(300f));
 											return;
 										default:
 											ev.ReturnMessage = "Uso: .079 ultimate <número>\n" +
@@ -679,6 +679,7 @@ namespace pro079
 				return;
 			}
 
+			// Block of code to avoid PlayerPrefs from doing retarded stuff
 			if (ev.Role != Role.SCP_079)
 			{
 				// Not done in the same IF as it would have to read the List if it's SCP 079 two times
@@ -698,14 +699,14 @@ namespace pro079
 			}
 		}
 
-		private IEnumerable<float> DisableTesla(Smod2.API.TeslaGate tesla, float current)
+		private IEnumerator<float> DisableTesla(Smod2.API.TeslaGate tesla, float current)
 		{
 			tesla.TriggerDistance = -1f;
 			yield return plugin.GetConfigFloat("p079_tesla_seconds");
 			tesla.TriggerDistance = current;
 		}
 		/* // this is fucking op btw
-		public static IEnumerable<float> OverCharge()
+		public static IEnumerator<float> OverCharge()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Warning All Security Personnel Unauthorized Use Of Error Error Error Error pitch_2 error error error error pitch_1 error");
 
@@ -719,11 +720,11 @@ namespace pro079
 
 			foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
 			{
-				Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
+				Timing.RunCoroutine(DisableTesla(tesla, tesla.TriggerDistance));
 			}
 		}
 		*/
-		public static IEnumerable<float> FakeKillPC()
+		public static IEnumerator<float> FakeKillPC()
 		{
 			// falta cerrar puertas
 			yield return 7.3f;
@@ -736,12 +737,12 @@ namespace pro079
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
 		}
 
-		public static IEnumerable<float> Fake5Gens()
+		public static IEnumerator<float> Fake5Gens()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
 			yield return 19.89f + 60f; // this value is fucking shit actually
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-			Timing.Run(FakeKillPC());
+			Timing.RunCoroutine(FakeKillPC());
 		}
 
 		/* Cooldowns could be substituted with a coroutine,
@@ -750,9 +751,9 @@ namespace pro079
 		 
 		 * Also before you ask, no, you can't pass a bool as a reference in C#
 		 * or else I don't know the proper way to do it*/
-		private IEnumerable<float> CooldownScp(float v)
+		private IEnumerator<float> CooldownScp(float v)
 		{
-			if (v > 0)
+			if (v > 4)
 			{
 				cooldownScp = true;
 				yield return v;
@@ -764,9 +765,9 @@ namespace pro079
 				cooldownScp = false;
 			}
 		}
-		private IEnumerable<float> CooldownUlt(float time)
+		private IEnumerator<float> CooldownUlt(float time)
 		{
-			if (time > 0)
+			if (time > 4)
 			{
 				ultDown = true;
 				yield return time;
@@ -779,9 +780,9 @@ namespace pro079
 			}
 		}
 
-		private IEnumerable<float> Ult2Toggle(float v)
+		private IEnumerator<float> Ult2Toggle(float v)
 		{
-			if (v > 0)
+			if (v > 4)
 			{
 				UltDoors = true;
 				yield return v;
@@ -790,9 +791,9 @@ namespace pro079
 			}
 		}
 
-		private IEnumerable<float> CooldownMTF(float time)
+		private IEnumerator<float> CooldownMTF(float time)
 		{
-			if (time > 0)
+			if (time > 4)
 			{
 				cooldownMTF = true;
 				yield return time;
@@ -805,9 +806,9 @@ namespace pro079
 			}
 		}
 
-		private IEnumerable<float> CooldownGen(float time)
+		private IEnumerator<float> CooldownGen(float time)
 		{
-			if (time > 0)
+			if (time > 4)
 			{
 				cooldownGenerator = true;
 				yield return time;
@@ -821,9 +822,9 @@ namespace pro079
 			}
 		}
 
-		private IEnumerable<float> CooldownCassie(float time)
+		private IEnumerator<float> CooldownCassie(float time)
 		{
-			if (time > 0)
+			if (time > 4)
 			{
 				cooldownCassieGeneral = true;
 				yield return time;
@@ -842,7 +843,7 @@ namespace pro079
 		 * the lights were going to be turned off for, so I just actually copied that yield
 		 * thingy I swear to god I'm not just a copy paster (and if I were I would still give proper credit)
 		 */
-		private IEnumerable<float> ShamelessTimingRunLights()
+		private IEnumerator<float> ShamelessTimingRunLights()
 		{
 			yield return 12.1f;
 			float start = PluginManager.Manager.Server.Round.Duration;
