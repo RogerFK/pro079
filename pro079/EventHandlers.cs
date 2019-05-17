@@ -150,7 +150,7 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
-								ev.Player.SendConsoleMessage(plugin.GetTranslation("controls").Replace("\\n", "\n"), "white");
+								ev.Player.SendConsoleMessage(plugin.GetTranslation("tips").Replace("\\n", "\n"), "white");
 								ev.ReturnMessage = "<Made by RogerFK#3679>";
 								return;
 							case 1: // teslacmd
