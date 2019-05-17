@@ -486,83 +486,114 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
-								if (ev.Player.Scp079Data.AP < 5 && !ev.Player.GetBypassMode())
+								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_info_cost") && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = "No tienes suficiente energía (necesitas 5).";
 									return;
 								}
-								string humansAlive = "[Nivel 2]";
-								string tiempoDecont = "[Nivel 2]";
-								string ScientistsEscaped = "[Nivel 3]";
-								string ClassDEscaped = "[Nivel 3]";
-								string ClassDAlive = "[Nivel 2]";
-								string ScientistsAlive = "[Nivel 2]";
-								string MTFAlive = "[Nivel 3]";
-								string CiAlive = "[Nivel 3]";
-								string MTFtiempo = "[Nivel 3]";
+								int level = ev.Player.Scp079Data.Level + 1;
+								string humansAlive;
+								string decontTime;
+								string ScientistsEscaped;
+								string ClassDEscaped;
+								string ClassDAlive;
+								string ScientistsAlive;
+								string MTFAlive;
+								string CiAlive;
+								string estMTFtime = "[Nivel 3]";
 
-								if (ev.Player.Scp079Data.Level > 0 || ev.Player.GetBypassMode())
+								if (level < plugin.GetConfigInt("p079_info_alive")) humansAlive = '[' + plugin.GetConfigInt("p079_info_alive").ToString() + ']';
+								else humansAlive = (PluginManager.Manager.Server.Round.Stats.ClassDAlive + PluginManager.Manager.Server.Round.Stats.ScientistsAlive + PluginManager.Manager.Server.Round.Stats.CiAlive + PluginManager.Manager.Server.Round.Stats.NTFAlive).ToString();
+
+								if (level < plugin.GetConfigInt("p079_info_decont")) decontTime = '[' + plugin.GetConfigInt("p079_info_decont").ToString() + ']';
+								else
 								{
-									humansAlive = (PluginManager.Manager.Server.Round.Stats.ClassDAlive + PluginManager.Manager.Server.Round.Stats.ScientistsAlive + PluginManager.Manager.Server.Round.Stats.CiAlive + PluginManager.Manager.Server.Round.Stats.NTFAlive).ToString();
-
-									ClassDAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive.ToString("00");
-									ScientistsAlive = PluginManager.Manager.Server.Round.Stats.ScientistsAlive.ToString("00");
-
 									if (DeconBool == true)
 									{
-										tiempoDecont = "La descontaminación está desactivada";
+										decontTime = plugin.GetTranslation("decontdisabled");
 									}
 									else if (PluginManager.Manager.Server.Map.LCZDecontaminated == true)
 									{
-										tiempoDecont = "LCZ está descontaminada";
+										decontTime = plugin.GetTranslation("deconthappened");
 									}
 									else
 									{
-										tiempoDecont = (DeconTime - float.Parse(PluginManager.Manager.Server.Round.Duration.ToString()) / 60.0f).ToString("0.00");
+										decontTime = (DeconTime - float.Parse(PluginManager.Manager.Server.Round.Duration.ToString()) / 60.0f).ToString("0.00");
 									}
 								}
-								if (ev.Player.Scp079Data.Level > 1 || ev.Player.GetBypassMode())
+								if (level < plugin.GetConfigInt("p079_info_escaped"))
+								{
+									ScientistsEscaped = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_escaped").ToString()) + ']';
+									ClassDEscaped = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_escaped").ToString()) + ']';
+								}
+								else
 								{
 									ClassDEscaped = PluginManager.Manager.Server.Round.Stats.ClassDEscaped.ToString("00");
 									ScientistsEscaped = PluginManager.Manager.Server.Round.Stats.ScientistsEscaped.ToString("00");
+								}
 
+								if (level < plugin.GetConfigInt("p079_info_plebs"))
+								{
+									ClassDAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_plebs").ToString()) + ']';
+									ScientistsAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_plebs").ToString()) + ']';
+								}
+								else
+								{
+									ClassDAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive.ToString("00");
+									ScientistsAlive = PluginManager.Manager.Server.Round.Stats.ScientistsAlive.ToString("00");
+								}
+								if (level < plugin.GetConfigInt("p079_info_mtfci"))
+								{
+									MTFAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_mtfci").ToString()) + ']';
+									CiAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_mtfci").ToString()) + ']';
+								}
+								else
+								{
 									MTFAlive = PluginManager.Manager.Server.Round.Stats.NTFAlive.ToString("00");
 									CiAlive = PluginManager.Manager.Server.Round.Stats.CiAlive.ToString("00");
+								}
 
+								if (ev.Player.Scp079Data.Level > 1 || ev.Player.GetBypassMode())
+								{
+									
 									if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MinMTF)
 									{
-										MTFtiempo = "entre " + (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " segundos y " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " segundos.";
+										estMTFtime = "entre " + (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " segundos y " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " segundos.";
 									}
 									else if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MaxMTF)
 									{
-										MTFtiempo = "menos de " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0");
+										estMTFtime = "menos de " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0");
 									}
 									else
 									{
-										MTFtiempo = "están reapareciendo / van a reaparecer pronto.";
+										estMTFtime = "están reapareciendo / van a reaparecer pronto.";
 									}
 								}
 								ev.Player.SendConsoleMessage(
 								"\nSCP vivos: " + PluginManager.Manager.Server.Round.Stats.SCPAlive +
-								"\nHumanos vivos: " + humansAlive + " | Siguientes MTF/Chaos: " + MTFtiempo +
-								"\nTiempo hasta la descontaminación: " + tiempoDecont +
+								"\nHumanos vivos: " + humansAlive + " | Siguientes MTF/Chaos: " + estMTFtime +
+								"\nTiempo hasta la descontaminación: " + decontTime +
 								"\nClase D escapados: " + ClassDEscaped + " | Científicos escapados: " + ScientistsEscaped +
 								"\nClase D vivos:     " + ClassDAlive + " | Chaos vivos:           " + CiAlive +
 								"\nCientíficos vivos: " + ScientistsAlive + " | MTF vivos:             " + MTFAlive
 								, "white");
-								ev.ReturnMessage = "Generadores:\n";
-								foreach (Generator generator in PluginManager.Manager.Server.Map.GetGenerators())
+								if (level > plugin.GetConfigInt("p079_info_gens"))
 								{
-									ev.ReturnMessage = ev.ReturnMessage + "Generador de " + generator.Room.RoomType.ToString();
-									if (generator.Engaged)
+									ev.ReturnMessage = "Generadores:\n";
+									foreach (Generator generator in PluginManager.Manager.Server.Map.GetGenerators())
 									{
-										ev.ReturnMessage += " está activado.\n";
-									}
-									else
-									{
-										ev.ReturnMessage += (generator.HasTablet ? " tiene una tablet y le quedan " : " no tiene tablet y le quedan ") + generator.TimeLeft.ToString("0") + " segundos.\n";
+										ev.ReturnMessage += plugin.GetTranslation("generatorin").Replace("$room", generator.Room.RoomType.ToString()) + ' ';
+										if (generator.Engaged)
+										{
+											ev.ReturnMessage += plugin.GetTranslation("activated") + '\n';
+										}
+										else
+										{
+											ev.ReturnMessage += (generator.HasTablet ? plugin.GetTranslation("hastablet") : plugin.GetTranslation("notablet")) + ' ' + plugin.GetTranslation("timeleft").Replace("$sec", generator.TimeLeft.ToString("0"));
+										}
 									}
 								}
+								else ev.ReturnMessage = '[' + plugin.GetTranslation("lockeduntil").Replace("$lvl", plugin.GetConfigInt("p079_info_gens").ToString()) + ']';
 								ev.Player.Scp079Data.AP -= 5;
 								ev.Player.Scp079Data.Exp += 5;
 								return;
