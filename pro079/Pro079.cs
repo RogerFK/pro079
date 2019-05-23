@@ -45,7 +45,6 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_tesla_level", 1, true, "Level for the tesla and teslas command"));
 
 			AddConfig(new ConfigSetting("p079_info", true, true, "Enables/disables Pro-079's info functionality"));
-			AddConfig(new ConfigSetting("p079_info_cost", 5, true, "AP cost for the info command"));
 			AddConfig(new ConfigSetting("p079_info_alive", 1, true, "Minimum level to display the info about how many people are alive"));
 			AddConfig(new ConfigSetting("p079_info_decont", 2, true, "Minimum level to display how many Class D and Scientists are alive"));
 			AddConfig(new ConfigSetting("p079_info_escaped", 2, true, "Minimum level to display the info about how many people escaped"));
@@ -134,7 +133,7 @@ namespace pro079
 
 			#endregion
 			// This line down below probably causes many issues when creating the file for the first time. Will be changed (or default completely disabled) in the future
-			AddTranslation(new LangSetting("tips", @"TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079\n", this.GetConfigString("p079_lang")));
+			AddTranslation(new LangSetting("tips", @"TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079", lang));
 
 			AddTranslation(new LangSetting("notscp079", "¡No eres SCP-079!", lang));
 
@@ -171,18 +170,13 @@ namespace pro079
             AddTranslation(new LangSetting("decontdisabled", "La descontaminación está desactivada", lang));
 			AddTranslation(new LangSetting("deconthappened", "LCZ está descontaminada", lang));
             // This happens when the nuke goes off before decont, but I don't know how it works and how many minutes it adds, because I saw at one time -3 mins.
-            AddTranslation(new LangSetting("deconthappened", "debería haber ocurrido", lang));
+            AddTranslation(new LangSetting("decontbug", "debería haber ocurrido", lang));
             AddTranslation(new LangSetting("mtfest0", "entre $(min)s y $(max)s", lang));
             AddTranslation(new LangSetting("mtfest1", "menos de $(max)", lang));
             AddTranslation(new LangSetting("mtfest2", "están reapareciendo / deberían haber reaparecido", lang));
 
-            AddTranslation(new LangSetting("infomsg", @"\nSCP vivos: $scpalive" +
-                                "\nHumanos vivos: $humans | Siguientes MTF/Chaos: $estMTF" +
-                                "\nTiempo hasta la descontaminación: $decont" +
-                                "\nClase D escapados: $cdesc | Científicos escapados: $sciesc" +
-                                "\nClase D vivos:     $cdalive | Chaos vivos:           $cialive" +
-                                "\nCientíficos vivos: $scialive | MTF vivos:             $mtfalive", lang));
-
+            AddTranslation(new LangSetting("infomsg",      "SCP vivos: $scpalive\\nHumanos vivos: $humans | Siguientes MTF/Chaos: $estMTF\\nTiempo hasta la descontaminación: $decont\\nClase D escapados: $cdesc | Científicos escapados: $sciesc\\nClase D vivos:     $cdalive | Chaos vivos:           $cialive\\nCientíficos vivos: $scialive | MTF vivos:             $mtfalive", lang));
+            
             AddTranslation(new LangSetting("lockeduntil", "Bloqueado hasta el nivel $lvl", lang));
 			AddTranslation(new LangSetting("generators", "Generadores:", lang));
 
@@ -197,10 +191,7 @@ namespace pro079
             AddTranslation(new LangSetting("ultdown", "Debes esperar antes de volver a usar un ultimate.", lang));
             AddTranslation(new LangSetting("ultlaunched", "Ultimate lanzada.", lang));
 
-
-            AddTranslation(new LangSetting("ultusage", @"Uso: .079 ultimate <número>\n" +
-                                        "1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
-                                        "2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n"));
+            AddTranslation(new LangSetting("ultusage", "Uso: .079 ultimate <número>\\n1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\\n2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)", lang));
             
             AddTranslation(new LangSetting("kys", "<color=#AA1515>Pulsa ñ y escribe \".079 suicidio\" para suicidarte.</color>", lang));
 

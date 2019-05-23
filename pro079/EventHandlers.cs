@@ -36,13 +36,18 @@ namespace pro079
 		private string FormatEnergyLevel(int energy, int level, string energStr, string lvlStr)
 		{
 			string str;
-			if (energy > 0 || level > 1)
+			if (energy > 0)
 			{
-				str = " (" + (energy > 0 ? energStr.Replace("$ap", energy.ToString()) : "")
+				str = " (" + energStr.Replace("$ap", energy.ToString())
 					+ (level > 1 ? ", " + lvlStr.Replace("$lvl", level.ToString()) : "") + ')';
 				return str;
 			}
-			return "";
+            if (energy <= 0 && level > 1)
+            {
+                str = " (" + FirstCharToUpper(lvlStr.Replace("$lvl", level.ToString())) + ')';
+                return str;
+            }
+			return string.Empty;
 		}
 
 		// This thing below was pasted from here: https://www.c-sharpcorner.com/blogs/first-letter-in-uppercase-in-c-sharp1
@@ -53,7 +58,7 @@ namespace pro079
 			{
 				return string.Empty;
 			}
-			// Return char and concat substring.  
+			// Return char and concat substring.
 			return char.ToUpper(s[0]) + s.Substring(1);
 		}
 		private string FormatHelp()
@@ -64,9 +69,9 @@ namespace pro079
 			if (plugin.GetConfigBool("p079_tesla"))
 			{
 				string aux = plugin.GetTranslation("teslahelp");
-				help += '\n' + aux.Replace("$sec", plugin.GetConfigInt("p079_tesla_seconds").ToString()) +
-					" (" + energyaux.Replace("$energy", plugin.GetConfigInt("p079_tesla_cost").ToString()) + (plugin.GetConfigInt("p079_tesla_level") > 1 ? ", " + lvlaux.Replace("$lvl", plugin.GetConfigInt("p079_tesla_level").ToString()) : "") + ')';
-				aux = plugin.GetTranslation("teslashelp");
+				help += '\n' + aux.Replace("$sec", plugin.GetConfigInt("p079_tesla_seconds").ToString())
+                + FormatEnergyLevel(plugin.GetConfigInt("p079_tesla_cost"), plugin.GetConfigInt("p079_tesla_level"), energyaux, lvlaux);
+                aux = plugin.GetTranslation("teslashelp");
 				help += '\n' + aux.Replace("$sec", plugin.GetConfigInt("p079_tesla_seconds").ToString())
 				+ FormatEnergyLevel(plugin.GetConfigInt("p079_tesla_global_cost"), plugin.GetConfigInt("p079_tesla_level"), energyaux, lvlaux);
 			}
@@ -96,7 +101,7 @@ namespace pro079
 			}
 			if (plugin.GetConfigBool("p079_info"))
 			{
-				help += '\n' + plugin.GetTranslation("infohelp") + FormatEnergyLevel(plugin.GetConfigInt("p079_info_cost"), 0, energyaux, lvlaux);
+				help += '\n' + plugin.GetTranslation("infohelp") + FormatEnergyLevel(0, 0, energyaux, lvlaux);
 			}
 			if (plugin.GetConfigBool("p079_tips"))
 			{
@@ -111,7 +116,7 @@ namespace pro079
 			if (command.StartsWith("079"))
 			{
 				ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
-				//this is pasted from PlayerPrefs https://github.com/probe4aiur/PlayerPreferences/
+				// this block is pasted from PlayerPrefs https://github.com/probe4aiur/PlayerPreferences/
 				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
 				string[] args = new string[collection.Count - 1];
 
@@ -130,7 +135,6 @@ namespace pro079
 					}
 				}
 				// end of the paste thx
-				// everything below this is completely hardcoded in Spanish
 				if (ev.Player.TeamRole.Role == Role.SCP_079)
 				{
 					if (args.Length == 0)
@@ -138,7 +142,7 @@ namespace pro079
 						ev.Player.SendConsoleMessage(helpFormatted, "white");
 						ev.ReturnMessage = plugin.GetTranslation("bugwarn") + " <Made by RogerFK#3679>";
 					}
-					else if (args.Length == 1)
+					else if (args.Length > 0)
 					{
 						// Most unclear way to do the switch statement, but anyways it's the most optimized way to do it.
 						switch (SwitchParser.ParseArg(args[0], plugin))
@@ -222,12 +226,11 @@ namespace pro079
 									if (tesla.TriggerDistance > 0)
 									{
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
-										ev.Player.Scp079Data.Exp += 5.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 										Timing.RunCoroutine(DisableTesla(tesla, tesla.TriggerDistance));
-										ev.Player.Scp079Data.Exp += 4.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 									}
 								}
-								ev.ReturnMessage = plugin.GetTranslation("globaltesla");
+                                ev.Player.Scp079Data.Exp += 5.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
+                                ev.ReturnMessage = plugin.GetTranslation("globaltesla");
 								return;
 							case 7: // suicidecmd
 								if (!plugin.GetConfigBool("p079_suicide"))
@@ -483,11 +486,6 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
-								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_info_cost") && !ev.Player.GetBypassMode())
-								{
-                                    ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_info_cost").ToString());
-                                    return;
-								}
 								int level = ev.Player.Scp079Data.Level + 1;
 								string humansAlive;
 								string decontTime;
@@ -574,7 +572,8 @@ namespace pro079
                                     estMTFtime = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_mtfest").ToString()) + ']';
 
                                 }
-                                /*ev.Player.SendConsoleMessage(
+                                /* Old method, just as a reference for me.
+                                ev.Player.SendConsoleMessage(
 								"\nSCP vivos: " + PluginManager.Manager.Server.Round.Stats.SCPAlive +
 								"\nHumanos vivos: " + humansAlive + " | Siguientes MTF/Chaos: " + estMTFtime +
 								"\nTiempo hasta la descontaminación: " + decontTime +
@@ -590,7 +589,7 @@ namespace pro079
                                     .Replace("$cdesc", ClassDEscaped).Replace("$sciesc", ScientistsEscaped)
                                     .Replace("$cdalive", ClassDAlive).Replace("$cialive", CiAlive)
                                     .Replace("$scialive", ScientistsAlive).Replace("$mtfalive", MTFAlive);
-                                ev.Player.SendConsoleMessage(infomsg, "white");
+                                ev.Player.SendConsoleMessage(infomsg.Replace("\\n", Environment.NewLine), "white");
 								if (level > plugin.GetConfigInt("p079_info_gens"))
 								{
                                     ev.ReturnMessage = plugin.GetTranslation("generators");
@@ -603,13 +602,11 @@ namespace pro079
 										}
 										else
 										{
-											ev.ReturnMessage += (generator.HasTablet ? plugin.GetTranslation("hastablet") : plugin.GetTranslation("notablet")) + ' ' + plugin.GetTranslation("timeleft").Replace("$sec", generator.TimeLeft.ToString("0"));
+											ev.ReturnMessage += (generator.HasTablet ? plugin.GetTranslation("hastablet") : plugin.GetTranslation("notablet")) + ' ' + plugin.GetTranslation("timeleft").Replace("$sec", generator.TimeLeft.ToString("0")) + '\n';
 										}
 									}
 								}
 								else ev.ReturnMessage = '[' + plugin.GetTranslation("lockeduntil").Replace("$lvl", plugin.GetConfigInt("p079_info_gens").ToString()) + ']';
-								ev.Player.Scp079Data.AP -= 5;
-								ev.Player.Scp079Data.Exp += 5;
 								return;
 							case 8: // ultcmd
 								if (!plugin.GetConfigBool("p079_ult"))
@@ -617,11 +614,9 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
-                                string ultUsage = "Uso: .079 ultimate <número>\n" +
-                                        "1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
-                                        "2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n";
-                                // if it's our server, don't enter if you're a guiri
-                                if (PluginManager.Manager.Server.Name.Contains("World in Chaos"))
+                                string ultUsage = plugin.GetTranslation("ultusage").Replace("\\n", "\n");
+                                // if it's our server, and by the way don't enter if you're a guiri
+                                if (PluginManager.Manager.Server.Name.ToLower().Contains("world in chaos"))
                                 {
                                     ultUsage += "3. ... ¡Añade tu idea aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
                                     + "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
@@ -724,16 +719,18 @@ namespace pro079
 				return;
 			}
 
-            ev.Player.PersonalClearBroadcasts();
-            ev.Player.PersonalBroadcast(20, plugin.GetTranslation("broadcast_msg"), true);
-            ev.Player.SendConsoleMessage(helpFormatted, "white");
-
+            if (ev.Role == Role.SCP_079)
+            {
+                ev.Player.PersonalClearBroadcasts();
+                ev.Player.PersonalBroadcast(20, plugin.GetTranslation("broadcast_msg"), true);
+                ev.Player.SendConsoleMessage(helpFormatted, "white"); 
+            }
         }
 
         private IEnumerator<float> DisableTesla(Smod2.API.TeslaGate tesla, float current)
 		{
 			tesla.TriggerDistance = -1f;
-			yield return plugin.GetConfigFloat("p079_tesla_seconds");
+			yield return Timing.WaitForSeconds(plugin.GetConfigFloat("p079_tesla_seconds"));
 			tesla.TriggerDistance = current;
 		}
 		/* // this is fucking op btw
@@ -758,20 +755,20 @@ namespace pro079
 		public static IEnumerator<float> FakeKillPC()
 		{
 			// doesn't close doors but I'm not gonna do it lmao
-			yield return 7.3f;
+			yield return Timing.WaitForSeconds(7.3f);
 
 			foreach (Room room in rooms)
 			{
 				room.FlickerLights();
 			}
-			yield return 8f;
+			yield return Timing.WaitForSeconds(8f);
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
 		}
 
 		public static IEnumerator<float> Fake5Gens()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
-			yield return 19.89f + 60f; // this value is fucking shit actually
+			yield return Timing.WaitForSeconds(79.89f); // this value is fucking shit actually
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 			Timing.RunCoroutine(FakeKillPC());
 		}
@@ -787,7 +784,7 @@ namespace pro079
 			if (v > 4)
 			{
 				cooldownScp = true;
-				yield return v;
+				yield return Timing.WaitForSeconds(v);
 				List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player pc in pcs)
 				{
@@ -801,7 +798,7 @@ namespace pro079
 			if (time > 4)
 			{
 				ultDown = true;
-				yield return time;
+				yield return Timing.WaitForSeconds(time);
 				ultDown = false;
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
@@ -816,7 +813,7 @@ namespace pro079
 			if (v > 4)
 			{
 				UltDoors = true;
-				yield return v;
+				yield return Timing.WaitForSeconds(v);
 				UltDoors = false;
 				PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
 			}
@@ -827,7 +824,7 @@ namespace pro079
 			if (time > 4)
 			{
 				cooldownMTF = true;
-				yield return time;
+				yield return Timing.WaitForSeconds(time);
 				cooldownMTF = false;
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
@@ -842,7 +839,7 @@ namespace pro079
 			if (time > 4)
 			{
 				cooldownGenerator = true;
-				yield return time;
+				yield return Timing.WaitForSeconds(time);
 				cooldownGenerator = false;
 
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
@@ -858,7 +855,7 @@ namespace pro079
 			if (time > 4)
 			{
 				cooldownCassieGeneral = true;
-				yield return time;
+				yield return Timing.WaitForSeconds(time);
 				cooldownCassieGeneral = false;
 
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
@@ -876,7 +873,7 @@ namespace pro079
 		 */
 		private IEnumerator<float> ShamelessTimingRunLights()
 		{
-			yield return 12.1f;
+			yield return Timing.WaitForSeconds(12.1f);
 			float start = PluginManager.Manager.Server.Round.Duration;
 			while (start + 60f > PluginManager.Manager.Server.Round.Duration)
 			{
@@ -884,7 +881,7 @@ namespace pro079
 				{
 					room.FlickerLights();
 				}
-				yield return 8f;
+				yield return Timing.WaitForSeconds(8f);
 			}
 		}
 
