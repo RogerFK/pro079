@@ -155,8 +155,8 @@ namespace pro079
 			AddTranslation(new LangSetting("teslasuccess",  "Tesla desactivada.", lang));
 			AddTranslation(new LangSetting("globaltesla", "Teslas desactivadas.", lang));
 			AddTranslation(new LangSetting("teslanotclose", "No estás cerca de una Tesla.", lang));
-			AddTranslation(new LangSetting("cooldown", "Tienes que esperar antes de usar este comando", lang));
-			AddTranslation(new LangSetting("cooldowncassie", "Espera antes de volver a usar un comando que requiera a C.A.S.S.I.E (anunciante)", lang));
+			AddTranslation(new LangSetting("cooldown", "Tienes que esperar $cds antes de usar este comando", lang));
+			AddTranslation(new LangSetting("cooldowncassie", "Espera $cds antes de volver a usar un comando que requiera a C.A.S.S.I.E (anunciante)", lang));
 
 			AddTranslation(new LangSetting("cantsuicide", "No puedes suicidarte cuando hay más SCP vivos", lang));
 

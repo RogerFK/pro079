@@ -19,20 +19,20 @@ namespace pro079
 		{
 			this.plugin = plugin;
 		}
-		private static bool cooldownGenerator = false;
-		private static bool cooldownCassieGeneral = false;
-		private static bool cooldownMTF = false;
-		private static bool cooldownChaos = false;
-		private static bool ultDown = false;
-		private static IEnumerable<Room> rooms;
+        private float cooldownGenerator;
+		private float cooldownCassieGeneral;
+		private float cooldownMTF;
+		private float cooldownChaos;
+		private float ultDown;
+        private float cooldownScp;
+        private static IEnumerable<Room> rooms;
 		private static bool DeconBool { get; set; }
 		private static float DeconTime { get; set; }
 		private static int MinMTF { get; set; }
 		private static int MaxMTF { get; set; }
 		private static float LastMtfSpawn { get; set; }
 		private bool UltDoors = false;
-		private bool cooldownScp;
-
+		
 		private string FormatEnergyLevel(int energy, int level, string energStr, string lvlStr)
 		{
 			string str;
@@ -260,16 +260,16 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_mtf_level").ToString());
 									return;
 								}
-								if (cooldownCassieGeneral)
+								if (PluginManager.Manager.Server.Round.Duration < cooldownCassieGeneral)
 								{
-									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie");
+									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie").Replace("$cd", (cooldownCassieGeneral - PluginManager.Manager.Server.Round.Duration).ToString());
 									return;
 								}
 								if (args.Count() >= 4)
 								{
-									if (cooldownMTF && !ev.Player.GetBypassMode())
+									if (PluginManager.Manager.Server.Round.Duration < cooldownMTF && !ev.Player.GetBypassMode())
 									{
-										ev.ReturnMessage = this.plugin.GetTranslation("cooldown");
+										ev.ReturnMessage = this.plugin.GetTranslation("cooldown").Replace("$cd", (cooldownMTF - PluginManager.Manager.Server.Round.Duration).ToString());
 										return;
 									}
 									if (ev.Player.Scp079Data.AP >= plugin.GetConfigInt("p079_mtf_cost") || ev.Player.GetBypassMode())
@@ -288,7 +288,10 @@ namespace pro079
 										if (!ev.Player.GetBypassMode())
 										{
 											ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_mtf_cost");
-											Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+
+                                            cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
+                                            cooldownMTF = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_mtf_cooldown");
+                                            Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 											Timing.RunCoroutine(CooldownMTF(plugin.GetConfigFloat("p079_mtf_cooldown")));
 										}
 										PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
@@ -323,9 +326,9 @@ namespace pro079
 										ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_scp_level").ToString());
 										return;
 									}
-									if (cooldownScp)
+									if (PluginManager.Manager.Server.Round.Duration < cooldownScp)
 									{
-										ev.ReturnMessage = plugin.GetTranslation("cooldown");
+										ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", (cooldownScp-PluginManager.Manager.Server.Round.Duration).ToString());
 										return;
 									}
 									if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_scp_cost") )
@@ -395,7 +398,9 @@ namespace pro079
 								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_scp_cost");
 								ev.Player.Scp079Data.Exp += 5.0f * (ev.Player.Scp079Data.Level + 1);
-								Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
+                                cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
+                                cooldownScp = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_scp_cooldown");
+                                Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 								Timing.RunCoroutine(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
 								return;
 							case 4: // gencmd
@@ -420,42 +425,23 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_gen_cost").ToString());
 									return;
 								}
-								if (cooldownGenerator && !ev.Player.GetBypassMode())
+								if (PluginManager.Manager.Server.Round.Duration < cooldownGenerator && !ev.Player.GetBypassMode())
 								{
-                                    ev.ReturnMessage = plugin.GetTranslation("cooldown");
+                                    ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", cooldownGenerator.ToString());
 									return;
 								}
 								switch (args[1])
 								{
 									case "1":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon1");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = plugin.GetTranslation("success");
-										return;
 									case "2":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon2");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = plugin.GetTranslation("success");
-										return;
 									case "3":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon3");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = plugin.GetTranslation("success");
-										return;
 									case "4":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon4");
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon" + args[1]);
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
-										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
+                                        cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
+                                        cooldownGenerator = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_cooldown");
+                                        Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
 										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
@@ -463,7 +449,9 @@ namespace pro079
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										Timing.RunCoroutine(Fake5Gens());
 										ev.Player.Scp079Data.Exp += 80f;
-										Timing.RunCoroutine(CooldownGen(70.3f + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
+                                        cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
+                                        cooldownGenerator = 70.3f + PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown");
+                                        Timing.RunCoroutine(CooldownGen(70.3f + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
 										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 										ev.ReturnMessage = plugin.GetTranslation("gen5msg");
 										return;
@@ -471,7 +459,9 @@ namespace pro079
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 50f;
-										Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
+                                        cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
+                                        cooldownGenerator = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown");
+                                        Timing.RunCoroutine(CooldownGen(plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
 										Timing.RunCoroutine(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 										Timing.RunCoroutine(FakeKillPC());
 										ev.ReturnMessage = plugin.GetTranslation("gen6msg");
@@ -641,7 +631,7 @@ namespace pro079
                                         ev.ReturnMessage = plugin.GetTranslation("ultlocked");
                                         return;
 									}
-									if (ultDown)
+									if (PluginManager.Manager.Server.Round.Duration < ultDown)
 									{
 										ev.ReturnMessage = plugin.GetTranslation("ultdown");
 										return;
@@ -676,21 +666,21 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
-								if (cooldownCassieGeneral)
+								if (PluginManager.Manager.Server.Round.Duration < cooldownCassieGeneral)
 								{
-									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie");
+									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie").Replace("$cd", (cooldownCassieGeneral - PluginManager.Manager.Server.Round.Duration).ToString());
 									return;
 								}
-								if (cooldownChaos)
+								if (PluginManager.Manager.Server.Round.Duration < cooldownChaos)
 								{
-									if (ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level"))
-									{
-										ev.ReturnMessage = plugin.GetConfigString("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
-										return;
-									}
-								}
-
-								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost"))
+                                    ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", (cooldownChaos - PluginManager.Manager.Server.Round.Duration).ToString());
+                                }
+                                if (ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level"))
+                                {
+                                    ev.ReturnMessage = plugin.GetConfigString("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
+                                    return;
+                                }
+                                if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost"))
 								{
 									ev.ReturnMessage = plugin.GetConfigString("lowmana").Replace("$min", plugin.GetConfigInt("p079_chaos_cost").ToString());
 									return;
@@ -783,23 +773,19 @@ namespace pro079
 		{
 			if (v > 4)
 			{
-				cooldownScp = true;
 				yield return Timing.WaitForSeconds(v);
 				List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player pc in pcs)
 				{
 					pc.PersonalBroadcast(6, plugin.GetTranslation("scpready"), false);
 				}
-				cooldownScp = false;
 			}
 		}
 		private IEnumerator<float> CooldownUlt(float time)
 		{
 			if (time > 4)
 			{
-				ultDown = true;
 				yield return Timing.WaitForSeconds(time);
-				ultDown = false;
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
 				{
@@ -812,9 +798,7 @@ namespace pro079
 		{
 			if (v > 4)
 			{
-				UltDoors = true;
 				yield return Timing.WaitForSeconds(v);
-				UltDoors = false;
 				PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
 			}
 		}
@@ -823,9 +807,7 @@ namespace pro079
 		{
 			if (time > 4)
 			{
-				cooldownMTF = true;
 				yield return Timing.WaitForSeconds(time);
-				cooldownMTF = false;
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
 				{
@@ -838,9 +820,7 @@ namespace pro079
 		{
 			if (time > 4)
 			{
-				cooldownGenerator = true;
 				yield return Timing.WaitForSeconds(time);
-				cooldownGenerator = false;
 
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
@@ -854,9 +834,7 @@ namespace pro079
 		{
 			if (time > 4)
 			{
-				cooldownCassieGeneral = true;
 				yield return Timing.WaitForSeconds(time);
-				cooldownCassieGeneral = false;
 
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
@@ -950,13 +928,14 @@ namespace pro079
 		{
 			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ);
 			helpFormatted = FormatHelp();
-			cooldownGenerator = false;
-			cooldownCassieGeneral = false;
-			cooldownMTF = false;
-			ultDown = false;
+			cooldownGenerator = 0f;
+			cooldownCassieGeneral = 0f;
+			cooldownMTF = 0f;
+			ultDown = 0f;
+            cooldownScp = 0f;
 			DeconBool = false;
 			UltDoors = false;
-			cooldownChaos = false;
+			cooldownChaos = 0f;
 		}
 	}
 }
