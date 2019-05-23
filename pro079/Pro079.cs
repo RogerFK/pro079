@@ -43,7 +43,6 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_tesla_cost", 15, true, "AP cost for the tesla command"));
 			AddConfig(new ConfigSetting("p079_tesla_global_cost", 50, true, "AP cost for the teslas command"));
 			AddConfig(new ConfigSetting("p079_tesla_level", 1, true, "Level for the tesla and teslas command"));
-			AddConfig(new ConfigSetting("p079_tesla_alias", "te", true, "Alias for the tesla command"));
 
 			AddConfig(new ConfigSetting("p079_info", true, true, "Enables/disables Pro-079's info functionality"));
 			AddConfig(new ConfigSetting("p079_info_cost", 5, true, "AP cost for the info command"));
@@ -53,15 +52,16 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_info_plebs", 2, true, "Minimum level to display how many Class D and Scientists are alive"));
 			AddConfig(new ConfigSetting("p079_info_mtfci", 3, true, "Minimum level to display how many MTF and Chaos are alive"));
 			AddConfig(new ConfigSetting("p079_info_gens", 1, true, "Minimum level to display info about the generators"));
+            AddConfig(new ConfigSetting("p079_info_mtfest", 3, true, "Minimum level to display info about the time that MTF will come"));
 
-			// Ultimates not configurable yet. Will use a Dictionary for Ult IDs in the future with it's own Ultimate079 class
-			// If you want to help with this, at least point me towards the best way to read other .dlls for custom made Ultimates or to use piping
-			AddConfig(new ConfigSetting("p079_ult", true, true, "Enables/disables Pro-079's fake Chaos messages"));
+            // Ultimates not configurable yet. Will use a Dictionary for Ult IDs in the future with it's own Ultimate079 class
+            // If you want to help with this, at least point me towards the best way to read other .dlls for custom made Ultimates or to use piping
+            AddConfig(new ConfigSetting("p079_ult", true, true, "Enables/disables Pro-079's fake Chaos messages"));
 			
 			AddConfig(new ConfigSetting("p079_suicide", true, true, "Enables/disables 079 to suicide when he is alone. Gives a shit about lone-079, feel free to use it"));
 
-			// From now on, they are just about C.A.S.S.I.E. announcements
-			AddConfig(new ConfigSetting("p079_cassie_cooldown", 30f, true, "How many seconds will C.A.S.S.I.E commands be generally disabled for after each command"));
+            // From now on, they are just about C.A.S.S.I.E. announcements
+            AddConfig(new ConfigSetting("p079_cassie_cooldown", 30f, true, "How many seconds will C.A.S.S.I.E commands be generally disabled for after each command"));
 
 			AddConfig(new ConfigSetting("p079_mtf", true, true, "Enables/disables Pro-079's fake MTF messages"));
 			AddConfig(new ConfigSetting("p079_mtf_cooldown", 60f, true, "How many seconds the command will give a cooldown for itself"));
@@ -161,24 +161,50 @@ namespace pro079
 
 			AddTranslation(new LangSetting("cantsuicide", "No puedes suicidarte cuando hay más SCP vivos", lang));
 
-			AddTranslation(new LangSetting("gen5msg", "Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.", lang));
+            AddTranslation(new LangSetting("genuse", "Uso: .079 gen (1-6) - Sonará que hay X generadores activados, o simulará tu muerte si pones 6. 5 generadores simulará tu recontención al completo. - $min de energía", lang));
+            AddTranslation(new LangSetting("gen5msg", "Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.", lang));
 			AddTranslation(new LangSetting("gen6msg", "Comando de falsear suicidio lanzado.", lang));
 
-			// Info translations
-			AddTranslation(new LangSetting("decontdisabled", "La descontaminación está desactivada", lang));
+            AddTranslation(new LangSetting("nomtfleft", "No hay MTFs vivos. Mandando como \"unknown\"", lang));
+
+            // Info translations
+            AddTranslation(new LangSetting("decontdisabled", "La descontaminación está desactivada", lang));
 			AddTranslation(new LangSetting("deconthappened", "LCZ está descontaminada", lang));
+            // This happens when the nuke goes off before decont, but I don't know how it works and how many minutes it adds, because I saw at one time -3 mins.
+            AddTranslation(new LangSetting("deconthappened", "debería haber ocurrido", lang));
+            AddTranslation(new LangSetting("mtfest0", "entre $(min)s y $(max)s", lang));
+            AddTranslation(new LangSetting("mtfest1", "menos de $(max)", lang));
+            AddTranslation(new LangSetting("mtfest2", "están reapareciendo / deberían haber reaparecido", lang));
 
-			AddTranslation(new LangSetting("lockeduntil", "Bloqueado hasta el nivel $lvl", lang));
+            AddTranslation(new LangSetting("infomsg", @"\nSCP vivos: $scpalive" +
+                                "\nHumanos vivos: $humans | Siguientes MTF/Chaos: $estMTF" +
+                                "\nTiempo hasta la descontaminación: $decont" +
+                                "\nClase D escapados: $cdesc | Científicos escapados: $sciesc" +
+                                "\nClase D vivos:     $cdalive | Chaos vivos:           $cialive" +
+                                "\nCientíficos vivos: $scialive | MTF vivos:             $mtfalive", lang));
+
+            AddTranslation(new LangSetting("lockeduntil", "Bloqueado hasta el nivel $lvl", lang));
 			AddTranslation(new LangSetting("generators", "Generadores:", lang));
-			AddTranslation(new LangSetting("generatorin", "Generador de $room", lang));
-			AddTranslation(new LangSetting("activated", "está activado.", lang));
 
+            AddTranslation(new LangSetting("generatorin", "Generador de $room", lang));
+            AddTranslation(new LangSetting("activated", "está activado.", lang));
 			AddTranslation(new LangSetting("hastablet", "tiene una tablet", lang));
 			AddTranslation(new LangSetting("notablet", "no tiene una tablet", lang));
 
 			AddTranslation(new LangSetting("timeleft", "y le quedan $sec segundos", lang));
 
-			this.Info("Done loading! Took " + (UnityEngine.Time.time - startingTime).ToString("0.00") + " seconds to complete!");
+            AddTranslation(new LangSetting("ultlocked", "Para lanzar un ultimate necesitas tier 4.", lang));
+            AddTranslation(new LangSetting("ultdown", "Debes esperar antes de volver a usar un ultimate.", lang));
+            AddTranslation(new LangSetting("ultlaunched", "Ultimate lanzada.", lang));
+
+
+            AddTranslation(new LangSetting("ultusage", @"Uso: .079 ultimate <número>\n" +
+                                        "1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n" +
+                                        "2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)\n"));
+            
+            AddTranslation(new LangSetting("kys", "<color=#AA1515>Pulsa ñ y escribe \".079 suicidio\" para suicidarte.</color>", lang));
+
+            this.Info("Done loading! Took " + (UnityEngine.Time.time - startingTime).ToString("0.00") + " seconds to complete!");
 		}
     }
 }
