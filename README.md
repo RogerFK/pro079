@@ -2,8 +2,10 @@
 A plugin to enhance playing 079 by giving it some fancy commands to play with, becuase the whole spanish community agreed that playing SCP-079 is boring, this plugin gives him more stuff to not be bored to literal death.
 
 # Configs
+
+*Wiki with **all** the configurations (you should check this one):* https://github.com/RogerFK/pro079/wiki
+
 This plugins take many configs. The basic ones, that work between features, are as follows:
-Wiki with **all** the configurations (you should check this one): https://github.com/RogerFK/pro079/wiki
 
 | Config Option | Value Type | Default Value | Description |
 |:-----------------------:|:----------:|:-------------------------:|:------------------------------:|
