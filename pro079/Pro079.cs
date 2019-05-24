@@ -97,7 +97,9 @@ namespace pro079
 			AddTranslation(new LangSetting("broadcast_msg", "<color=#85ff4c>Press ` to open up the console and use additional commands.</color>", lang));
 			AddTranslation(new LangSetting("help", "<b>.079</b> - Displays this info", lang));
 
-			AddTranslation(new LangSetting("level", "level $lvl", lang));
+            AddTranslation(new LangSetting("tips", @"TAB (above Caps Lock): opens up the map.\nSpacebar: switches the camera view from the normal mode to the FPS one (with the white dot).\nWASD: move to the camera the plugin says\nTo get out of the Heavy Containment Zone, go to the elevetor (with TAB) and click the floor's white rectangle, or to the checkpoint and press WASD to get out\nAdditionally, this plugins provides extra commands by typing .079 in the console", lang));
+
+            AddTranslation(new LangSetting("level", "level $lvl", lang));
 			AddTranslation(new LangSetting("energy", "$ap AP", lang));
 
 			AddTranslation(new LangSetting("unknowncmd", "Unknown command. Type \".079\" for help.", lang));
@@ -134,8 +136,6 @@ namespace pro079
 			AddTranslation(new LangSetting("scpway", "Type a method that exists", lang));
 
 			#endregion
-			// This line down below probably causes many issues when creating the file for the first time. Will be changed (or default completely disabled) in the future
-			AddTranslation(new LangSetting("tips", @"TAB (above Caps Lock): opens up the map.\nSpacebar: switches the camera view from the normal mode to the FPS one (with the white dot).\nWASD: move to the camera the plugin says\nTo get out of the Heavy Containment Zone, go to the elevetor (with TAB) and click the floor's white rectangle, or to the checkpoint and press WASD to get out\nAdditionally, this plugins provides extra commands by typing .079 in the console", lang));
 
 			AddTranslation(new LangSetting("notscp079", "You aren't SCP-079!", lang));
 

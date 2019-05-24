@@ -116,6 +116,11 @@ namespace pro079
 			string command = ev.Command.ToLower();
 			if (command.StartsWith("079"))
 			{
+                if (!plugin.GetConfigBool("p079_enable"))
+                {
+                    return;
+                }
+
 				ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
 				// this block is pasted from PlayerPrefs https://github.com/probe4aiur/PlayerPreferences/
 				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
