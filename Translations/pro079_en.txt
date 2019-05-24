@@ -1,0 +1,73 @@
+broadcast_msg: <color=#85ff4c>Press ` to open up the console and use additional commands.</color>
+help: <b>.079</b> - Displays this info
+level: level $lvl
+energy: $ap AP
+unknowncmd: Unknown command. Type ".079" for help.
+bugwarn: If you find any bug, tell RogerFK#3679 on Discord
+teslacmd: te
+teslascmd: teslas
+mtfcmd: mtf
+gencmd: gen
+scpcmd: scp
+infocmd: info
+suicidecmd: suicide
+ultcmd: ultimate
+chaoscmd: chaos
+tipscmd: tips
+teslahelp: <b>.079 te</b> - Disables the tesla of the room you're in for $sec seconds
+teslashelp: <b>.079 teslas</b> - Disables all teslas for $sec seconds
+mtfhelp: <b>.079 mtf <character> <number> <alive-scps></b> - Announces that a new MTF squad arrived, with your own custom number of SCPs
+genhelp: <b>.079 gen [1-5]</b> - Announces that X generators are enabled, if it's 6 it will fake your suicide
+scphelp: <b>.079 scp <###> <reason></b> - Fakes an SCP (173, 096...) death, the reason can be: unknown, tesla, mtf, decont
+infohelp: <b>.079 info</b> - Shows stuff about the facility
+suicidehelp: <b>.079 suicide</b> - Overcharges the generators to die when you're alone
+ulthelp: <b>.079 ultimate</b> - Displays info about ultimates
+chaoshelp: <b>.079 chaos</b> - Announces the chaos comming
+tipshelp: <b>.079 tips</b> - Tips about SCP-079 and stuff to take into account
+mtfuse: Usage: .079 mtf (p) (5) (4), will say Papa-5 is coming and there are 4 SCP remaining - $min ap
+mtfmaxscp: Maximum SCPs: $max
+scpuse: Usage: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - $min AP
+scpexist: Type a SCP that exists
+scpway: Type a method that exists
+tips: TAB (above Caps Lock): opens up the map.\nSpacebar: switches the camera view from the normal mode to the FPS one (with the white dot).\nWASD: move to the camera the plugin says\nTo get out of the Heavy Containment Zone, go to the elevetor (with TAB) and click the floor's white rectangle, or to the checkpoint and press WASD to get out\nAdditionally, this plugins provides extra commands by typing .079 in the console
+notscp079: You aren't SCP-079!
+cassieready: <color=#85ff4c>Announcer (CASSIE) commands ready</color>
+ultready: <color=#85ff4c>Ultimates ready</color>
+mtfready: <color=#85ff4c>MTF command ready</color>
+genready: <color=#85ff4c>Generator command ready</color>
+scpready: <color=#85ff4c>SCP command ready</color>
+ready: ready
+success: Command successfully handled
+lowlevel: Your level is too low (you need $min)
+lowmana: Not enough AP (you need  $min)
+disabled: This command is disabled.
+teslaerror: This tesla is already disabled.
+teslasuccess: Tesla disabled.
+globaltesla: All teslas disabled.
+teslanotclose: You're not close to a tesla.
+cooldown: You have to wait $cds before using this command again
+cooldowncassie: Wait $cds before using a command that requires CASSIE (the announcer)
+cantsuicide: You can't suicide when there's other SCP's remaining
+genuse: Use: .079 gen (1-6) - Will announce there are X generator activated, or will fake your death if you ttype 6. 5 generators will fake your whole recontainment process. - $min AP
+gen5msg: Success. Your recontainment procedure, including when lights are turned off and a message telling you died, will be played.
+gen6msg: Fake death command launched.
+nomtfleft: No MTF's alive. Sending as "unknown"
+decontdisabled: Decontamination is disabled
+deconthappened: LCZ is decontaminated
+decontbug: should have happened
+mtfest0: between $(min)s and $(max)s
+mtfest1: less than $(max)
+mtfest2: are respawning / should have already respawned
+infomsg: SCP alive: $scpalive\nHumans alive: $humans | Next MTF/Chaos: $estMTF\nTime until decontamination: $decont\nEscaped Class Ds:  $cdesc | Escaped scientists:    $sciesc\nAlive Class-Ds:    $cdalive | Alive chaos:           $cialive\nAlive scientists:  $scialive | Alive MTFs:            $mtfalive
+lockeduntil: Locked until level $lvl
+generators: Generators:
+generatorin: $room's generator
+activated: is activated.
+hastablet: has a tablet
+notablet: doesn't have a tablet
+timeleft: and has $secs remaining
+ultlocked: To use an ultimate, you need level 4
+ultdown: You must wait $cds before using ultimates again.
+ultlaunched: Ultimate successfully used.
+ultusage: Usage: .079 ultimate <number>\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 segundos, cooldown: 300 segundos)
+kys: <color=#AA1515>Press ` and write ".079 suicide" to kill yourself.</color>

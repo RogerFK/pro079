@@ -1,0 +1,73 @@
+﻿broadcast_msg: <color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>
+help: <b>.079</b> - Muestra este mensaje de ayuda
+level: nivel $lvl
+energy: $ap de energía
+unknowncmd: Comando desconocido. Escribe .079 para recibir ayuda.
+bugwarn: Si encuentras algún fallo, avisa a RogerFK#3679
+teslacmd: te
+teslascmd: teslas
+mtfcmd: mtf
+gencmd: gen
+scpcmd: scp
+infocmd: info
+suicidecmd: suicidio
+ultcmd: ultimate
+chaoscmd: chaos
+tipscmd: controles
+teslahelp: <b>.079 te</b> - Desactiva la tesla de la habitación en la que estás durante $sec segundos
+teslashelp: <b>.079 teslas</b> - Desactiva todas las teslas durante $sec segundos
+mtfhelp: <b>.079 mtf <letra> <numero> <scp-vivos></b> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida
+genhelp: <b>.079 gen [1-5]</b> - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte
+scphelp: <b>.079 scp <###> <motivo></b> - Manda un mensaje de muerte de SCP con el número del SCP (173, 096...), el motivo puede ser: unknown, tesla, mtf, decont
+infohelp: <b>.079 info</b> - Muestra datos sobre las instalaciones
+suicidehelp: <b>.079 suicidio</b> - Sobrecarga los generadores para morir cuando quedes tú solo
+ulthelp: <b>.079 ultimate</b> - Mira los ultimate que tienes disponibles
+chaoshelp: <b>.079 chaos</b> - Anuncia la llegada de Chaos Insurgency
+tipshelp: <b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta
+mtfuse: Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - $min de energía
+mtfmaxscp: Máximo de SCPs: $max
+scpuse: Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - $min de energía
+scpexist: Pon un SCP que exista
+scpway: Pon un método de morir que exista
+tips: TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079
+notscp079: ¡No eres SCP-079!
+cassieready: <color=#85ff4c>Comandos de anunciante listos</color>
+ultready: <color=#85ff4c>Tus ultimates están listas</color>
+mtfready: <color=#85ff4c>Comando MTF listo</color>
+genready: <color=#85ff4c>Comando generador listo</color>
+scpready: <color=#85ff4c>Comando SCP listo</color>
+ready: listo
+success: Comando lanzado
+lowlevel: No tienes suficiente nivel (necesitas $min)
+lowmana: No tienes suficiente AP (necesitas $min)
+disabled: Este comando está deshabilitado.
+teslaerror: Esta Tesla ya está desactivada.
+teslasuccess: Tesla desactivada.
+globaltesla: Teslas desactivadas.
+teslanotclose: No estás cerca de una Tesla.
+cooldown: Tienes que esperar $cds antes de usar este comando
+cooldowncassie: Espera $cds antes de volver a usar un comando que requiera a C.A.S.S.I.E (anunciante)
+cantsuicide: No puedes suicidarte cuando hay más SCP vivos
+genuse: Uso: .079 gen (1-6) - Sonará que hay X generadores activados, o simulará tu muerte si pones 6. 5 generadores simulará tu recontención al completo. - $min de energía
+gen5msg: Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.
+gen6msg: Comando de falsear suicidio lanzado.
+nomtfleft: No hay MTFs vivos. Mandando como "unknown"
+decontdisabled: La descontaminación está desactivada
+deconthappened: LCZ está descontaminada
+decontbug: debería haber ocurrido
+mtfest0: entre $(min)s y $(max)s
+mtfest1: menos de $(max)
+mtfest2: están reapareciendo / deberían haber reaparecido
+infomsg: SCP vivos: $scpalive\nHumanos vivos: $humans | Siguientes MTF/Chaos: $estMTF\nTiempo hasta la descontaminación: $decont\nClase D escapados: $cdesc | Científicos escapados: $sciesc\nClase D vivos:     $cdalive | Chaos vivos:           $cialive\nCientíficos vivos: $scialive | MTF vivos:             $mtfalive
+lockeduntil: Bloqueado hasta el nivel $lvl
+generators: Generadores:
+generatorin: Generador de $room
+activated: está activado.
+hastablet: tiene una tablet
+notablet: no tiene una tablet
+timeleft: y le quedan $sec segundos
+ultlocked: Para lanzar un ultimate necesitas tier 4.
+ultdown: Debes esperar $cds antes de volver a usar un ultimate.
+ultlaunched: Ultimate lanzada.
+ultusage: Uso: .079 ultimate <número>\n1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\n2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)
+kys: <color=#AA1515>Pulsa ñ y escribe ".079 suicidio" para suicidarte.</color>

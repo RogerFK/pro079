@@ -68,7 +68,7 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_mtf_cooldown", 60f, true, "How many seconds the command will give a cooldown for itself"));
 			AddConfig(new ConfigSetting("p079_mtf_level", 2, true, "Minimum level for 079 to fake a MTF message"));
 			AddConfig(new ConfigSetting("p079_mtf_cost", 70, true, "AP cost for 079 to fake a MTF message"));
-			AddConfig(new ConfigSetting("p079_mtf_maxscp", 5, true, "Max SCP input so the guy doesn't spam it"));
+			AddConfig(new ConfigSetting("p079_mtf_maxscp", 5, true, "Max SCP input so the guy doesn't spam it, or spams it"));
 
 			AddConfig(new ConfigSetting("p079_chaos", false, true, "Enables/disables Pro-079's fake Chaos messages"));
 			AddConfig(new ConfigSetting("p079_chaos_cooldown", 50f, true, "How many seconds the command will give a cooldown for itself"));
@@ -80,28 +80,28 @@ namespace pro079
 			AddConfig(new ConfigSetting("p079_scp_cooldown", 30f, true, "How many seconds the command will give a cooldown for itself"));
 			AddConfig(new ConfigSetting("p079_scp_cost", 40, true, "AP cost for 079 to fake a SCP death message"));
 			AddConfig(new ConfigSetting("p079_scp_level", 2, true, "Minimum level for 079 to fake a SCP death message"));
+            AddConfig(new ConfigSetting("p079_scp_list", new string[] { "173", "096", "106", "049", "939" }, true, "List of allowed SCPs you can type in the .079 scp command"));
 
-			AddConfig(new ConfigSetting("p079_gen", true, true, "Enables/disables Pro-079's fake SCP death messages"));
+            AddConfig(new ConfigSetting("p079_gen", true, true, "Enables/disables Pro-079's fake SCP death messages"));
 			AddConfig(new ConfigSetting("p079_gen_cooldown", 60f, true, "How many seconds the command will give a cooldown for itself"));
 			AddConfig(new ConfigSetting("p079_gen_cost", 40, true, "Cost for the command"));
 			AddConfig(new ConfigSetting("p079_gen_level", 1, true, "Minimum level for 079 to fake a SCP death message"));
 			AddConfig(new ConfigSetting("p079_gen_penalty", 60f, true, "For how long there will be a penalty after using gen 5 or gen 6"));
 
 			AddConfig(new ConfigSetting("p079_tips", true, true, "Enables/disables Pro-079's fake SCP death messages"));
-			#endregion
+            #endregion
 
-			// Translations
-			AddConfig(new ConfigSetting("p079_lang", "es", true, "Selects the language"));
-			string lang = "pro079_" + GetConfigString("p079_lang");
+            // Translations
+            string lang = "pro079";
 
-			AddTranslation(new LangSetting("broadcast_msg", "<color=#85ff4c>Presiona ñ para abrir la consola y usar comandos adicionales</color>", lang));
-			AddTranslation(new LangSetting("help", "<b>.079</b> - Muestra este mensaje de ayuda", lang));
+			AddTranslation(new LangSetting("broadcast_msg", "<color=#85ff4c>Press ` to open up the console and use additional commands.</color>", lang));
+			AddTranslation(new LangSetting("help", "<b>.079</b> - Displays this info", lang));
 
-			AddTranslation(new LangSetting("level", "nivel $lvl", lang));
-			AddTranslation(new LangSetting("energy", "$ap de energía", lang));
+			AddTranslation(new LangSetting("level", "level $lvl", lang));
+			AddTranslation(new LangSetting("energy", "$ap AP", lang));
 
-			AddTranslation(new LangSetting("unknowncmd", "Comando desconocido. Escribe .079 para recibir ayuda.", lang));
-			AddTranslation(new LangSetting("bugwarn", "Si encuentras algún fallo, avisa a RogerFK#3679", lang));
+			AddTranslation(new LangSetting("unknowncmd", "Unknown command. Type \".079\" for help.", lang));
+			AddTranslation(new LangSetting("bugwarn", "If you find any bug, tell RogerFK#3679 on Discord", lang));
 
 			#region Cmds and Help strings
 			AddTranslation(new LangSetting(  "teslacmd", "te", lang));
@@ -110,92 +110,91 @@ namespace pro079
 			AddTranslation(new LangSetting(    "gencmd", "gen", lang));
 			AddTranslation(new LangSetting(    "scpcmd", "scp", lang));
 			AddTranslation(new LangSetting(   "infocmd", "info", lang));
-			AddTranslation(new LangSetting("suicidecmd", "suicidio", lang));
+			AddTranslation(new LangSetting("suicidecmd", "suicide", lang));
 			AddTranslation(new LangSetting(    "ultcmd", "ultimate", lang));
 			AddTranslation(new LangSetting(  "chaoscmd", "chaos", lang));
-			AddTranslation(new LangSetting(   "tipscmd", "controles", lang));
+			AddTranslation(new LangSetting(   "tipscmd", "tips", lang));
 
-			AddTranslation(new LangSetting(  "teslahelp", "<b>.079 te</b> - Desactiva la tesla de la habitación en la que estás durante $sec segundos", lang));
-			AddTranslation(new LangSetting( "teslashelp", "<b>.079 teslas</b> - Desactiva todas las teslas durante $sec segundos", lang));
-			AddTranslation(new LangSetting(    "mtfhelp", "<b>.079 mtf <letra> <numero> <scp-vivos></b> - Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida", lang));
-			AddTranslation(new LangSetting(    "genhelp", "<b>.079 gen [1-5]</b> - Manda el mensaje de que X generadores han sido activados, o manda con un 6 para fingir tu muerte", lang));
-			AddTranslation(new LangSetting(    "scphelp", "<b>.079 scp <###> <motivo></b> - Manda un mensaje de muerte de SCP con el número del SCP (173, 096...), el motivo puede ser: unknown, tesla, mtf, decont", lang));
-			AddTranslation(new LangSetting(   "infohelp", "<b>.079 info</b> - Muestra datos sobre las instalaciones", lang));
-			AddTranslation(new LangSetting("suicidehelp", "<b>.079 suicidio</b> - Sobrecarga los generadores para morir cuando quedes tú solo", lang));
-			AddTranslation(new LangSetting(    "ulthelp", "<b>.079 ultimate</b> - Mira los ultimate que tienes disponibles", lang));
-			AddTranslation(new LangSetting("chaoshelp", "<b>.079 chaos</b> - Anuncia la llegada de Chaos Insurgency", lang));
-			AddTranslation(new LangSetting(   "tipshelp", "<b>.079 controles</b> - Controles de SCP-079 y cosas a tener en cuenta", lang));
+			AddTranslation(new LangSetting(  "teslahelp", "<b>.079 te</b> - Disables the tesla of the room you're in for $sec seconds", lang));
+			AddTranslation(new LangSetting( "teslashelp", "<b>.079 teslas</b> - Disables all teslas for $sec seconds", lang));
+			AddTranslation(new LangSetting(    "mtfhelp", "<b>.079 mtf <character> <number> <alive-scps></b> - Announces that a new MTF squad arrived, with your own custom number of SCPs", lang)); //Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida"
+            AddTranslation(new LangSetting(    "genhelp", "<b>.079 gen [1-5]</b> - Announces that X generators are enabled, if it's 6 it will fake your suicide", lang));
+			AddTranslation(new LangSetting(    "scphelp", "<b>.079 scp <###> <reason></b> - Fakes an SCP (173, 096...) death, the reason can be: unknown, tesla, mtf, decont", lang));
+			AddTranslation(new LangSetting(   "infohelp", "<b>.079 info</b> - Shows stuff about the facility", lang));
+			AddTranslation(new LangSetting("suicidehelp", "<b>.079 suicide</b> - Overcharges the generators to die when you're alone", lang));
+			AddTranslation(new LangSetting(    "ulthelp", "<b>.079 ultimate</b> - Displays info about ultimates", lang));
+			AddTranslation(new LangSetting(  "chaoshelp", "<b>.079 chaos</b> - Announces the chaos comming", lang));
+			AddTranslation(new LangSetting(   "tipshelp", "<b>.079 tips</b> - Tips about SCP-079 and stuff to take into account", lang));
 
-			AddTranslation(new LangSetting("mtfuse", "Uso: .079 mtf (p) (5) (4), dirá que Papa-5 viene y quedan 4 SCP - $min de energía", lang));
-			AddTranslation(new LangSetting("mtfmaxscp", "Máximo de SCPs: $max", lang));
+			AddTranslation(new LangSetting("mtfuse", "Usage: .079 mtf (p) (5) (4), will say Papa-5 is coming and there are 4 SCP remaining - $min ap", lang));
+			AddTranslation(new LangSetting("mtfmaxscp", "Maximum SCPs: $max", lang));
 
-			AddTranslation(new LangSetting("scpuse", "Uso: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - $min de energía", lang));
-			AddTranslation(new LangSetting("scpexist", "Pon un SCP que exista", lang));
-			AddTranslation(new LangSetting("scpway", "Pon un método de morir que exista - Uso:", lang));
+			AddTranslation(new LangSetting("scpuse", "Usage: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - $min AP", lang));
+			AddTranslation(new LangSetting("scpexist", "Type a SCP that exists", lang));
+			AddTranslation(new LangSetting("scpway", "Type a method that exists", lang));
 
 			#endregion
 			// This line down below probably causes many issues when creating the file for the first time. Will be changed (or default completely disabled) in the future
-			AddTranslation(new LangSetting("tips", @"TAB (encima del Bloq. Mayus): abre el mapa donde estás.\nEspacio: cambia tu modo de cámara entre el modo normal (ratón libre) y el modo primera persona (con el punto blanco).\nTeclas de movimiento: muévete a la cámara que indica arriba a la derecha\nPara salir de la heavy containment zone, ve hacia el elevador y pulsa el recuadro blanco, o hacia el checkpoint y usa la W para moverte entre cámaras\nAdicionalmente, este plugin te permite usar comandos como podrás haber comprobado usando .079", lang));
+			AddTranslation(new LangSetting("tips", @"TAB (above Caps Lock): opens up the map.\nSpacebar: switches the camera view from the normal mode to the FPS one (with the white dot).\nWASD: move to the camera the plugin says\nTo get out of the Heavy Containment Zone, go to the elevetor (with TAB) and click the floor's white rectangle, or to the checkpoint and press WASD to get out\nAdditionally, this plugins provides extra commands by typing .079 in the console", lang));
 
-			AddTranslation(new LangSetting("notscp079", "¡No eres SCP-079!", lang));
+			AddTranslation(new LangSetting("notscp079", "You aren't SCP-079!", lang));
 
-			AddTranslation(new LangSetting("cassieready", "<color=#85ff4c>Comandos de anunciante listos</color>", lang));
-			AddTranslation(new LangSetting("ultready", "<color=#85ff4c>Tus ultimates están listas</color>", lang));
-			AddTranslation(new LangSetting("mtfready", "<color=#85ff4c>Comando MTF listo</color>", lang));
-			AddTranslation(new LangSetting("genready", "<color=#85ff4c>Comando generador listo</color>", lang));
-			AddTranslation(new LangSetting("scpready", "<color=#85ff4c>Comando SCP listo</color>", lang));
-			AddTranslation(new LangSetting("ready", "listo", lang));
-			AddTranslation(new LangSetting("success", "Comando lanzado", lang));
+			AddTranslation(new LangSetting("cassieready", "<color=#85ff4c>Announcer (CASSIE) commands ready</color>", lang));
+			AddTranslation(new LangSetting("ultready", "<color=#85ff4c>Ultimates ready</color>", lang));
+			AddTranslation(new LangSetting("mtfready", "<color=#85ff4c>MTF command ready</color>", lang));
+			AddTranslation(new LangSetting("genready", "<color=#85ff4c>Generator command ready</color>", lang));
+			AddTranslation(new LangSetting("scpready", "<color=#85ff4c>SCP command ready</color>", lang));
+			AddTranslation(new LangSetting("ready", "ready", lang));
+			AddTranslation(new LangSetting("success", "Command successfully handled", lang));
 
-			AddTranslation(new LangSetting("lowlevel", "No tienes suficiente nivel (necesitas $min)", lang));
-			AddTranslation(new LangSetting("lowmana", "No tienes suficiente AP (necesitas $min)", lang));
-			//AddTranslation(new LangSetting("minimum", "Mínimo: ", lang));
+			AddTranslation(new LangSetting("lowlevel", "Your level is too low (you need $min)", lang));
+			AddTranslation(new LangSetting("lowmana", "Not enough AP (you need  $min)", lang));
 
-			AddTranslation(new LangSetting("disabled", "Este comando está deshabilitado.", lang));
+			AddTranslation(new LangSetting("disabled", "This command is disabled.", lang));
 
-			AddTranslation(new LangSetting("teslaerror",    "Esta Tesla ya está desactivada.", lang));
-			AddTranslation(new LangSetting("teslasuccess",  "Tesla desactivada.", lang));
-			AddTranslation(new LangSetting("globaltesla", "Teslas desactivadas.", lang));
-			AddTranslation(new LangSetting("teslanotclose", "No estás cerca de una Tesla.", lang));
-			AddTranslation(new LangSetting("cooldown", "Tienes que esperar $cds antes de usar este comando", lang));
-			AddTranslation(new LangSetting("cooldowncassie", "Espera $cds antes de volver a usar un comando que requiera a C.A.S.S.I.E (anunciante)", lang));
+			AddTranslation(new LangSetting("teslaerror",    "This tesla is already disabled.", lang));
+			AddTranslation(new LangSetting("teslasuccess",  "Tesla disabled.", lang));
+			AddTranslation(new LangSetting("globaltesla", "All teslas disabled.", lang));
+			AddTranslation(new LangSetting("teslanotclose", "You're not close to a tesla.", lang));
+			AddTranslation(new LangSetting("cooldown", "You have to wait $cds before using this command again", lang));
+			AddTranslation(new LangSetting("cooldowncassie", "Wait $cds before using a command that requires CASSIE (the announcer)", lang));
 
-			AddTranslation(new LangSetting("cantsuicide", "No puedes suicidarte cuando hay más SCP vivos", lang));
+			AddTranslation(new LangSetting("cantsuicide", "You can't suicide when there's other SCP's remaining", lang));
 
-            AddTranslation(new LangSetting("genuse", "Uso: .079 gen (1-6) - Sonará que hay X generadores activados, o simulará tu muerte si pones 6. 5 generadores simulará tu recontención al completo. - $min de energía", lang));
-            AddTranslation(new LangSetting("gen5msg", "Comando lanzado. Se reproducirá el mensaje de tu contención al completo, incluyendo cuando te matan y cuando se apagan/encienden las luces.", lang));
-			AddTranslation(new LangSetting("gen6msg", "Comando de falsear suicidio lanzado.", lang));
+            AddTranslation(new LangSetting("genuse", "Use: .079 gen (1-6) - Will announce there are X generator activated, or will fake your death if you ttype 6. 5 generators will fake your whole recontainment process. - $min AP", lang));
+            AddTranslation(new LangSetting("gen5msg", "Success. Your recontainment procedure, including when lights are turned off and a message telling you died, will be played.", lang));
+			AddTranslation(new LangSetting("gen6msg", "Fake death command launched.", lang));
 
-            AddTranslation(new LangSetting("nomtfleft", "No hay MTFs vivos. Mandando como \"unknown\"", lang));
+            AddTranslation(new LangSetting("nomtfleft", "No MTF's alive. Sending as \"unknown\"", lang));
 
             // Info translations
-            AddTranslation(new LangSetting("decontdisabled", "La descontaminación está desactivada", lang));
-			AddTranslation(new LangSetting("deconthappened", "LCZ está descontaminada", lang));
+            AddTranslation(new LangSetting("decontdisabled", "Decontamination is disabled", lang));
+			AddTranslation(new LangSetting("deconthappened", "LCZ is decontaminated", lang));
             // This happens when the nuke goes off before decont, but I don't know how it works and how many minutes it adds, because I saw at one time -3 mins.
-            AddTranslation(new LangSetting("decontbug", "debería haber ocurrido", lang));
-            AddTranslation(new LangSetting("mtfest0", "entre $(min)s y $(max)s", lang));
-            AddTranslation(new LangSetting("mtfest1", "menos de $(max)", lang));
-            AddTranslation(new LangSetting("mtfest2", "están reapareciendo / deberían haber reaparecido", lang));
-
-            AddTranslation(new LangSetting("infomsg",      "SCP vivos: $scpalive\\nHumanos vivos: $humans | Siguientes MTF/Chaos: $estMTF\\nTiempo hasta la descontaminación: $decont\\nClase D escapados: $cdesc | Científicos escapados: $sciesc\\nClase D vivos:     $cdalive | Chaos vivos:           $cialive\\nCientíficos vivos: $scialive | MTF vivos:             $mtfalive", lang));
+            AddTranslation(new LangSetting("decontbug", "should have happened", lang));
+            AddTranslation(new LangSetting("mtfest0", "between $(min)s and $(max)s", lang));
+            AddTranslation(new LangSetting("mtfest1", "less than $(max)", lang));
+            AddTranslation(new LangSetting("mtfest2", "are respawning / should have already respawned", lang));
+                                                     //SCP alive: $scpalive\\nHumans alive: $humans | N N N N N N N : $estMTF\\nTiempo hasta la descontami: $decont\\nClase D escapados: $cdesc | Científicos escapados: $sciesc\\nClase D vivos:     $cdalive | Chaos vivos:           $cialive\\nCientíficos vivos: $scialive | MTF vivos:             $mtfalive
+            AddTranslation(new LangSetting("infomsg", "SCP alive: $scpalive\\nHumans alive: $humans | Next MTF/Chaos: $estMTF\\nTime until decontamination: $decont\\nEscaped Class Ds:  $cdesc | Escaped scientists:    $sciesc\\nAlive Class-Ds:    $cdalive | Alive chaos:           $cialive\\nAlive scientists:  $scialive | Alive MTFs:            $mtfalive", lang));
             
-            AddTranslation(new LangSetting("lockeduntil", "Bloqueado hasta el nivel $lvl", lang));
-			AddTranslation(new LangSetting("generators", "Generadores:", lang));
+            AddTranslation(new LangSetting("lockeduntil", "Locked until level $lvl", lang));
+			AddTranslation(new LangSetting("generators", "Generators:", lang));
 
-            AddTranslation(new LangSetting("generatorin", "Generador de $room", lang));
-            AddTranslation(new LangSetting("activated", "está activado.", lang));
-			AddTranslation(new LangSetting("hastablet", "tiene una tablet", lang));
-			AddTranslation(new LangSetting("notablet", "no tiene una tablet", lang));
+            AddTranslation(new LangSetting("generatorin", "$room's generator", lang));
+            AddTranslation(new LangSetting("activated", "is activated.", lang));
+			AddTranslation(new LangSetting("hastablet", "has a tablet", lang));
+			AddTranslation(new LangSetting("notablet", "doesn't have a tablet", lang));
 
-			AddTranslation(new LangSetting("timeleft", "y le quedan $sec segundos", lang));
+			AddTranslation(new LangSetting("timeleft", "and has $secs remaining", lang));
 
-            AddTranslation(new LangSetting("ultlocked", "Para lanzar un ultimate necesitas tier 4.", lang));
-            AddTranslation(new LangSetting("ultdown", "Debes esperar $cds antes de volver a usar un ultimate.", lang));
-            AddTranslation(new LangSetting("ultlaunched", "Ultimate lanzada.", lang));
+            AddTranslation(new LangSetting("ultlocked", "To use an ultimate, you need level 4", lang));
+            AddTranslation(new LangSetting("ultdown", "You must wait $cds before using ultimates again.", lang));
+            AddTranslation(new LangSetting("ultlaunched", "Ultimate successfully used.", lang));
 
-            AddTranslation(new LangSetting("ultusage", "Uso: .079 ultimate <número>\\n1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\\n2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)", lang));
+            AddTranslation(new LangSetting("ultusage", "Usage: .079 ultimate <number>\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 segundos, cooldown: 300 segundos)", lang));
             
-            AddTranslation(new LangSetting("kys", "<color=#AA1515>Pulsa ñ y escribe \".079 suicidio\" para suicidarte.</color>", lang));
+            AddTranslation(new LangSetting("kys", "<color=#AA1515>Press ` and write \".079 suicide\" to kill yourself.</color>", lang));
 
             this.Info("Done loading! Took " + (UnityEngine.Time.time - startingTime).ToString("0.00") + " seconds to complete!");
 		}
