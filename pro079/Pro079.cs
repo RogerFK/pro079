@@ -1,4 +1,5 @@
-﻿using Smod2;
+﻿using scp4aiur;
+using Smod2;
 using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
@@ -32,6 +33,7 @@ namespace pro079
         {
 			this.Info("Loading Pro-079 configs and commands...");
 			float startingTime = UnityEngine.Time.time;
+            Timing.Init(this);
 			AddEventHandlers(new Pro79Handlers(this));
 
 			AddConfig(new ConfigSetting("p079_enable", true, true, "Enables/disables Pro-079"));

@@ -790,18 +790,17 @@ namespace pro079
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
 				{
-					player.PersonalBroadcast(6, plugin.GetTranslation("ultready"), false);
+					player.PersonalBroadcast(3, plugin.GetTranslation("ultready"), false);
 				} 
 			}
 		}
 
 		private IEnumerable<float> Ult2Toggle(float v)
 		{
-			if (v > 4)
-			{
-				yield return (v);
-				PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
-			}
+            UltDoors = true;
+			yield return (v);
+            UltDoors = false;
+            PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
 		}
 
 		private IEnumerable<float> CooldownMTF(float time)
@@ -812,7 +811,7 @@ namespace pro079
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
 				{
-					player.PersonalBroadcast(5, plugin.GetTranslation("mtfready"), false);
+					player.PersonalBroadcast(3, plugin.GetTranslation("mtfready"), false);
 				} 
 			}
 		}
@@ -826,7 +825,7 @@ namespace pro079
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
 				{
-					player.PersonalBroadcast(5, plugin.GetTranslation("genready"), false);
+					player.PersonalBroadcast(3, plugin.GetTranslation("genready"), false);
 				} 
 			}
 		}
@@ -840,7 +839,7 @@ namespace pro079
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
 				{
-					player.PersonalBroadcast(5, plugin.GetTranslation("cassieready"), false);
+					player.PersonalBroadcast(3, plugin.GetTranslation("cassieready"), false);
 				} 
 			}
 		}
