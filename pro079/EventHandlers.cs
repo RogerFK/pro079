@@ -634,7 +634,7 @@ namespace pro079
 									}
 									if (PluginManager.Manager.Server.Round.Duration < ultDown)
 									{
-										ev.ReturnMessage = plugin.GetTranslation("ultdown");
+										ev.ReturnMessage = plugin.GetTranslation("ultdown").Replace("$cd", (ultDown - PluginManager.Manager.Server.Round.Duration).ToString());
 										return;
 									}
 									if (!int.TryParse(args[1], out int ult))
@@ -648,12 +648,14 @@ namespace pro079
 										case 1:
 											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
 											Timing.Run(ShamelessTimingRunLights());
-											Timing.Run(CooldownUlt(180f));
+                                            ultDown = PluginManager.Manager.Server.Round.Duration + 180;
+                                            Timing.Run(CooldownUlt(180f));
 											return;
 										case 2:
 											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
 											Timing.Run(Ult2Toggle(30f));
-											Timing.Run(CooldownUlt(300f));
+                                            ultDown = PluginManager.Manager.Server.Round.Duration + 300;
+                                            Timing.Run(CooldownUlt(300f));
 											return;
 										default:
                                             ev.ReturnMessage = ultUsage;
@@ -890,6 +892,7 @@ namespace pro079
 			{
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				int pcs = PCplayers.Count;
+                if (pcs < 0) return;
 				if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs == 0)
 				{
                     string kys = plugin.GetTranslation("kys");

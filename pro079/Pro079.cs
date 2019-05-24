@@ -190,7 +190,7 @@ namespace pro079
 			AddTranslation(new LangSetting("timeleft", "y le quedan $sec segundos", lang));
 
             AddTranslation(new LangSetting("ultlocked", "Para lanzar un ultimate necesitas tier 4.", lang));
-            AddTranslation(new LangSetting("ultdown", "Debes esperar antes de volver a usar un ultimate.", lang));
+            AddTranslation(new LangSetting("ultdown", "Debes esperar $cds antes de volver a usar un ultimate.", lang));
             AddTranslation(new LangSetting("ultlaunched", "Ultimate lanzada.", lang));
 
             AddTranslation(new LangSetting("ultusage", "Uso: .079 ultimate <número>\\n1. Luces fuera: apaga durante 1 minuto la HCZ (cooldown: 180 segundos)\\n2. Lockdown: impide a los humanos abrir puertas, permite a los SCP abrir cualquiera (duración: 30 segundos, cooldown: 300 segundos)", lang));
