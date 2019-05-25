@@ -1,0 +1,73 @@
+broadcast_msg: <color=#85ff4c>нажмите ` что бы открыть консоль для просмотра доп.возможностей.Команда для просмотра доп.возможностей ".079" </color>
+help: <b>.079</b> - Displays this info
+tips: TAB (над Caps Lock): открывает карту.\nSpacebar: меняет вид камеры (с белой точкой).\nWASD: для движения камепрй\nЧтобы выйти из зоны тяжелого сдерживания, перейдите к элеватору (с TAB) и щелкните белый прямоугольник пола, или к чекпоинту и нажмите WASD, чтобы выйти из игры\nAdditionally, эти плагины предоставляют дополнительные команды, набрав .079 в консоли.
+level: level $lvl
+energy: $ap AP
+unknowncmd: Неизвестная команда. Введите ".079" для справки.
+bugwarn: Если вы найдете ошибку, сообщите RogerFK#3679 в Discord.
+teslacmd: te
+teslascmd: teslas
+mtfcmd: mtf
+gencmd: gen
+scpcmd: scp
+infocmd: info
+suicidecmd: suicide
+ultcmd: ultimate
+chaoscmd: chaos
+tipscmd: tips
+teslahelp: <b>.079 te</b> - Отключает тесла комнаты, в которой вы находитесь, на $sec cекунд
+teslashelp: <b>.079 teslas</b> - Отключает все тесла на $sec секунд
+mtfhelp: <b>.079 mtf <character> <number> <alive-scps></b> - Объявляет, что прибыл новый отряд МТФ с вашим собственным номером и названием отряда и кол-во оставшихся SCP.
+genhelp: <b>.079 gen [1-5]</b> - Объявляет, что генераторы X включены, если это 6 генераторов, то это подделает ваше самоубийство.
+scphelp: <b>.079 scp <###> <reason></b> - Делает фальшие объявление о смерти SCP (173, 096...) и причины смерти их: unknown, tesla, mtf, decont
+infohelp: <b>.079 info</b> - Показывает информацию о комплексе.
+suicidehelp: <b>.079 suicide</b> - Перезаряжает генераторы, чтобы вы умерли когда вы одни.
+ulthelp: <b>.079 ultimate</b> - Отображает информацию об ультиматах
+chaoshelp: <b>.079 chaos</b> - Объявляет о надвигающемся отряде хаоса.
+tipshelp: <b>.079 tips</b> - Советы по SCP-079 и тому, что нужно принимать во внимание.
+mtfuse: Usage: .079 mtf (p) (5) (4), скажет Papa-5 is coming and there are 4 SCP remaining - $min ap
+mtfmaxscp: Maximum SCPs: $max
+scpuse: Usage: .079 scp (173/096/106/049/939) (unknown/tesla/mtf/decont) - $min AP
+scpexist: Введите существующий SCP .
+scpway: Введите существующий метод
+notscp079: Ты не SCP-079!
+cassieready: <color=#85ff4c>Команды диктора (CASSIE) готовы</color>
+ultready: <color=#85ff4c>Ultimates ready</color>
+mtfready: <color=#85ff4c>Команда МТФ готова</color>
+genready: <color=#85ff4c>Команда генератора готова</color>
+scpready: <color=#85ff4c>Команда SCP готова</color>
+ready: готово
+success: Команда успешно обработана
+lowlevel: Твой уровень слишком низкий. (вам нужен $min)
+lowmana: Недостаточно AP (вам нужно  $min)
+disabled: Эта команда отключена.
+teslaerror: Эта тесла уже отключена.
+teslasuccess: Тесла отключена.
+globaltesla: Все тесла отключены.
+teslanotclose: Ты не в комнате с Теслой.
+cooldown: Ты должен подождать $cds прежде чем использовать эту команду снова.
+cooldowncassie: Подождите $cds, прежде чем использовать команду, требующую CASSIE (диктор).
+cantsuicide: Ты не можешь покончить жизнь самоубийством, когда есть другие SCP.
+genuse: Use: .079 gen (1-6) - объявит, что активирован генератор X, или подделает вашу смерть, если вы введете 6. 5 генераторов подделают весь ваш процесс восстановления условий. - $min AP
+gen5msg: Успех. Будет воспроизведена ваша процедура восстановления условий содержания, в том числе при выключении света и сообщении о вашей смерти.
+gen6msg: Фальшивая команда смерти запущена..
+nomtfleft: Ни одна МТФ группа не жива. Отправляю как "неизвестный"
+decontdisabled: Дезинфекция отключена
+deconthappened: LCZ обеззараженна
+decontbug: должно было случиться
+mtfest0: между $(min)s и $(max)s
+mtfest1: менее $(max)
+mtfest2: возрождены / должны были уже возродиться 
+infomsg: SCP живо: $scpalive\nHumans живо: $humans | Следуйщий отряд MTF/Chaos: $estMTF\nВремя до деконтамизации: $decont\nСбежало класса Д:  $cdesc | Сбежало ученых:    $sciesc\nЖиво из персонала класса Д:    $cdalive | Живо из отрядов хоса:           $cialive\nЖиво ученых:  $scialive | Живо из отряда МТФs:            $mtfalive
+lockeduntil: недоступно пока уровень не будет равняться $lvl
+generators: Generators:
+generatorin: $room's generator
+activated: активировано.
+hastablet: имеет планшет
+notablet: не имеет планшет
+timeleft: и осталось $secs 
+ultlocked: Чтобы использовать конечный результат, вам нужен уровень 4.
+ultdown: Вы должны подождать $cds перед повторным использованием ульт.
+ultlaunched: Ульта успешно использована.
+ultusage: Usage: .079 ultimate <number>\n1. Lights out: выключает HCZ на 1 минуту (перезапуск: 180 секунд).\n2. Lockdown: делает людей неспособными открывать большие двери, но SCPs могут любые двери открывать (duration: 30 segundos, cooldown: 300 segundos)
+kys: <color=#AA1515>нажмите ` и напишите ".079 suicide" что бы сделать суицид.</color>
