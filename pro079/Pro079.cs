@@ -192,7 +192,7 @@ namespace pro079
             AddTranslation(new LangSetting("ultdown", "You must wait $cds before using ultimates again.", lang));
             AddTranslation(new LangSetting("ultlaunched", "Ultimate successfully used.", lang));
 
-            AddTranslation(new LangSetting("ultusage", "Usage: .079 ultimate <number>\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 segundos, cooldown: 300 segundos)", lang));
+            AddTranslation(new LangSetting("ultusage", "Usage: .079 ultimate <number>\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 seconds, cooldown: 300 seconds)", lang));
             
             AddTranslation(new LangSetting("kys", "<color=#AA1515>Press ` and write \".079 suicide\" to kill yourself.</color>", lang));
 
