@@ -86,7 +86,12 @@ namespace pro079
 				help += '\n' + plugin.GetTranslation("chaoshelp")
 				+ FormatEnergyLevel(plugin.GetConfigInt("p079_chaos_cost"), plugin.GetConfigInt("p079_chaos_level"), energyaux, lvlaux);
 			}
-			if (plugin.GetConfigBool("p079_scp"))
+            if (plugin.GetConfigBool("p079_gen"))
+            {
+                help += '\n' + plugin.GetTranslation("genhelp")
+                + FormatEnergyLevel(plugin.GetConfigInt("p079_gen_cost"), plugin.GetConfigInt("p079_gen_level"), energyaux, lvlaux);
+            }
+            if (plugin.GetConfigBool("p079_scp"))
 			{
 				help += '\n' + plugin.GetTranslation("scphelp")
 				+ FormatEnergyLevel(plugin.GetConfigInt("p079_scp_cost"), plugin.GetConfigInt("p079_scp_level"), energyaux, lvlaux);
@@ -930,7 +935,7 @@ namespace pro079
 		}
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
-			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType == ZoneType.HCZ);
+			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType != ZoneType.ENTRANCE);
 			helpFormatted = FormatHelp();
 			cooldownGenerator = 0f;
 			cooldownCassieGeneral = 0f;
