@@ -670,33 +670,37 @@ namespace pro079
 								}
 								return;
 							case 9: // chaoscmd
-								if (plugin.GetConfigBool("p079_chaos"))
+								if (!plugin.GetConfigBool("p079_chaos"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
-								if (PluginManager.Manager.Server.Round.Duration < cooldownCassieGeneral)
+								if (PluginManager.Manager.Server.Round.Duration < cooldownCassieGeneral && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie").Replace("$cd", (cooldownCassieGeneral - PluginManager.Manager.Server.Round.Duration).ToString());
 									return;
 								}
-								if (PluginManager.Manager.Server.Round.Duration < cooldownChaos)
+								if (PluginManager.Manager.Server.Round.Duration < cooldownChaos && !ev.Player.GetBypassMode())
 								{
                                     ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", (cooldownChaos - PluginManager.Manager.Server.Round.Duration).ToString());
                                 }
-                                if (ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level"))
+                                if (ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level") && !ev.Player.GetBypassMode())
                                 {
                                     ev.ReturnMessage = plugin.GetConfigString("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
                                     return;
                                 }
-                                if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost"))
+                                if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost") && !ev.Player.GetBypassMode())
 								{
 									ev.ReturnMessage = plugin.GetConfigString("lowmana").Replace("$min", plugin.GetConfigInt("p079_chaos_cost").ToString());
 									return;
 								}
-								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_chaos_cost");
-								PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.GetConfigString("p079_chaos_msg"));
-								ev.ReturnMessage = plugin.GetTranslation("success");
+                                if (!ev.Player.GetBypassMode())
+                                {
+                                    ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_chaos_cost");
+                                    cooldownChaos = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigInt("p079_chaos_cooldown");
+                                }
+                                PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.GetConfigString("p079_chaos_msg"));
+                                ev.ReturnMessage = plugin.GetTranslation("success");
 								return;
 							default:
 								ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
