@@ -4,6 +4,7 @@ A plugin to enhance playing 079 by giving it some fancy commands to play with, b
 # Configs
 
 *Wiki with **all** the configurations (you should check this one):* https://github.com/RogerFK/pro079/wiki
+**The only feature disabled by default is `p079_chaos`. If you want to use it, you have to enable it.**
 
 This plugin take many configs. The basic ones, that work between features, are as follows:
 
