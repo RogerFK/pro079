@@ -686,12 +686,12 @@ namespace pro079
                                 }
                                 if (ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level") && !ev.Player.GetBypassMode())
                                 {
-                                    ev.ReturnMessage = plugin.GetConfigString("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
+                                    ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
                                     return;
                                 }
                                 if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost") && !ev.Player.GetBypassMode())
 								{
-									ev.ReturnMessage = plugin.GetConfigString("lowmana").Replace("$min", plugin.GetConfigInt("p079_chaos_cost").ToString());
+									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_chaos_cost").ToString());
 									return;
 								}
                                 if (!ev.Player.GetBypassMode())
