@@ -350,7 +350,7 @@ namespace pro079
 								}
 								if (args.Length >= 3)
 								{
-									if (plugin.GetConfigList("p079_scp_list").Contains(args[1]))
+									if (!plugin.GetConfigList("p079_scp_list").Contains(args[1]))
 									{
 										ev.ReturnMessage = plugin.GetTranslation("scpexist") + " - " + plugin.GetTranslation("scpuse").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
 										return;
