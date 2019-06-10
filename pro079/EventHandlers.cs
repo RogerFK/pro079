@@ -699,6 +699,8 @@ namespace pro079
                                     ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_chaos_cost");
                                     cooldownChaos = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigInt("p079_chaos_cooldown");
                                 }
+				cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
+                                cooldownChaos = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_chaos_cooldown");        
                                 PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.GetConfigString("p079_chaos_msg"));
                                 ev.ReturnMessage = plugin.GetTranslation("success");
 								return;
