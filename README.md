@@ -18,3 +18,8 @@ This plugin take many configs. The basic ones, that work between features, are a
 
 # Translations
 Just place one of the translations into your sm_translations folder and you're good to go! Defaults to english, this plugin will autogenerate the default translation if you're missing any
+
+# Upcoming features
+**Next release (v2.0) will come with custom command functionality, in the future it'll be used like Gamemode Manager and it'll take different .dll's in case you want to slap things like calling chaos as a custom ultimate, or if you just want to add new fake messages**
+
+This is a hard task for me to do, so I'll do a pre-release with just ultimates. *Note: It'll probably be a dictionary with actions or something like that, but I'm not really sure how it should be done. I'm new at C#, so take it easy on me.*
