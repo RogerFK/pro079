@@ -40,10 +40,9 @@ namespace pro079
 
 			#region Specific configs
 			AddConfig(new ConfigSetting("p079_tesla", true, true, "Enables/disables Pro-079's Teslas functionality"));
-			AddConfig(new ConfigSetting("p079_tesla_seconds", 10, true, "How many seconds the teslas will be disabled for"));
-			AddConfig(new ConfigSetting("p079_tesla_cost", 15, true, "AP cost for the tesla command"));
-			AddConfig(new ConfigSetting("p079_tesla_global_cost", 50, true, "AP cost for the teslas command"));
+			AddConfig(new ConfigSetting("p079_tesla_cost", 40, true, "AP cost for the tesla command"));
 			AddConfig(new ConfigSetting("p079_tesla_level", 1, true, "Level for the tesla and teslas command"));
+			AddConfig(new ConfigSetting("p079_tesla_remaining", 5, true, "So it tells the remaining secondds for the teslas to be reenabled"));
 
 			AddConfig(new ConfigSetting("p079_info", true, true, "Enables/disables Pro-079's info functionality"));
 			AddConfig(new ConfigSetting("p079_info_alive", 1, true, "Minimum level to display the info about how many people are alive"));
@@ -107,8 +106,7 @@ namespace pro079
 			AddTranslation(new LangSetting("bugwarn", "If you find any bug, tell RogerFK#3679 on Discord", lang));
 
 			#region Cmds and Help strings
-			AddTranslation(new LangSetting(  "teslacmd", "te", lang));
-			AddTranslation(new LangSetting( "teslascmd", "teslas", lang));
+			AddTranslation(new LangSetting("newteslacmd", "tesla", lang));
 			AddTranslation(new LangSetting(    "mtfcmd", "mtf", lang));
 			AddTranslation(new LangSetting(    "gencmd", "gen", lang));
 			AddTranslation(new LangSetting(    "scpcmd", "scp", lang));
@@ -120,6 +118,7 @@ namespace pro079
 
 			AddTranslation(new LangSetting(  "teslahelp", "<b>.079 te</b> - Disables the tesla of the room you're in for $sec seconds", lang));
 			AddTranslation(new LangSetting( "teslashelp", "<b>.079 teslas</b> - Disables all teslas for $sec seconds", lang));
+			AddTranslation(new LangSetting("newteslahelp","<b>.079 tesla <time></b> - Disables all teslas for the amount of seconds you want", lang));
 			AddTranslation(new LangSetting(    "mtfhelp", "<b>.079 mtf <character> <number> <alive-scps></b> - Announces that a new MTF squad arrived, with your own custom number of SCPs", lang)); //Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida"
             AddTranslation(new LangSetting(    "genhelp", "<b>.079 gen [1-5]</b> - Announces that X generators are enabled, if it's 6 it will fake your suicide", lang));
 			AddTranslation(new LangSetting(    "scphelp", "<b>.079 scp <###> <reason></b> - Fakes an SCP (173, 096...) death, the reason can be: unknown, tesla, mtf, decont", lang));
@@ -153,16 +152,17 @@ namespace pro079
 
 			AddTranslation(new LangSetting("disabled", "This command is disabled.", lang));
 
-			AddTranslation(new LangSetting("teslaerror",    "This tesla is already disabled.", lang));
-			AddTranslation(new LangSetting("teslasuccess",  "Tesla disabled.", lang));
 			AddTranslation(new LangSetting("globaltesla", "All teslas disabled.", lang));
-			AddTranslation(new LangSetting("teslanotclose", "You're not close to a tesla.", lang));
+			AddTranslation(new LangSetting("teslausage", "Usage: .079 tesla <time>", lang));
+			AddTranslation(new LangSetting("teslarem", "Teslas re-enabled in $sec seconds", lang));
+			AddTranslation(new LangSetting("teslarenabled", "<color=#66F>Teslas re-enabled</color>", lang));
+
 			AddTranslation(new LangSetting("cooldown", "You have to wait $cds before using this command again", lang));
 			AddTranslation(new LangSetting("cooldowncassie", "Wait $cds before using a command that requires CASSIE (the announcer)", lang));
 
 			AddTranslation(new LangSetting("cantsuicide", "You can't suicide when there's other SCP's remaining", lang));
 
-            AddTranslation(new LangSetting("genuse", "Use: .079 gen (1-6) - Will announce there are X generator activated, or will fake your death if you ttype 6. 5 generators will fake your whole recontainment process. - $min AP", lang));
+            AddTranslation(new LangSetting("genuse", "Usage: .079 gen (1-6) - Will announce there are X generator activated, or will fake your death if you ttype 6. 5 generators will fake your whole recontainment process. - $min AP", lang));
             AddTranslation(new LangSetting("gen5msg", "Success. Your recontainment procedure, including when lights are turned off and a message telling you died, will be played.", lang));
 			AddTranslation(new LangSetting("gen6msg", "Fake death command launched.", lang));
 

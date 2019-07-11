@@ -5,16 +5,15 @@ namespace pro079
 	internal class SwitchParser
 	{
 		private static string[] cmds = new string[] {
-			"teslacmd", // 1
-			"teslascmd", // 2
-			"mtfcmd", // 3
-			"gencmd", // 4
-			"scpcmd", // 5
-			"infocmd", // 6
-			"suicidecmd", // 7
-			"ultcmd", // 8
-			"chaoscmd", // 9
-			"tipscmd" // 10
+			"newteslacmd", // 1
+			"mtfcmd", // 2
+			"gencmd", // 3
+			"scpcmd", // 4
+			"infocmd", // 5
+			"suicidecmd", // 6
+			"ultcmd", // 7
+			"chaoscmd", // 8
+			"tipscmd" // 9
 		};
 		public static byte ParseArg(string arg, Plugin plugin)
 		{

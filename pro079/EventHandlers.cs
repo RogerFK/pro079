@@ -68,12 +68,8 @@ namespace pro079
 			string lvlaux = plugin.GetTranslation("level"), energyaux = plugin.GetTranslation("energy");
 			if (plugin.GetConfigBool("p079_tesla"))
 			{
-				string aux = plugin.GetTranslation("teslahelp");
-				help += '\n' + aux.Replace("$sec", plugin.GetConfigInt("p079_tesla_seconds").ToString())
+				help += '\n' + plugin.GetTranslation("newteslahelp")
 				+ FormatEnergyLevel(plugin.GetConfigInt("p079_tesla_cost"), plugin.GetConfigInt("p079_tesla_level"), energyaux, lvlaux);
-				aux = plugin.GetTranslation("teslashelp");
-				help += '\n' + aux.Replace("$sec", plugin.GetConfigInt("p079_tesla_seconds").ToString())
-				+ FormatEnergyLevel(plugin.GetConfigInt("p079_tesla_global_cost"), plugin.GetConfigInt("p079_tesla_level"), energyaux, lvlaux);
 			}
 			if (plugin.GetConfigBool("p079_mtf"))
 			{
@@ -157,7 +153,7 @@ namespace pro079
 						// Most unclear way to do the switch statement, but anyways it's the most optimized way to do it.
 						switch (SwitchParser.ParseArg(args[0], plugin))
 						{
-							case 10: // tipscmd
+							case 9: // tipscmd
 								if (!plugin.GetConfigBool("p079_tips"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
@@ -166,83 +162,43 @@ namespace pro079
 								ev.Player.SendConsoleMessage(plugin.GetTranslation("tips").Replace("\\n", "\n"), "white");
 								ev.ReturnMessage = "<Made by RogerFK#3679>";
 								return;
+							
 							case 1: // teslacmd
 								if (!plugin.GetConfigBool("p079_tesla"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
 									return;
 								}
-								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_tesla_level") - 1)
+								if(args.Length < 2)
 								{
-									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_tesla_level").ToString());
+									ev.ReturnMessage = plugin.GetTranslation("teslausage");
 									return;
 								}
-								if (ev.Player.Scp079Data.AP >= plugin.GetConfigInt("p079_tesla_cost"))
+								float time;
+								if (!float.TryParse(args[1], out time))
 								{
-									bool noTesla = true;
-									foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
-									{
-										if (Vector.Distance(ev.Player.Scp079Data.Camera, tesla.Position) < 8.0f)
-										{
-											if (tesla.TriggerDistance > 0)
-											{
-												ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_tesla_cost");
-												ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
-												ev.Player.Scp079Data.Exp += 10.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
-												Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
-												noTesla = false;
-												ev.ReturnMessage = plugin.GetTranslation("teslasuccess");
-												break;
-											}
-											else
-											{
-												ev.ReturnMessage = plugin.GetTranslation("teslaerror");
-											}
-										}
-									}
-									if (noTesla == true)
-									{
-										ev.ReturnMessage = plugin.GetTranslation("teslanotclose");
-									}
-								}
-								else
-								{
-									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_tesla_cost").ToString());
-								}
-								return;
-							case 2: // teslascmd
-								if (!plugin.GetConfigBool("p079_tesla"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_tesla_level") - 1 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_tesla_level").ToString());
-									return;
-								}
-								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_tesla_global_cost") && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_tesla_global_cost").ToString());
+									ev.ReturnMessage = plugin.GetTranslation("teslausage");
 									return;
 								}
 								if (!ev.Player.GetBypassMode())
 								{
-									ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_tesla_global_cost");
-								}
-
-								foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
-								{
-									if (tesla.TriggerDistance > 0)
+									if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_tesla_level") - 1 && !ev.Player.GetBypassMode())
 									{
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.USE_TESLAGATE);
-										Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
+										ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_tesla_level").ToString());
+										return;
 									}
+									if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_tesla_cost") && !ev.Player.GetBypassMode())
+									{
+										ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_tesla_cost").ToString());
+										return;
+									}
+									ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_tesla_cost");
 								}
+								Timing.Run(DisableTeslas(time));
 								ev.Player.Scp079Data.Exp += 5.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
 								ev.ReturnMessage = plugin.GetTranslation("globaltesla");
 								return;
-							case 7: // suicidecmd
+							case 6: // suicidecmd
 								if (!plugin.GetConfigBool("p079_suicide"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
@@ -259,7 +215,7 @@ namespace pro079
 								Timing.Run(FakeKillPC());
 								ev.Player.Kill(DamageType.NUKE);
 								return;
-							case 3: // mtfcmd
+							case 2: // mtfcmd
 								if (!plugin.GetConfigBool("p079_mtf"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
@@ -323,7 +279,7 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
 									return;
 								}
-							case 5: // scpcmd
+							case 4: // scpcmd
 								if (!plugin.GetConfigBool("p079_scp"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
@@ -409,7 +365,7 @@ namespace pro079
 								Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
 								Timing.Run(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
 								return;
-							case 4: // gencmd
+							case 3: // gencmd
 								if (!plugin.GetConfigBool("p079_gen"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
@@ -506,7 +462,7 @@ namespace pro079
 										ev.ReturnMessage = plugin.GetTranslation("genuse");
 										return;
 								}
-							case 6: // infocmd
+							case 5: // infocmd
 								if (!plugin.GetConfigBool("p079_info"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
@@ -641,7 +597,7 @@ namespace pro079
 								}
 
 								return;
-							case 8: // ultcmd
+							case 7: // ultcmd
 								if (!plugin.GetConfigBool("p079_ult"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
@@ -705,7 +661,7 @@ namespace pro079
 									}
 								}
 								return;
-							case 9: // chaoscmd
+							case 8: // chaoscmd
 								if (!plugin.GetConfigBool("p079_chaos"))
 								{
 									ev.ReturnMessage = plugin.GetTranslation("disabled");
@@ -768,31 +724,40 @@ namespace pro079
 			}
 		}
 
-		private IEnumerable<float> DisableTesla(Smod2.API.TeslaGate tesla, float current)
+		private IEnumerable<float> DisableTeslas(float time)
 		{
-			tesla.TriggerDistance = -1f;
-			yield return (plugin.GetConfigFloat("p079_tesla_seconds"));
-			tesla.TriggerDistance = current;
-		}
-		/* // this is fucking op btw
-		public static IEnumerable<float> OverCharge()
-		{
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Warning All Security Personnel Unauthorized Use Of Error Error Error Error pitch_2 error error error error pitch_1 error");
+			TeslaGate[] teslas = UnityEngine.Object.FindObjectsOfType<TeslaGate>();
+			int length = teslas.Length;
+			float[] distances = new float[teslas.Length];
+			int i;
 
-			yield return 7.3f;
-
-			foreach (Room room in PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA))
+			for (i=0; i<length; i++)
 			{
-				try { if (room.ZoneType == ZoneType.HCZ) room.FlickerLights(); }
-				catch { }
+				distances[i] = teslas[i].sizeOfTrigger;
+				teslas[i].sizeOfTrigger = -1f;
 			}
-
-			foreach (Smod2.API.TeslaGate tesla in PluginManager.Manager.Server.Map.GetTeslaGates())
+			int remTime = plugin.GetConfigInt("p079_tesla_remaining");
+			yield return time - remTime;
+			foreach (Smod2.API.Player player in PluginManager.Manager.Server.GetPlayers())
 			{
-				Timing.Run(DisableTesla(tesla, tesla.TriggerDistance));
+				string remainingStr = plugin.GetTranslation("teslarem");
+				if (player.TeamRole.Role == Role.SCP_079)
+				{
+					for(i=remTime; i>0; i--)
+					{
+						player.PersonalBroadcast(1, Environment.NewLine + remainingStr.Replace("$sec", "<b>" + i.ToString() + "</b>"), false);
+					}
+					player.PersonalBroadcast(5, Environment.NewLine + plugin.GetTranslation("teslarenabled"), false);
+				}
+			}
+			yield return remTime;
+
+			for (i = 0; i < length; i++)
+			{
+				teslas[i].sizeOfTrigger = distances[i];
 			}
 		}
-		*/
+
 		public static IEnumerable<float> FakeKillPC()
 		{
 			// doesn't close doors but I'm not gonna do it lmao
