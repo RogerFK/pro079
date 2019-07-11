@@ -32,7 +32,6 @@ namespace pro079
         public override void Register()
         {
 			this.Info("Loading Pro-079 configs and commands...");
-			float startingTime = UnityEngine.Time.time;
             Timing.Init(this);
 			AddEventHandlers(new Pro79Handlers(this));
 
@@ -195,8 +194,6 @@ namespace pro079
             AddTranslation(new LangSetting("ultusage", "Usage: .079 ultimate <number>\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 seconds, cooldown: 300 seconds)", lang));
             
             AddTranslation(new LangSetting("kys", "<color=#AA1515>Press ` and write \".079 suicide\" to kill yourself.</color>", lang));
-
-            this.Info("Done loading! Took " + (UnityEngine.Time.time - startingTime).ToString("0.00") + " seconds to complete!");
 		}
     }
 }
