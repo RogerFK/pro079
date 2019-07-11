@@ -84,7 +84,9 @@ namespace pro079
             AddConfig(new ConfigSetting("p079_gen", true, true, "Enables/disables Pro-079's fake SCP death messages"));
 			AddConfig(new ConfigSetting("p079_gen_cooldown", 60f, true, "How many seconds the command will give a cooldown for itself"));
 			AddConfig(new ConfigSetting("p079_gen_cost", 40, true, "Cost for the command"));
-			AddConfig(new ConfigSetting("p079_gen_level", 1, true, "Minimum level for 079 to fake a SCP death message"));
+			AddConfig(new ConfigSetting("p079_gen_cost_blackout", 40, true, "Penalty for the Gen5 and Gen6 commands"));
+			AddConfig(new ConfigSetting("p079_gen_level", 2, true, "Minimum level for 079 to fake a generator"));
+			AddConfig(new ConfigSetting("p079_gen_level_blackout", 3, true, "Minimum level for 079 to fake gen 5 and gen 6"));
 			AddConfig(new ConfigSetting("p079_gen_penalty", 60f, true, "For how long there will be a penalty after using gen 5 or gen 6"));
 
 			AddConfig(new ConfigSetting("p079_tips", true, true, "Enables/disables Pro-079's fake SCP death messages"));

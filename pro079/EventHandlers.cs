@@ -427,7 +427,7 @@ namespace pro079
 									return;
 								}
 								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_gen_cost") && !ev.Player.GetBypassMode())
-								{//"p079_gen_cost"
+								{
 									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_gen_cost").ToString());
 									return;
 								}
@@ -436,6 +436,7 @@ namespace pro079
 									ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", cooldownGenerator.ToString());
 									return;
 								}
+								int blackcost = plugin.GetConfigInt("p079_gen_cost") + plugin.GetConfigInt("p079_gen_cost_blackout");
 								switch (args[1])
 								{
 									case "1":
@@ -445,6 +446,7 @@ namespace pro079
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon" + args[1]);
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 20f;
+										ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_gen_cost");
 										cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
 										cooldownGenerator = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_cooldown");
 										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
@@ -452,9 +454,23 @@ namespace pro079
 										ev.ReturnMessage = plugin.GetTranslation("success");
 										return;
 									case "5":
+										if (!ev.Player.GetBypassMode())
+										{
+											if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_gen_level_blackout") - 1)
+											{
+												ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_gen_level_blackout").ToString());
+												return;
+											}
+											if (ev.Player.Scp079Data.AP < blackcost)
+											{
+												ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", blackcost.ToString());
+												return;
+											} 
+										}
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										Timing.Run(Fake5Gens());
 										ev.Player.Scp079Data.Exp += 80f;
+										ev.Player.Scp079Data.AP -= blackcost;
 										cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
 										cooldownGenerator = 70.3f + PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown");
 										Timing.Run(CooldownGen(70.3f + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
@@ -462,9 +478,23 @@ namespace pro079
 										ev.ReturnMessage = plugin.GetTranslation("gen5msg");
 										return;
 									case "6":
+										if (!ev.Player.GetBypassMode())
+										{
+											if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_gen_level_blackout") - 1)
+											{
+												ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_gen_level_blackout").ToString());
+												return;
+											}
+											if (ev.Player.Scp079Data.AP < blackcost)
+											{
+												ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", blackcost.ToString());
+												return;
+											}
+										}
 										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
 										ev.Player.Scp079Data.Exp += 50f;
+										ev.Player.Scp079Data.AP -= blackcost;
 										cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
 										cooldownGenerator = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown");
 										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
