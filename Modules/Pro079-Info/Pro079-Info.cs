@@ -62,6 +62,9 @@ namespace pro079tesla
 			AddTranslation(new LangSetting("notablet", "doesn't have a tablet", lang));
 
 			AddTranslation(new LangSetting("timeleft", "and has $secs remaining", lang));
+
+			//
+			AddTranslation(new LangSetting("infohelp", "<b>.079 info</b> - Shows stuff about the facility", lang));
 		}
 	}
 }

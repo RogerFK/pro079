@@ -18,7 +18,7 @@ namespace pro079tesla
 		SmodRevision = 0
 		)]
 
-	public class Pro079 : Plugin, I079Command
+	public class Pro079 : Plugin
 	{
 		public override void OnDisable()
 		{
@@ -48,8 +48,12 @@ namespace pro079tesla
 			AddTranslation(new LangSetting("teslausage", "Usage: .079 tesla <time>", lang));
 			AddTranslation(new LangSetting("teslarem", "Teslas re-enabled in $sec seconds", lang));
 			AddTranslation(new LangSetting("teslarenabled", "<color=#66F>Teslas re-enabled</color>", lang));
+			//
+			AddTranslation(new LangSetting("teslahelp", "<b>.079 tesla <time></b> - Disables all teslas for the amount of seconds you want", lang));
 		}
-
+	}
+	public class TeslaCommand : ICommand079
+	{
 		public string CallComand(string[] args, Player player)
 		{
 			if (!this.GetConfigBool("p079_tesla"))

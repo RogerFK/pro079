@@ -11,7 +11,9 @@ using Smod2.EventSystem.Events;
 
 namespace pro079
 {
-	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole, IEventHandlerSetConfig, IEventHandlerPlayerDie, IEventHandlerTeamRespawn, IEventHandlerDoorAccess, IEventHandlerWaitingForPlayers
+	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole,
+		IEventHandlerSetConfig, IEventHandlerPlayerDie, IEventHandlerTeamRespawn,
+		IEventHandlerDoorAccess, IEventHandlerWaitingForPlayers
 	{
 		private readonly Pro079 plugin;
 		private string helpFormatted;
@@ -19,10 +21,6 @@ namespace pro079
 		{
 			this.plugin = plugin;
 		}
-		private float cooldownGenerator;
-		private float cooldownCassieGeneral;
-		private float cooldownMTF;
-		private float cooldownChaos;
 		private float ultDown;
 		private float cooldownScp;
 		private static IEnumerable<Room> rooms;

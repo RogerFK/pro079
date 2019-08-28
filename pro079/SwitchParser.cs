@@ -1,6 +1,6 @@
 ﻿using Smod2;
 
-namespace pro079
+namespace ddd
 {
 	internal class SwitchParser
 	{

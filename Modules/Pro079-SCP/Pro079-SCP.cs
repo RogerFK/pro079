@@ -47,6 +47,8 @@ namespace pro079mtf
 			AddTranslation(new LangSetting("scpway", "Type a method that exists", lang));
 			AddTranslation(new LangSetting("nomtfleft", "No MTF's alive. Sending as \"unknown\"", lang));
 
+			//
+			AddTranslation(new LangSetting("scphelp", "<b>.079 scp <###> <reason></b> - Fakes an SCP (173, 096...) death, the reason can be: unknown, tesla, mtf, decont", lang));
 		}
 	}
 }

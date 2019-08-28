@@ -21,6 +21,8 @@ namespace pro079
     {
 		// Language options
 		[LangOption]
+		public static readonly string basicHelp = "<b>.079</b> - Displays this info.";
+		[LangOption]
 		public static readonly string disabled = "This command is disabled.";
 		[LangOption]
 		public static readonly string cooldown = "You have to wait $cds before using this command again";
@@ -84,16 +86,8 @@ namespace pro079
 			AddTranslation(new LangSetting(  "chaoscmd", "chaos", lang));
 			AddTranslation(new LangSetting(   "tipscmd", "tips", lang));
 
-			AddTranslation(new LangSetting(  "teslahelp", "<b>.079 te</b> - Disables the tesla of the room you're in for $sec seconds", lang));
-			AddTranslation(new LangSetting( "teslashelp", "<b>.079 teslas</b> - Disables all teslas for $sec seconds", lang));
-			AddTranslation(new LangSetting("newteslahelp","<b>.079 tesla <time></b> - Disables all teslas for the amount of seconds you want", lang));
-			AddTranslation(new LangSetting(    "mtfhelp", "<b>.079 mtf <character> <number> <alive-scps></b> - Announces that a new MTF squad arrived, with your own custom number of SCPs", lang)); //Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida"
-            AddTranslation(new LangSetting(    "genhelp", "<b>.079 gen [1-5]</b> - Announces that X generators are enabled, if it's 6 it will fake your suicide", lang));
-			AddTranslation(new LangSetting(    "scphelp", "<b>.079 scp <###> <reason></b> - Fakes an SCP (173, 096...) death, the reason can be: unknown, tesla, mtf, decont", lang));
-			AddTranslation(new LangSetting(   "infohelp", "<b>.079 info</b> - Shows stuff about the facility", lang));
 			AddTranslation(new LangSetting("suicidehelp", "<b>.079 suicide</b> - Overcharges the generators to die when you're alone", lang));
 			AddTranslation(new LangSetting(    "ulthelp", "<b>.079 ultimate</b> - Displays info about ultimates", lang));
-			AddTranslation(new LangSetting(  "chaoshelp", "<b>.079 chaos</b> - Announces the chaos comming", lang));
 			AddTranslation(new LangSetting(   "tipshelp", "<b>.079 tips</b> - Tips about SCP-079 and stuff to take into account", lang));
 
 			#endregion
@@ -102,11 +96,7 @@ namespace pro079
 
 			AddTranslation(new LangSetting("cassieready", "<color=#85ff4c>Announcer (CASSIE) commands ready</color>", lang));
 			AddTranslation(new LangSetting("ultready", "<color=#85ff4c>Ultimates ready</color>", lang));
-			AddTranslation(new LangSetting("mtfready", "<color=#85ff4c>MTF command ready</color>", lang));
-			AddTranslation(new LangSetting("genready", "<color=#85ff4c>Generator command ready</color>", lang));
-			AddTranslation(new LangSetting("scpready", "<color=#85ff4c>SCP command ready</color>", lang));
-			AddTranslation(new LangSetting("ready", "ready", lang));
-			AddTranslation(new LangSetting("success", "Command successfully handled", lang));
+			AddTranslation(new LangSetting("success", "Command successfully launched", lang));
 
 			AddTranslation(new LangSetting("lowlevel", "Your level is too low (you need $min)", lang));
 			AddTranslation(new LangSetting("lowmana", "Not enough AP (you need  $min)", lang));

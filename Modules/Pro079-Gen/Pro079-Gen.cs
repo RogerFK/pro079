@@ -46,6 +46,10 @@ namespace pro079mtf
 			AddTranslation(new LangSetting("genuse", "Usage: .079 gen (1-6) - Will announce there are X generator activated, or will fake your death if you ttype 6. 5 generators will fake your whole recontainment process. - $min AP", lang));
 			AddTranslation(new LangSetting("gen5msg", "Success. Your recontainment procedure, including when lights are turned off and a message telling you died, will be played.", lang));
 			AddTranslation(new LangSetting("gen6msg", "Fake death command launched.", lang));
+
+			// registblabla
+
+			AddTranslation(new LangSetting("genhelp", "<b>.079 gen [1-5]</b> - Announces that X generators are enabled, if it's 6 it will fake your suicide", lang));
 		}
 	}
 }

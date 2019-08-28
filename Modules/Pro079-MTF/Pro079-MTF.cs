@@ -43,6 +43,9 @@ namespace pro079mtf
 			// Cmds and Help strings
 			AddTranslation(new LangSetting("mtfuse", "Usage: .079 mtf (p) (5) (4), will say Papa-5 is coming and there are 4 SCP remaining - $min ap", lang));
 			AddTranslation(new LangSetting("mtfmaxscp", "Maximum SCPs: $max", lang));
+
+			//
+			AddTranslation(new LangSetting("mtfhelp", "<b>.079 mtf <character> <number> <alive-scps></b> - Announces that a new MTF squad arrived, with your own custom number of SCPs", lang)); //Lanza un mensaje sobre que ha llegado la MTF a la zona con un número que elijas de SCPs con vida"
 		}
 	}
 }

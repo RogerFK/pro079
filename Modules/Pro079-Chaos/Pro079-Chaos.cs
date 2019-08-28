@@ -41,7 +41,10 @@ namespace pro079mtf
 			AddConfig(new ConfigSetting("p079_chaos_msg", "warning . chaosinsurgency detected in the surface", true, "Message for the chaos command"));
 
 			// Cmds and Help strings
-			
+
+			// Register command
+			// new blabla
+			AddTranslation(new LangSetting("chaoshelp", "<b>.079 chaos</b> - Announces the chaos comming"));
 		}
 	}
 }
