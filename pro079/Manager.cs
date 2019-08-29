@@ -84,14 +84,15 @@ namespace pro079
 		}
 		public static string GetHelp()
 		{
-			string help = Pro079.basicHelp;
+			string help = Pro079.singleton.basicHelp;
 			if (Help == null || Help.Count != Commands.Keys.Count) FormatHelp();
 			foreach(string line in Help)
 			{
 				help += System.Environment.NewLine + line;
 			}
 			// Faltan suicidio, ultimates y tips
-			help += System.Environment.NewLine + "";
+			if(Pro079.singleton.suicide)
+			help += System.Environment.NewLine + $"<b>.079 {/*suicide*/0} - ";
 			return help;
 		}
 	}
