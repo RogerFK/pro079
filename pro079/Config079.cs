@@ -1,4 +1,4 @@
-﻿namespace pro079
+﻿namespace Pro079
 {
 	public class Config079
 	{
@@ -48,7 +48,54 @@
 		//////////////////////////////////////////////////////
 
 		/// <summary>
-		/// Default user-defined string for when you/the user wants to disable the command.
+		/// Gets the translated string for level. Something like: "level {number}"
+		/// </summary>
+		/// <param name="Level">The number of the level</param>
+		/// <param name="Uppercase">If the first character should be uppercase</param>
+		/// <returns>The translated level string</returns>
+		public string LevelString(int Level, bool Uppercase)
+		{
+			if(Uppercase || char.IsDigit(plugin.level[0])) return char.ToUpper(plugin.level[0])
+					+ plugin.level.Substring(1).Replace("$lvl", Level.ToString());
+			return plugin.level.Replace("$lvl", Level.ToString());
+		}
+		/// <summary>
+		/// Gets the translated string for AP. Something like: "{number} AP"
+		/// </summary>
+		/// <param name="AP">The number of the AP</param>
+		/// <param name="Uppercase">If the first character should be uppercase</param>
+		/// <returns>The translated AP string</returns>
+		public string APString(int AP, bool Uppercase)
+		{
+			if (Uppercase || char.IsDigit(plugin.level[0])) return char.ToUpper(plugin.level[0])
+					 + plugin.level.Substring(1).Replace("$ap", AP.ToString());
+			return plugin.level.Replace("$ap", AP.ToString());
+		}
+		/// <summary>
+		/// Gets the "Not enough AP (you need $min)" but translated
+		/// </summary>
+		/// <param name="MinAP">The minimum AP</param>
+		/// <returns>The translated string</returns>
+		public string LowAP(int MinAP)
+		{
+			return Min(plugin.lowmana, MinAP);
+		}
+		/// <summary>
+		/// Gets the "Your level is too low (you need $min)" but translated
+		/// </summary>
+		/// <param name="MinLevel">The required level</param>
+		/// <returns>The translated string</returns>
+		public string LowLevel(int MinLevel)
+		{
+			return Min(plugin.level, MinLevel);
+		}
+		private string Min(string str, int number)
+		{
+			return str.Replace("$min", number.ToString());
+		}
+
+		/// <summary>
+		/// Translated "This command is disabled."
 		/// </summary>
 		public string CommandDisabled
 		{
@@ -57,7 +104,25 @@
 				return plugin.disabled;
 			}
 		}
-
+		/// <summary>
+		/// Translated "Command succesfully launched".
+		/// </summary>
+		public string CommandSuccess
+		{
+			get
+			{
+				return plugin.success;
+			}
+		}
+		/// <summary>
+		/// Translated "Ultimate succesfully used."
+		/// </summary>
+		public string UltimateLaunched
+		{
+			get
+			{
+				return plugin.ultlaunched;
+			}
+		}
 	}
-
 }

@@ -1,7 +1,7 @@
 ﻿using Smod2;
 using Smod2.API;
 
-namespace pro079.API
+namespace Pro079.API
 {
 	public interface ICommand079
 	{

@@ -1,23 +1,26 @@
 ﻿using MEC;
 using System.Collections.Generic;
-using pro079.API;
+using Pro079.API;
 using Smod2.API;
 using Smod2;
 
-namespace pro079
+namespace Pro079
 {
-	class Manager
+	public class Manager
 	{
+		private readonly Pro079 plugin;
+		public Manager(Pro079 plugin) => this.plugin = plugin;
+
 		/// <summary>
 		/// Dictionary with all the Commands and their respective handlers
 		/// </summary>
-		public readonly static Dictionary<string, ICommand079> Commands = new Dictionary<string, ICommand079>();
+		public readonly Dictionary<string, ICommand079> Commands = new Dictionary<string, ICommand079>();
 		/// <summary>
 		/// Function used to register the current command. Doesn't register EventHandlers, so be aware of that.
 		/// </summary>
 		/// <param name="CommandHandler">The class that implements ICommand079</param>
 		/// <returns></returns>
-		public static string RegisterCommand(ICommand079 CommandHandler)
+		public string RegisterCommand(ICommand079 CommandHandler)
 		{
 			if(CommandHandler == null || string.IsNullOrEmpty(CommandHandler.Command))
 			{
@@ -33,13 +36,13 @@ namespace pro079
 		/// <summary>
 		/// Dictionary with all the Ultimates and their respective handlers
 		/// </summary>
-		public readonly static Dictionary<string, IUltimate079> Ultimates = new Dictionary<string, IUltimate079>();
+		public readonly Dictionary<string, IUltimate079> Ultimates = new Dictionary<string, IUltimate079>();
 		/// <summary>
 		/// Function used to register the current command. Doesn't register EventHandlers, so be aware of that.
 		/// </summary>
 		/// <param name="UltimateHandler">The class that implements ICommand079</param>
 		/// <returns></returns>
-		public static string RegisterUltimate(IUltimate079 UltimateHandler)
+		public string RegisterUltimate(IUltimate079 UltimateHandler)
 		{
 			if (UltimateHandler == null || string.IsNullOrEmpty(UltimateHandler.Name))
 			{
@@ -57,7 +60,7 @@ namespace pro079
 		/// Properly sets the cooldown for the given command
 		/// </summary>
 		/// <param name="Command"></param>
-		public static void SetOnCooldown(ICommand079 Command)
+		public void SetOnCooldown(ICommand079 Command)
 		{
 			Command.CurrentCooldown = PluginManager.Manager.Server.Round.Duration + Command.Cooldown;
 			if (!string.IsNullOrEmpty(Command.CommandReady))
@@ -67,33 +70,11 @@ namespace pro079
 				else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), 1);
 			}
 		}
-		private static IEnumerator<float> DelayMessage(string message, int delay)
+		private IEnumerator<float> DelayMessage(string message, int delay)
 		{
 			yield return MEC.Timing.WaitForSeconds(delay);
 			var pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 			foreach (Player pc in pcs) pc.PersonalBroadcast(6, message, false);
-		}
-		private static List<string> Help;
-		private static void FormatHelp()
-		{
-			Help = new List<string>(Commands.Keys.Count);
-			foreach (KeyValuePair<string, ICommand079> kvp in Commands)
-			{
-				if(!kvp.Value.Disabled) Help.Add($"<b>.079 {kvp.Key} - {kvp.Value.HelpInfo}");
-			}
-		}
-		public static string GetHelp()
-		{
-			string help = Pro079.singleton.basicHelp;
-			if (Help == null || Help.Count != Commands.Keys.Count) FormatHelp();
-			foreach(string line in Help)
-			{
-				help += System.Environment.NewLine + line;
-			}
-			// Faltan suicidio, ultimates y tips
-			if(Pro079.singleton.suicide)
-			help += System.Environment.NewLine + $"<b>.079 {/*suicide*/0} - ";
-			return help;
 		}
 	}
 }
