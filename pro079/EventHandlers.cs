@@ -28,6 +28,9 @@ namespace Pro079
 		private static int MinMTF { get; set; }
 		private static int MaxMTF { get; set; }
 		private static float LastMtfSpawn { get; set; }
+		public static FlickerableLight[] FlickerableLightsArray { get; private set; }
+		public static IEnumerable<Door> DoorArray { get; private set; }
+
 		private bool UltDoors = false;
 
 		private List<string> Help;
@@ -84,8 +87,7 @@ namespace Pro079
 
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
-			string command = ev.Command.ToLower();
-			if (command.StartsWith("079"))
+			if (ev.Command.StartsWith("079"))
 			{
 				if (!plugin.GetConfigBool("p079_enable"))
 				{
@@ -94,7 +96,7 @@ namespace Pro079
 
 				ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
 				// this block is pasted from PlayerPrefs https://github.com/probe4aiur/PlayerPreferences/
-				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
+				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(ev.Command);
 				string[] args = new string[collection.Count - 1];
 
 				for (int i = 1; i < collection.Count; i++)
@@ -119,123 +121,152 @@ namespace Pro079
 						ev.Player.SendConsoleMessage(GetHelp(), "white");
 						ev.ReturnMessage = "<Pro-079 made by RogerFK#3679. Repository: github.com/RogerFK/pro079>";
 					}
-					else if (args.Length > 0)
+					else if (args.Length >= 1)
 					{
 						// Most unclear way to do the switch statement, but anyways it's the most optimized way to do it.
-						switch (args[0])
+						if (args[0] == plugin.tipscmd)
 						{
-							case "tips": // tipscmd
-								if (!plugin.GetConfigBool("p079_tips"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								ev.Player.SendConsoleMessage(plugin.GetTranslation("tips").Replace("\\n", "\n"), "white");
-								ev.ReturnMessage = "<Made by RogerFK#3679>";
+							if (!plugin.tips)
+							{
+								ev.ReturnMessage = plugin.disabled;
 								return;
-							case 1: // teslacmd
+							}
+							ev.Player.SendConsoleMessage(plugin.tipsMsg.Replace("\\n", "\n"), "white");
+							ev.ReturnMessage = "<Made by RogerFK#3679>";
+							return;
+						}
+						else if (args[0] == plugin.suicidecmd)
+						{
+							if (!plugin.suicide)
+							{
+								ev.ReturnMessage = plugin.disabled;
 								return;
-							case 6: // suicidecmd
-								if (!plugin.GetConfigBool("p079_suicide"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-								int pcs = PCplayers.Count;
-								if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
-								{
-									ev.ReturnMessage = plugin.GetTranslation("cantsuicide");
-									return;
-								}
-								PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-								Timing.Run(FakeKillPC());
-								ev.Player.Kill(DamageType.NUKE);
+							}
+							List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+							int pcs = PCplayers.Count;
+							if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
+							{
+								ev.ReturnMessage = plugin.cantsuicide;
 								return;
-							case 2: // mtfcmd
+							}
+							PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
+							int p = (int)System.Environment.OSVersion.Platform;
+							if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(FakeKillPC(ev.Player), MEC.Segment.Update);
+							else MEC.Timing.RunCoroutine(FakeKillPC(ev.Player), 1);
+							return;
+						}
+						if (!Pro079.Manager.Commands.TryGetValue(args[0], out ICommand079 CommandHandler))
+						{
+							ev.ReturnMessage = plugin.unknowncmd;
+							return;
+						}
+						if(ev.Player.Scp079Data.Level + 1 < CommandHandler.MinLevel)
+						{
+							ev.ReturnMessage = Pro079.Configs.LowLevel(CommandHandler.MinLevel);
+							return;
+						}
+						else if(ev.Player.Scp079Data.AP < CommandHandler.APCost)
+						{
+							ev.ReturnMessage = Pro079.Configs.LowAP(CommandHandler.APCost);
+							return;
+						}
+						int cooldown = CommandHandler.CurrentCooldown - PluginManager.Manager.Server.Round.Duration;
+						if (cooldown > 0)
+						{
+							ev.ReturnMessage = Pro079.Configs.CmdOnCooldown(cooldown);
+							return;
+						}
+						if (CommandHandler.Cassie)
+						{
+							// Need to add the cassie cooldown logic
+							// int cassieCD = this.CassieCooldown - PluginManager.Manager.Server.Round.Duration;
+							// if (cassieCD > 0)
+						}
+						try
+						{
+							// This part should only throw an exception if the command is buggy.
+							ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player);
+							Pro079.Manager.SetOnCooldown(CommandHandler);
+						}
+						catch (Exception e)
+						{
+							plugin.Error($"Error with command {args[0]} and literally not my problem:\n" + e.ToString());
+							ev.ReturnMessage = plugin.error + ": " + e.Message;
+						}
+						/*
+						case 7: // ultcmd
+							if (!plugin.GetConfigBool("p079_ult"))
+							{
+								ev.ReturnMessage = plugin.GetTranslation("disabled");
 								return;
-							case 4: // scpcmd
-								return;
-							case 3: // gencmd
-								return;
-							case 5: // infocmd
-								return;
-							case 7: // ultcmd
-								if (!plugin.GetConfigBool("p079_ult"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								string ultUsage = plugin.GetTranslation("ultusage").Replace("\\n", "\n");
-								// if it's our server, and by the way don't enter if you're a guiri
-								if (PluginManager.Manager.Server.Name.ToLower().Contains("world in chaos"))
-								{
-									ultUsage += "3. ... ¡Añade tu idea aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
-									+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
-								}
+							}
+							string ultUsage = plugin.GetTranslation("ultusage").Replace("\\n", "\n");
+							// if it's our server, and by the way don't enter if you're a guiri
+							if (PluginManager.Manager.Server.Name.ToLower().Contains("world in chaos"))
+							{
+								ultUsage += "3. ... ¡Añade tu idea aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
+								+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
+							}
 
-								if (args.Count() == 1)
+							if (args.Count() == 1)
+							{
+								if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
 								{
-									if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
-									{
-										ev.ReturnMessage = plugin.GetTranslation("ultlocked");
-									}
-									else
-									{
-										ev.ReturnMessage = ultUsage;
-										return;
-									}
+									ev.ReturnMessage = plugin.GetTranslation("ultlocked");
 								}
 								else
 								{
-									if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
-									{
-										ev.ReturnMessage = plugin.GetTranslation("ultlocked");
+									ev.ReturnMessage = ultUsage;
+									return;
+								}
+							}
+							else
+							{
+								if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
+								{
+									ev.ReturnMessage = plugin.GetTranslation("ultlocked");
+									return;
+								}
+								if (PluginManager.Manager.Server.Round.Duration < ultDown)
+								{
+									ev.ReturnMessage = plugin.GetTranslation("ultdown").Replace("$cd", (ultDown - PluginManager.Manager.Server.Round.Duration).ToString());
+									return;
+								}
+								if (!int.TryParse(args[1], out int ult))
+								{
+									ev.ReturnMessage = ultUsage;
+									return;
+								}
+								ev.ReturnMessage = plugin.GetTranslation("ultlaunched");
+								switch (ult)
+								{
+									case 1:
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
+										Timing.Run(ShamelessTimingRunLights());
+										ultDown = PluginManager.Manager.Server.Round.Duration + 180;
+										Timing.Run(CooldownUlt(180f));
 										return;
-									}
-									if (PluginManager.Manager.Server.Round.Duration < ultDown)
-									{
-										ev.ReturnMessage = plugin.GetTranslation("ultdown").Replace("$cd", (ultDown - PluginManager.Manager.Server.Round.Duration).ToString());
+									case 2:
+										PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
+										Timing.Run(Ult2Toggle(30f));
+										ultDown = PluginManager.Manager.Server.Round.Duration + 300;
+										Timing.Run(CooldownUlt(300f));
 										return;
-									}
-									if (!int.TryParse(args[1], out int ult))
-									{
+									default:
 										ev.ReturnMessage = ultUsage;
 										return;
-									}
-									ev.ReturnMessage = plugin.GetTranslation("ultlaunched");
-									switch (ult)
-									{
-										case 1:
-											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
-											Timing.Run(ShamelessTimingRunLights());
-											ultDown = PluginManager.Manager.Server.Round.Duration + 180;
-											Timing.Run(CooldownUlt(180f));
-											return;
-										case 2:
-											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
-											Timing.Run(Ult2Toggle(30f));
-											ultDown = PluginManager.Manager.Server.Round.Duration + 300;
-											Timing.Run(CooldownUlt(300f));
-											return;
-										default:
-											ev.ReturnMessage = ultUsage;
-											return;
-									}
 								}
-								return;
-							case 8: // chaoscmd
-								return;
-							default:
-								ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
-								return;
-						}
+							}
+							return;
+						default:
+							ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
+							return;*/
 					}
 				}
-				else
-				{
-					ev.ReturnMessage = plugin.GetTranslation("notscp079");
-				}
+			}
+			else
+			{
+				ev.ReturnMessage = plugin.GetTranslation("notscp079");
 			}
 		}
 
@@ -253,39 +284,52 @@ namespace Pro079
 		}
 		private IEnumerator<float> DelayMsg(Player player)
 		{
-			yield return 0.1f; // This value produces completely random outputs, but it's good enough for delaying the message so it doesn't overlap.
-			if(player.TeamRole.Role == Role.SCP_079)
+			yield return 0.1f; // This value produces completely random outputs, but it's good enough for delaying the message so it doesn't overlap, as MEC supposedly works with frames.
+			if (player.TeamRole.Role == Role.SCP_079)
 			{
-				ev.Player.PersonalClearBroadcasts();
-				ev.Player.PersonalBroadcast(20, plugin.broadcastMsg, true);
-				ev.Player.SendConsoleMessage(GetHelp(), "white");
+				player.PersonalClearBroadcasts();
+				player.PersonalBroadcast(20, plugin.broadcastMsg, true);
+				player.SendConsoleMessage(GetHelp(), "white");
 			}
 		}
-		public static IEnumerable<float> FakeKillPC()
+		public static IEnumerator<float> FakeKillPC(Player player)
 		{
-			// doesn't close doors but I'm not gonna do it lmao
-			yield return (7.3f);
-
-			foreach (Room room in rooms)
+			yield return MEC.Timing.WaitForSeconds(7.3f);
+			foreach (FlickerableLight flickerableLight in FlickerableLightsArray)
 			{
-				room.FlickerLights();
+				Scp079Interactable component = flickerableLight.GetComponent<Scp079Interactable>();
+				if (component == null || component.currentZonesAndRooms[0].currentZone == "HeavyRooms")
+				{
+					flickerableLight.EnableFlickering(10f);
+				}
 			}
-			yield return (8f);
+			foreach (Door door in DoorArray)
+			{
+				Scp079Interactable component = door.GetComponent<Scp079Interactable>();
+				if (component.currentZonesAndRooms[0].currentZone == "HeavyRooms" && door.isOpen && !door.locked)
+				{
+					door.ChangeState(true);
+				}
+			}
+			yield return MEC.Timing.WaitForSeconds(8f);
+			if(player != null) player.ChangeRole(Role.SPECTATOR);
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
 		}
 
 		public static IEnumerable<float> Fake5Gens()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
-			yield return (79.89f); // this value is fucking shit actually
+			yield return MEC.Timing.WaitForSeconds(79.89f);
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-			Timing.Run(FakeKillPC());
+			int p = (int)System.Environment.OSVersion.Platform;
+			if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(FakeKillPC(null), MEC.Segment.Update);
+			else MEC.Timing.RunCoroutine(FakeKillPC(null), 1);
 		}
 
 		/* Cooldowns could be substituted with float like I did in Stalky 106 (https://github.com/RogerFK/stalky106),
 		 * but it wouldn't matter anyways as there will always be
 		 * a coroutine for the broadcast 
-		 
+
 		 * Also before you ask, no, you can't pass a bool as a reference in C#
 		 * or else I don't know the proper way to do it.*/
 		private IEnumerable<float> CooldownScp(float v)
@@ -449,15 +493,12 @@ namespace Pro079
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
 			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType != ZoneType.ENTRANCE);
-			helpFormatted = FetchExternalHelp();
-			cooldownGenerator = 0f;
-			cooldownCassieGeneral = 0f;
-			cooldownMTF = 0f;
+			FlickerableLightsArray = UnityEngine.Object.FindObjectsOfType<FlickerableLight>();
+			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
 			ultDown = 0f;
 			cooldownScp = 0f;
 			DeconBool = false;
 			UltDoors = false;
-			cooldownChaos = 0f;
 		}
 	}
 }

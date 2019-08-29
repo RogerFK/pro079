@@ -57,12 +57,13 @@ namespace Pro079
 		}
 
 		/// <summary>
-		/// Properly sets the cooldown for the given command
+		/// Properly sets the cooldown for the given command, and delays a broadcast to tell the user when it's ready if the property <see cref="CommandReady"/> has been set.
 		/// </summary>
 		/// <param name="Command"></param>
 		public void SetOnCooldown(ICommand079 Command)
 		{
 			Command.CurrentCooldown = PluginManager.Manager.Server.Round.Duration + Command.Cooldown;
+
 			if (!string.IsNullOrEmpty(Command.CommandReady))
 			{
 				int p = (int) System.Environment.OSVersion.Platform;
@@ -75,6 +76,27 @@ namespace Pro079
 			yield return MEC.Timing.WaitForSeconds(delay);
 			var pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 			foreach (Player pc in pcs) pc.PersonalBroadcast(6, message, false);
+		}
+		/// <summary>
+		/// Properly gives the player XP. Must be done per-command.
+		/// </summary>
+		/// <param name="player">The player to give XP to</param>
+		/// <param name="XP">The amount of XP</param>
+		/// <param name="xptype">The experience type you want to show the player (optional)</param>
+		public void GiveExp(Player player, float XP, ExperienceType xptype = (ExperienceType)(-1))
+		{
+			player.Scp079Data.Exp += XP;
+			if (xptype != (ExperienceType)(-1)) player.Scp079Data.ShowGainExp(xptype);
+		}
+		/// <summary>
+		/// Drains the AP from a player. Will never go below 0. Negative amounts probably add AP instead of draining it.
+		/// </summary>
+		/// <param name="player"></param>
+		/// <param name="amount"></param>
+		public void DrainAP(Player player, float amount)
+		{
+			if (player.Scp079Data.AP < amount) player.Scp079Data.AP = 0;
+			else player.Scp079Data.AP -= amount;
 		}
 	}
 }

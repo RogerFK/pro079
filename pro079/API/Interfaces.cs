@@ -9,7 +9,7 @@ namespace Pro079.API
 		//					  BASIC DATA					//
 		//////////////////////////////////////////////////////
 		/// <summary>
-		/// If the command is currently disabled, useful for untested modules and alike
+		/// If the command is currently disabled, useful for untested modules and alike.
 		/// </summary>
 		bool Disabled { set; get; }
 		/// <summary>
@@ -55,7 +55,7 @@ namespace Pro079.API
 		string CommandReady { get; }
 		/// <summary>
 		/// Time when the command will be ready. 
-		/// After each round, it gets resetted. This shouldn't get modified or initialized outside of Pro-079 Core in most cases. 
+		/// After each round, it gets resetted. This shouldn't get modified or initialized outside of Pro-079 Core in most cases. Remove both throw operations and you're good to go.
 		/// Uses <see cref="PluginManager.Manager.Server.Round.Duration"/> as it's base.
 		/// </summary>
 		int CurrentCooldown { set; get; }

@@ -107,6 +107,8 @@ namespace Pro079
 		public readonly string suicidecmd = "suicide";
 		[LangOption]
 		public readonly string ultcmd = "ultimate";
+		[LangOption]
+		public readonly string error = "There was an error processing your command";
 		public override void OnDisable()
         {
             this.Info("Pro079 Core disabled.");

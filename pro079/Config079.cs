@@ -93,6 +93,13 @@
 		{
 			return str.Replace("$min", number.ToString());
 		}
+		/// <summary>
+		/// Returns the cooldown translated
+		/// </summary>
+		public string CmdOnCooldown(int Cooldown)
+		{
+			return plugin.cooldown.Replace("$cd", Cooldown.ToString());
+		}
 
 		/// <summary>
 		/// Translated "This command is disabled."

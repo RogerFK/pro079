@@ -7,8 +7,8 @@
     <ProjectGuid>{B9FBF509-2FA5-4A68-907C-A1A016225EC9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>pro079</RootNamespace>
-    <AssemblyName>pro079</AssemblyName>
+    <RootNamespace>Pro079</RootNamespace>
+    <AssemblyName>Pro079-Core</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
