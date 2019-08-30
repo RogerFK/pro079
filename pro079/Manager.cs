@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Pro079.API;
 using Smod2.API;
 using Smod2;
+using System;
+using System.Linq;
 
 namespace Pro079
 {
@@ -11,6 +13,10 @@ namespace Pro079
 		private readonly Pro079 plugin;
 		public Manager(Pro079 plugin) => this.plugin = plugin;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public int CassieCooldown { set; get; }
 		/// <summary>
 		/// Dictionary with all the Commands and their respective handlers
 		/// </summary>
@@ -71,6 +77,18 @@ namespace Pro079
 				else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), 1);
 			}
 		}
+		public int UltimateCooldown { set; get; }
+		public void SetOnCooldown(IUltimate079 Ultimate)
+		{
+			UltimateCooldown = Ultimate.Cooldown + PluginManager.Manager.Server.Round.Duration;
+
+			if (!string.IsNullOrEmpty(plugin.ultready) || plugin.ultready == "disable" || plugin.ultready == "disabled" || plugin.ultready == "none" || plugin.ultready == "null")
+			{
+				int p = (int)System.Environment.OSVersion.Platform;
+				if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(DelayMessage(plugin.ultready, Ultimate.Cooldown), MEC.Segment.Update);
+				else MEC.Timing.RunCoroutine(DelayMessage(plugin.ultready, Ultimate.Cooldown), 1); 
+			}
+		}
 		private IEnumerator<float> DelayMessage(string message, int delay)
 		{
 			yield return MEC.Timing.WaitForSeconds(delay);
@@ -97,6 +115,24 @@ namespace Pro079
 		{
 			if (player.Scp079Data.AP < amount) player.Scp079Data.AP = 0;
 			else player.Scp079Data.AP -= amount;
+		}
+		/// <summary>
+		/// Gets the ultimate based on the name or based on how it starts.
+		/// </summary>
+		/// <param name="Name"></param>
+		/// <returns></returns>
+		public IUltimate079 GetUltimate(string Name)
+		{
+			if (Pro079.Manager.Ultimates.TryGetValue(Name, out IUltimate079 ultimate))
+			{
+				return ultimate;
+			}
+			string name = Pro079.Manager.Ultimates.Keys.OrderBy(x => x.Length).FirstOrDefault(x => x.StartsWith(Name));
+			if(name == null)
+			{
+				return null;
+			}
+			return Pro079.Manager.Ultimates[name];
 		}
 	}
 }

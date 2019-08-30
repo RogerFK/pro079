@@ -62,8 +62,28 @@ namespace Pro079.API
 	}
 	public interface IUltimate079
 	{
+		/// <summary>
+		/// The name of the command. Can have spaces.
+		/// </summary>
 		string Name { get; }
+		/// <summary>
+		/// The info that will be shown about what the ultimate is about
+		/// </summary>
+		string Info { get; }
+		/// <summary>
+		/// How much cooldown the ultimate sets all other ultimates for
+		/// </summary>
 		int Cooldown { get; }
+		/// <summary>
+		/// If set to 0, won't be shown. AP cost for the ultimate.
+		/// </summary>
+		int Cost { get; }
+		/// <summary>
+		/// The logic of the function goes here
+		/// </summary>
+		/// <param name="args"></param>
+		/// <param name="Player"></param>
+		/// <returns></returns>
 		string TriggerUltimate(string[] args, Smod2.API.Player Player);
 	}
 }

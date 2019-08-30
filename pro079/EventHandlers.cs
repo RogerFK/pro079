@@ -20,14 +20,8 @@ namespace Pro079
 		{
 			this.plugin = plugin;
 		}
-		private float ultDown;
-		private float cooldownScp;
 		private static IEnumerable<Room> rooms;
-		private static bool DeconBool { get; set; }
-		private static float DeconTime { get; set; }
-		private static int MinMTF { get; set; }
-		private static int MaxMTF { get; set; }
-		private static float LastMtfSpawn { get; set; }
+		
 		public static FlickerableLight[] FlickerableLightsArray { get; private set; }
 		public static IEnumerable<Door> DoorArray { get; private set; }
 
@@ -66,10 +60,28 @@ namespace Pro079
 			{
 				help += Environment.NewLine + line;
 			}
-			// Faltan suicidio, ultimates y tips
 			if (plugin.suicide) help += System.Environment.NewLine + $"<b>.079 {plugin.suicidecmd}</b> - " + plugin.suicidehelp;
 			if (plugin.ult) help += System.Environment.NewLine + $"<b>.079 {plugin.ultcmd}</b> - " + plugin.ulthelp;
 			if (plugin.tips) help += System.Environment.NewLine + $"<b>.079 {plugin.tipscmd}</b> - " + plugin.tipshelp;
+			return help;
+		}
+		List<string> UltimateHelp;
+		private void FetchUltimates()
+		{
+			UltimateHelp = new List<string>(Pro079.Manager.Ultimates.Keys.Count);
+			foreach (KeyValuePair<string, IUltimate079> kvp in Pro079.Manager.Ultimates)
+			{
+				UltimateHelp.Add($"<b>.079 {kvp.Key}</b> - {kvp.Value.Info} {plugin.ultdata.Replace("$cd", kvp.Value.Cooldown.ToString()).Replace("$cost", kvp.Value.Cost.ToString())}");
+			}
+		}
+		private string GetUltimates()
+		{
+			string help = plugin.ultusageFirstline;
+			if (UltimateHelp == null || UltimateHelp.Count != Pro079.Manager.Ultimates.Keys.Count) FetchExternalHelp();
+			foreach (string line in UltimateHelp)
+			{
+				help += Environment.NewLine + " - " + line;
+			}
 			return help;
 		}
 
@@ -155,6 +167,30 @@ namespace Pro079
 							else MEC.Timing.RunCoroutine(FakeKillPC(ev.Player), 1);
 							return;
 						}
+						if(args[0] == plugin.ultcmd)
+						{
+							if(args.Length == 1)
+							{
+								ev.ReturnMessage = GetUltimates();
+								return;
+							}
+							int ultcd = Pro079.Manager.UltimateCooldown - PluginManager.Manager.Server.Round.Duration;
+							if (ultcd > 0)
+							{
+								plugin.ultdown.Replace("$cd", ultcd.ToString());
+								return;
+							}
+							string ultName = string.Join(" ", args.Skip(1).ToArray());
+							IUltimate079 ultimate = Pro079.Manager.GetUltimate(ultName);
+							if(ultimate == null)
+							{
+								ev.ReturnMessage = plugin.ulterror;
+								return;
+							}
+							ultimate.TriggerUltimate(args.Skip(1).ToArray(), ev.Player);
+						}
+
+						// When everything else wasn't caught, search for external commands //
 						if (!Pro079.Manager.Commands.TryGetValue(args[0], out ICommand079 CommandHandler))
 						{
 							ev.ReturnMessage = plugin.unknowncmd;
@@ -178,13 +214,17 @@ namespace Pro079
 						}
 						if (CommandHandler.Cassie)
 						{
-							// Need to add the cassie cooldown logic
-							// int cassieCD = this.CassieCooldown - PluginManager.Manager.Server.Round.Duration;
-							// if (cassieCD > 0)
+							int cassieCD = Pro079.Manager.CassieCooldown - PluginManager.Manager.Server.Round.Duration;
+							if (cassieCD < 0)
+							{
+								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", cassieCD.ToString()).Replace("$(cd)", cassieCD.ToString());
+								return;
+							}
+							Pro079.Manager.CassieCooldown = PluginManager.Manager.Server.Round.Duration + plugin.cassieCooldown;
 						}
+						// A try-catch statement since some plugins will throw an exception, I'm sure of it.
 						try
 						{
-							// This part should only throw an exception if the command is buggy.
 							ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player);
 							Pro079.Manager.SetOnCooldown(CommandHandler);
 						}
@@ -495,9 +535,6 @@ namespace Pro079
 			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType != ZoneType.ENTRANCE);
 			FlickerableLightsArray = UnityEngine.Object.FindObjectsOfType<FlickerableLight>();
 			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
-			ultDown = 0f;
-			cooldownScp = 0f;
-			DeconBool = false;
 			UltDoors = false;
 		}
 	}

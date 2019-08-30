@@ -40,7 +40,7 @@ namespace Pro079
 
 		// Core-only options
 		[ConfigOption]
-		public readonly float cassieCooldown = 30f;
+		public readonly int cassieCooldown = 30;
 		[ConfigOption]
 		public readonly bool spawnBroadcast = true;
 		[ConfigOption]
@@ -70,6 +70,8 @@ namespace Pro079
 		public readonly string suicidehelp = "Overcharges the generators to die when you're alone";
 		[LangOption]
 		public readonly string ulthelp = "Displays info about ultimates";
+		[LangOption]
+		public readonly string ultdata = "(Cost: $cost | Cooldown: $cd)";
 		[LangOption]
 		public readonly string tipshelp = "Tips about SCP-079 and stuff to take into account";
 		[LangOption]
@@ -109,6 +111,9 @@ namespace Pro079
 		public readonly string ultcmd = "ultimate";
 		[LangOption]
 		public readonly string error = "There was an error processing your command";
+		[LangOption]
+		public readonly string ulterror = "Ultimate not found. Use <b>.079 ultimate</b> to check the names.";
+
 		public override void OnDisable()
         {
             this.Info("Pro079 Core disabled.");
