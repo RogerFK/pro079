@@ -12,8 +12,7 @@ using Smod2.EventSystem.Events;
 namespace Pro079
 {
 	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole,
-		IEventHandlerSetConfig, IEventHandlerPlayerDie, IEventHandlerTeamRespawn,
-		IEventHandlerDoorAccess, IEventHandlerWaitingForPlayers
+		IEventHandlerPlayerDie,	IEventHandlerWaitingForPlayers
 	{
 		private readonly Pro079 plugin;
 		public Pro79Handlers(Pro079 plugin)
@@ -281,7 +280,6 @@ namespace Pro079
 								switch (ult)
 								{
 									case 1:
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
 										Timing.Run(ShamelessTimingRunLights());
 										ultDown = PluginManager.Manager.Server.Round.Duration + 180;
 										Timing.Run(CooldownUlt(180f));
@@ -324,7 +322,7 @@ namespace Pro079
 		}
 		private IEnumerator<float> DelayMsg(Player player)
 		{
-			yield return 0.1f; // This value produces completely random outputs, but it's good enough for delaying the message so it doesn't overlap, as MEC supposedly works with frames.
+			yield return 0.1f; // This value produces completely random outputs, but it's good enough for delaying the message a tiny bit so it doesn't overlap
 			if (player.TeamRole.Role == Role.SCP_079)
 			{
 				player.PersonalClearBroadcasts();
@@ -351,7 +349,7 @@ namespace Pro079
 					door.ChangeState(true);
 				}
 			}
-			yield return MEC.Timing.WaitForSeconds(8f);
+			yield return MEC.Timing.WaitForSeconds(11f);
 			if(player != null) player.ChangeRole(Role.SPECTATOR);
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
 		}
@@ -368,69 +366,10 @@ namespace Pro079
 
 		/* Cooldowns could be substituted with float like I did in Stalky 106 (https://github.com/RogerFK/stalky106),
 		 * but it wouldn't matter anyways as there will always be
-		 * a coroutine for the broadcast 
+		 * a coroutine for the broadcast
 
 		 * Also before you ask, no, you can't pass a bool as a reference in C#
 		 * or else I don't know the proper way to do it.*/
-		private IEnumerable<float> CooldownScp(float v)
-		{
-			if (v > 4)
-			{
-				yield return (v);
-				List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player pc in pcs)
-				{
-					pc.PersonalBroadcast(6, plugin.GetTranslation("scpready"), false);
-				}
-			}
-		}
-		private IEnumerable<float> CooldownUlt(float time)
-		{
-			if (time > 4)
-			{
-				yield return (time);
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player player in PCplayers)
-				{
-					player.PersonalBroadcast(3, plugin.GetTranslation("ultready"), false);
-				}
-			}
-		}
-
-		private IEnumerable<float> Ult2Toggle(float v)
-		{
-			UltDoors = true;
-			yield return (v);
-			UltDoors = false;
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
-		}
-
-		private IEnumerable<float> CooldownMTF(float time)
-		{
-			if (time > 4)
-			{
-				yield return (time);
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player player in PCplayers)
-				{
-					player.PersonalBroadcast(3, plugin.GetTranslation("mtfready"), false);
-				}
-			}
-		}
-
-		private IEnumerable<float> CooldownGen(float time)
-		{
-			if (time > 4)
-			{
-				yield return (time);
-
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player player in PCplayers)
-				{
-					player.PersonalBroadcast(3, plugin.GetTranslation("genready"), false);
-				}
-			}
-		}
 
 		private IEnumerable<float> CooldownCassie(float time)
 		{
@@ -441,43 +380,8 @@ namespace Pro079
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
 				{
-					player.PersonalBroadcast(3, plugin.GetTranslation("cassieready"), false);
+					player.PersonalBroadcast(3, plugin.cassieready, false);
 				}
-			}
-		}
-		// where do I move this lol
-		private IEnumerable<float> ShamelessTimingRunLights()
-		{
-			yield return (12.1f);
-			float start = PluginManager.Manager.Server.Round.Duration;
-			while (start + 60f > PluginManager.Manager.Server.Round.Duration)
-			{
-				foreach (Room room in rooms)
-				{
-					room.FlickerLights();
-				}
-				yield return (8f);
-			}
-		}
-
-		public void OnSetConfig(SetConfigEvent ev)
-		{
-			switch (ev.Key)
-			{
-				case "disable_decontamination":
-					DeconBool = (bool)ev.Value;
-					return;
-				case "decontamination_time":
-					DeconTime = (float)ev.Value;
-					return;
-				case "minimum_MTF_time_to_spawn":
-					MinMTF = (int)ev.Value;
-					return;
-				case "maximum_MTF_time_to_spawn":
-					MaxMTF = (int)ev.Value;
-					return;
-				default:
-					return;
 			}
 		}
 
@@ -496,37 +400,13 @@ namespace Pro079
 		}
 		private IEnumerator<float> DelayKysMessage(List<Player> PCplayers)
 		{
+			if (string.IsNullOrEmpty(plugin.kys)) yield break;
 			yield return 0.3f;
 			if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - PCplayers.Count == 0)
 			{
-				string kys = plugin.GetTranslation("kys");
 				foreach (Player player in PCplayers)
 				{
-					player.PersonalBroadcast(10, kys, false);
-				}
-			}
-		}
-
-		public void OnTeamRespawn(TeamRespawnEvent ev)
-		{
-			LastMtfSpawn = PluginManager.Manager.Server.Round.Duration;
-		}
-
-		public void OnDoorAccess(PlayerDoorAccessEvent ev)
-		{
-			if (UltDoors == false || string.IsNullOrWhiteSpace(ev.Door.Permission))
-			{
-				return;
-			}
-			else
-			{
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
-				{
-					ev.Allow = true;
-				}
-				else
-				{
-					ev.Allow = false;
+					player.PersonalBroadcast(20, plugin.kys, false);
 				}
 			}
 		}
@@ -535,7 +415,6 @@ namespace Pro079
 			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType != ZoneType.ENTRANCE);
 			FlickerableLightsArray = UnityEngine.Object.FindObjectsOfType<FlickerableLight>();
 			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
-			UltDoors = false;
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace LockdownUltimate
 		SmodRevision = 0
 		)]
 
-	public class Pro079 : Plugin, I079Command
+	public class BlackoutUltimate : Plugin
 	{
 		public override void OnDisable()
 		{
@@ -34,12 +34,6 @@ namespace LockdownUltimate
 			this.Info("Loading Pro-079 Chaos configs and registering the command...");
 
 			// Command configs
-			AddConfig(new ConfigSetting("p079_chaos", false, true, "Enables/disables Pro-079's fake Chaos messages"));
-			AddConfig(new ConfigSetting("p079_chaos_cooldown", 50f, true, "How many seconds the command will give a cooldown for itself"));
-			AddConfig(new ConfigSetting("p079_chaos_level", 2, true, "Minimum level for 079 to fake a Chaos message"));
-			AddConfig(new ConfigSetting("p079_chaos_cost", 70, true, "AP cost for 079 to fake a Chaos message"));
-			AddConfig(new ConfigSetting("p079_chaos_msg", "warning . chaosinsurgency detected in the surface", true, "Message for the chaos command"));
-
 			// Cmds and Help strings
 
 			// Register command

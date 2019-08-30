@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Smod2;
+using Smod2.API;
+using Smod2.EventHandlers;
+using Smod2.Events;
+using Smod2.EventSystem.Events;
 
 namespace Pro079_Info
 {
-	class InfoCommand : I079Command
+	class InfoCommand : IEventHandlerTeamRespawn, IEventHandlerSetConfig, I079Command
 	{
+		private int LastMtfSpawn;
+
 		public string CallComand(string[] args, Player player)
 		{
 			if (!plugin.GetConfigBool("p079_info"))
@@ -144,6 +151,32 @@ namespace Pro079_Info
 			}
 
 			return;
+		}
+
+		public void OnSetConfig(SetConfigEvent ev)
+		{
+			switch (ev.Key)
+			{
+				case "disable_decontamination":
+					DeconBool = (bool)ev.Value;
+					return;
+				case "decontamination_time":
+					DeconTime = (float)ev.Value;
+					return;
+				case "minimum_MTF_time_to_spawn":
+					MinMTF = (int)ev.Value;
+					return;
+				case "maximum_MTF_time_to_spawn":
+					MaxMTF = (int)ev.Value;
+					return;
+				default:
+					return;
+			}
+		}
+
+		public void OnTeamRespawn(TeamRespawnEvent ev)
+		{
+			LastMtfSpawn = PluginManager.Manager.Server.Round.Duration;
 		}
 	}
 }

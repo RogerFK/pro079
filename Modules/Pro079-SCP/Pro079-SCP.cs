@@ -4,7 +4,7 @@ using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
 
-namespace pro079mtf
+namespace LockdownUltimate
 {
 	[PluginDetails(
 		author = "RogerFK",
