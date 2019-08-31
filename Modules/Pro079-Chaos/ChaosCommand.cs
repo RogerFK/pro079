@@ -3,47 +3,56 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Pro079Core.API;
+using Smod2;
+using Smod2.API;
 
-namespace Pro079_Info
+namespace ChaosCommand
 {
 	class ChaosCommand : ICommand079
 	{
-		public string CallComand(string[] args, Player player)
+		private ChaosPlugin plugin;
+
+		public ChaosCommand(ChaosPlugin plugin)
 		{
-			if (!plugin.GetConfigBool("p079_chaos"))
+			this.plugin = plugin;
+		}
+
+		public bool OverrideDisable = false;
+		public bool Disabled
+		{
+			get
 			{
-				ev.ReturnMessage = plugin.GetTranslation("disabled");
-				return;
+				return OverrideDisable || !plugin.enable;
 			}
-			if (PluginManager.Manager.Server.Round.Duration < cooldownCassieGeneral && !ev.Player.GetBypassMode())
+			set
 			{
-				ev.ReturnMessage = plugin.GetTranslation("cooldowncassie").Replace("$cd", (cooldownCassieGeneral - PluginManager.Manager.Server.Round.Duration).ToString());
-				return;
+				OverrideDisable = value;
 			}
-			if (PluginManager.Manager.Server.Round.Duration < cooldownChaos && !ev.Player.GetBypassMode())
-			{
-				ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", (cooldownChaos - PluginManager.Manager.Server.Round.Duration).ToString());
-			}
-			if (ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level") && !ev.Player.GetBypassMode())
-			{
-				ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
-				return;
-			}
-			if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost") && !ev.Player.GetBypassMode())
-			{
-				ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_chaos_cost").ToString());
-				return;
-			}
-			if (!ev.Player.GetBypassMode())
-			{
-				ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_chaos_cost");
-				cooldownChaos = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigInt("p079_chaos_cooldown");
-			}
-			cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
-			cooldownChaos = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_chaos_cooldown");
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.GetConfigString("p079_chaos_msg"));
-			ev.ReturnMessage = plugin.GetTranslation("success");
-			return;
+		}
+
+		public string Command => plugin.chaoscmd;
+
+		public string ExtraUsage => string.Empty;
+
+		public string HelpInfo => plugin.chaoshelp;
+
+		public bool Cassie => true;
+
+		public int Cooldown => plugin.cooldown;
+
+		public int MinLevel => plugin.level;
+
+		public int APCost => plugin.cost;
+
+		public string CommandReady => plugin.ready;
+
+		public int CurrentCooldown { get; set; }
+
+		public string CallCommand(string[] args, Player player)
+		{
+			PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.msg);
+			return Pro079Core.Pro079.Configs.CommandSuccess;
 		}
 	}
 }

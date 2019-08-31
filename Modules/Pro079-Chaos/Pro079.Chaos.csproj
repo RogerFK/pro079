@@ -7,8 +7,8 @@
     <ProjectGuid>{C24E4863-B21C-4E26-898C-AB594015D6F7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pro079_Info</RootNamespace>
-    <AssemblyName>Pro079-Info</AssemblyName>
+    <RootNamespace>ChaosCommand</RootNamespace>
+    <AssemblyName>Pro079.Chaos</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Pro079">
+      <HintPath>..\..\pro079\bin\Release\Pro079.dll</HintPath>
+    </Reference>
     <Reference Include="Smod2">
       <HintPath>..\..\Lib\Smod2.dll</HintPath>
     </Reference>
@@ -45,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChaosCommand.cs" />
-    <Compile Include="Pro079-Chaos.cs" />
+    <Compile Include="Pro079.Chaos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
