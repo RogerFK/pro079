@@ -166,7 +166,6 @@ namespace Pro079Core
 						ev.ReturnMessage = plugin.error + ": " + e.Message;
 					}
 				}
-
 			}
 		}
 
