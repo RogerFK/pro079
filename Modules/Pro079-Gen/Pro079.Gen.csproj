@@ -7,8 +7,8 @@
     <ProjectGuid>{4145493B-06FF-4F71-9ED1-76DE76E0CDDE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pro079_Info</RootNamespace>
-    <AssemblyName>Pro079-Info</AssemblyName>
+    <RootNamespace>GeneratorCommand</RootNamespace>
+    <AssemblyName>Pro079.Gen</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GenCommand.cs" />
-    <Compile Include="Pro079-Gen.cs" />
+    <Compile Include="Pro079.Gen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
