@@ -88,7 +88,7 @@
 		/// <returns>The translated string</returns>
 		public string LowLevel(int MinLevel)
 		{
-			return Min(plugin.level, MinLevel);
+			return Min(plugin.lowlevel, MinLevel);
 		}
 		private string Min(string str, int number)
 		{

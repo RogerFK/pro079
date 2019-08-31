@@ -126,16 +126,18 @@ namespace Pro079Core
 			// Info string to ASSERT DOMINANCE.
 			Info("Pro079 Core enabled.\n╔═══╗╔═══╗╔═══╗╔═══╗╔═══╗╔═══╗\n║╔═╗║║╔═╗║║╔═╗║║╔═╗║║╔═╗║║╔═╗║\n║╚═╝║║╚═╝║║║─║║║║║║║╚╝╔╝║║╚═╝║\n║╔══╝║╔╗╔╝║║─║║║║║║║──║╔╝╚══╗║\n║║───║║║╚╗║╚═╝║║╚═╝║──║║─╔══╝║\n╚╝───╚╝╚═╝╚═══╝╚═══╝──╚╝─╚═══╝");
         }
-		
-        public override void Register()
+
+		internal static Pro079 Instance;
+		public override void Register()
         {
 			this.Info("Loading Pro-079 Core configs and registering default commands...");
-			AddEventHandlers(new Pro79Handlers(this));
+			AddEventHandlers(new EventHandlers(this));
 
 			//"\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 seconds, cooldown: 300 seconds)", lang));
 
 			Manager = new Manager(this);
 			Configs = new Configs(this);
+			Instance = this;
 		}
     }
 }

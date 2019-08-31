@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="API\Interfaces.cs" />
     <Compile Include="Config079.cs" />
+    <Compile Include="Logic.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EventHandlers.cs" />
