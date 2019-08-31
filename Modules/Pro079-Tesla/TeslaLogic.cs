@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Smod2;
 using Smod2.API;
 
-namespace Pro079_Tesla
+namespace TeslaCommand
 {
-	class TeslaLogic
+	internal static class TeslaLogic
 	{
-		private static IEnumerable<float> DisableTeslas(float time)
+		internal static IEnumerator<float> DisableTeslas(float time, TeslaPlugin plugin)
 		{
 			TeslaGate[] teslas = UnityEngine.Object.FindObjectsOfType<TeslaGate>();
 			int length = teslas.Length;
@@ -22,11 +22,11 @@ namespace Pro079_Tesla
 				distances[i] = teslas[i].sizeOfTrigger;
 				teslas[i].sizeOfTrigger = -1f;
 			}
-			int remTime = plugin.GetConfigInt("p079_tesla_remaining");
-			yield return time - remTime;
+			int remTime = plugin.remaining;
+			yield return MEC.Timing.WaitForSeconds(time - remTime);
 			foreach (Smod2.API.Player player in PluginManager.Manager.Server.GetPlayers())
 			{
-				string remainingStr = plugin.GetTranslation("teslarem");
+				string remainingStr = plugin.teslarem;
 				if (player.TeamRole.Role == Role.SCP_079)
 				{
 					for (i = remTime; i > 0; i--)
@@ -36,7 +36,7 @@ namespace Pro079_Tesla
 					player.PersonalBroadcast(5, Environment.NewLine + plugin.GetTranslation("teslarenabled"), false);
 				}
 			}
-			yield return remTime;
+			yield return MEC.Timing.WaitForSeconds(remTime);
 
 			for (i = 0; i < length; i++)
 			{

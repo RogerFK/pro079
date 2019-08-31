@@ -7,8 +7,8 @@
     <ProjectGuid>{979E2184-3CA0-4B5E-BD1E-B4C783137430}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pro079_Info</RootNamespace>
-    <AssemblyName>Pro079-Info</AssemblyName>
+    <RootNamespace>InfoCommand</RootNamespace>
+    <AssemblyName>Pro079.Info</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

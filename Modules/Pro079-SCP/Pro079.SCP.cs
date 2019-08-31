@@ -60,6 +60,7 @@ namespace SCPCommand
 		{
 			this.Info("Loading Pro-079 SCP command configs and registering the command...");
 
+			Pro079Core.Pro079.Manager.RegisterCommand(new SCPCommand(this));
 		}
 	}
 }

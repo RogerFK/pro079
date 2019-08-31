@@ -7,8 +7,8 @@
     <ProjectGuid>{F7D7C63A-97DE-482C-AC7B-2D39549A6B92}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pro079_Tesla</RootNamespace>
-    <AssemblyName>Pro079-Tesla</AssemblyName>
+    <RootNamespace>TeslaCommand</RootNamespace>
+    <AssemblyName>Pro079.Tesla</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -34,6 +34,12 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\Lib\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Pro079">
+      <HintPath>..\..\pro079\bin\Release\Pro079.dll</HintPath>
+    </Reference>
     <Reference Include="Smod2">
       <HintPath>..\..\Lib\Smod2.dll</HintPath>
     </Reference>
@@ -56,7 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Pro079-Tesla.cs" />
+    <Compile Include="Pro079.Tesla.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TeslaLogic.cs" />
   </ItemGroup>
