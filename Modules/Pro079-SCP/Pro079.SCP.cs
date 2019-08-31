@@ -53,6 +53,8 @@ namespace SCPCommand
 		public readonly string nomtfleft = "No MTF's alive. Sending as \"unknown\"";
 		[LangOption]
 		public readonly string scpcmd = "scp";
+		[LangOption]
+		public readonly string ready = "<b><color=\"red\">SCP command ready</color></b>";
 
 		public override void Register()
 		{
