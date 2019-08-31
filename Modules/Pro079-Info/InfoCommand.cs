@@ -39,7 +39,7 @@ namespace InfoCommand
 
 		public string Command => plugin.infocmd;
 
-		public string ExtraUsage => string.Empty;
+		public string ExtraArguments => string.Empty;
 
 		public string HelpInfo => plugin.infoextrahelp;
 

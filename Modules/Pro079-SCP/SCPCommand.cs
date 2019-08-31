@@ -3,12 +3,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Pro079Core.API;
+using Smod2.API;
 
-namespace Pro079_Info
+namespace SCPCommand
 {
 	class SCPCommand : ICommand079
 	{
-		public string CallComand(string[] args, Player player)
+		private readonly SCPPlugin plugin;
+		public SCPCommand(SCPPlugin plugin) => this.plugin = plugin;
+
+		public bool OverrideDisable = false;
+		public bool Disabled
+		{
+			get
+			{
+				return OverrideDisable ? OverrideDisable : !plugin.enabled;
+			}
+			set
+			{
+				OverrideDisable = value;
+			}
+		}
+
+		public string Command => plugin.scpcmd;
+
+		public string ExtraArguments => plugin.extrainfo;
+
+		public string HelpInfo => plugin.scpusage;
+
+		public bool Cassie => true;
+
+		public int Cooldown => throw new NotImplementedException();
+
+		public int MinLevel => throw new NotImplementedException();
+
+		public int APCost => throw new NotImplementedException();
+
+		public string CommandReady => throw new NotImplementedException();
+
+		public int CurrentCooldown { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+		public string CallCommand(string[] args, Player player)
 		{
 			if (!plugin.GetConfigBool("p079_scp"))
 			{

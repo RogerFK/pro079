@@ -30,7 +30,7 @@ namespace GeneratorCommand
 
 		public string Command => plugin.gencmd;
 
-		public string ExtraUsage => "[1-6]";
+		public string ExtraArguments => "[1-6]";
 
 		public string HelpInfo => plugin.usage;
 

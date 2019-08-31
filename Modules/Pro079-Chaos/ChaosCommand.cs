@@ -33,7 +33,7 @@ namespace ChaosCommand
 
 		public string Command => plugin.chaoscmd;
 
-		public string ExtraUsage => string.Empty;
+		public string ExtraArguments => string.Empty;
 
 		public string HelpInfo => plugin.chaoshelp;
 
