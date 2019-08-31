@@ -201,6 +201,11 @@ namespace Pro079Core
 		{
 			FlickerableLightsArray = UnityEngine.Object.FindObjectsOfType<FlickerableLight>();
 			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
+			foreach (var Command in Pro079.Manager.Commands)
+			{
+				Command.Value.CurrentCooldown = 0;
+			}
+			Pro079.Manager.UltimateCooldown = 0;
 		}
 	}
 }
