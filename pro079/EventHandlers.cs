@@ -109,9 +109,6 @@ namespace Pro079Core
 
 				for (int i = 1; i < collection.Count; i++)
 				{
-					// If the first char (0) and the last one (its length - 1) is ", that is the char (defined by ' ')
-					// that is \" (the \ is to define it's not a quote for a string), then take the substring that
-					// starts from the second character to the second last one. Pretty fucking clever.
 					if (collection[i].Value[0] == '\"' && collection[i].Value[collection[i].Value.Length - 1] == '\"')
 					{
 						args[i - 1] = collection[i].Value.Substring(1, collection[i].Value.Length - 2);
@@ -126,12 +123,10 @@ namespace Pro079Core
 				{
 					if (args.Length == 0)
 					{
-						ev.Player.SendConsoleMessage(GetHelp(), "white");
-						ev.ReturnMessage = "<Pro-079 made by RogerFK#3679. Repository: github.com/RogerFK/pro079>";
+						ev.ReturnMessage = "<color=\"white\">" + GetHelp() + "</color>";
 					}
 					else if (args.Length >= 1)
 					{
-						// Most unclear way to do the switch statement, but anyways it's the most optimized way to do it.
 						if (args[0] == plugin.tipscmd)
 						{
 							if (!plugin.tips)
@@ -190,43 +185,47 @@ namespace Pro079Core
 							ev.ReturnMessage = plugin.unknowncmd;
 							return;
 						}
-						if(ev.Player.Scp079Data.Level + 1 < CommandHandler.MinLevel)
+						if (!ev.Player.GetBypassMode())
 						{
-							ev.ReturnMessage = Pro079.Configs.LowLevel(CommandHandler.MinLevel);
-							return;
-						}
-						else if(ev.Player.Scp079Data.AP < CommandHandler.APCost)
-						{
-							ev.ReturnMessage = Pro079.Configs.LowAP(CommandHandler.APCost);
-							return;
-						}
-						int cooldown = CommandHandler.CurrentCooldown - PluginManager.Manager.Server.Round.Duration;
-						if (cooldown > 0)
-						{
-							ev.ReturnMessage = Pro079.Configs.CmdOnCooldown(cooldown);
-							return;
-						}
-						if (CommandHandler.Cassie)
-						{
-							if (Pro079.Manager.CassieCooldown > 0)
+							if (ev.Player.Scp079Data.Level + 1 < CommandHandler.MinLevel)
 							{
-								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Pro079.Manager.CassieCooldown.ToString()).Replace("$(cd)", Pro079.Manager.CassieCooldown.ToString());
+								ev.ReturnMessage = Pro079.Configs.LowLevel(CommandHandler.MinLevel);
 								return;
 							}
-							Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
-							if (!string.IsNullOrEmpty(plugin.cassieready))
+							else if (ev.Player.Scp079Data.AP < CommandHandler.APCost)
 							{
-								int p = (int)System.Environment.OSVersion.Platform;
-								if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
-								else MEC.Timing.RunCoroutine(CooldownCassie(plugin.cassieCooldown), 1);
+								ev.ReturnMessage = Pro079.Configs.LowAP(CommandHandler.APCost);
 								return;
 							}
+							int cooldown = CommandHandler.CurrentCooldown - PluginManager.Manager.Server.Round.Duration;
+							if (cooldown > 0)
+							{
+								ev.ReturnMessage = Pro079.Configs.CmdOnCooldown(cooldown);
+								return;
+							}
+							if (CommandHandler.Cassie)
+							{
+								if (Pro079.Manager.CassieCooldown > 0)
+								{
+									ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Pro079.Manager.CassieCooldown.ToString()).Replace("$(cd)", Pro079.Manager.CassieCooldown.ToString());
+									return;
+								}
+								Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
+								if (!string.IsNullOrEmpty(plugin.cassieready))
+								{
+									int p = (int)System.Environment.OSVersion.Platform;
+									if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
+									else MEC.Timing.RunCoroutine(CooldownCassie(plugin.cassieCooldown), 1);
+									return;
+								}
+							} 
 						}
 						// A try-catch statement since some plugins will throw an exception, I'm sure of it.
 						try
 						{
 							ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player);
 							Pro079.Manager.SetOnCooldown(CommandHandler);
+							Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
 						}
 						catch (Exception e)
 						{

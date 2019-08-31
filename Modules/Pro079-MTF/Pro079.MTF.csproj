@@ -7,8 +7,8 @@
     <ProjectGuid>{B01B7699-F941-4502-A216-6723810C3D21}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pro079_Info</RootNamespace>
-    <AssemblyName>Pro079-Info</AssemblyName>
+    <RootNamespace>Pro079MTF</RootNamespace>
+    <AssemblyName>Pro079.MTF</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Pro079-Core">
+      <HintPath>..\..\pro079\bin\Release\Pro079-Core.dll</HintPath>
+    </Reference>
     <Reference Include="Smod2">
       <HintPath>..\..\Lib\Smod2.dll</HintPath>
     </Reference>
@@ -45,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MTFCommand.cs" />
-    <Compile Include="Pro079-MTF.cs" />
+    <Compile Include="Pro079.MTF.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

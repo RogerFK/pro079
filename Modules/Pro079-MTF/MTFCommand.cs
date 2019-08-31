@@ -3,76 +3,70 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Pro079Core.API;
+using Smod2.API;
+using Pro079Core;
+using Smod2;
 
-namespace Pro079_Info
+namespace Pro079MTF
 {
 	class MTFCommand : ICommand079
 	{
-		public string CallComand(string[] args, Player player)
+		private MTFPlugin plugin;
+		public MTFCommand(MTFPlugin plugin) => this.plugin = plugin;
+		public bool OverrideDisable = false;
+		public bool Disabled
 		{
-			if (!plugin.GetConfigBool("p079_mtf"))
+			get
 			{
-				ev.ReturnMessage = plugin.GetTranslation("disabled");
-				return;
+				return OverrideDisable ? OverrideDisable : !plugin.enabled;
 			}
-			if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_mtf_level") - 1)
+			set
 			{
-				ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_mtf_level").ToString());
-				return;
+				OverrideDisable = value;
 			}
-			if (PluginManager.Manager.Server.Round.Duration < cooldownCassieGeneral)
-			{
-				ev.ReturnMessage = plugin.GetTranslation("cooldowncassie").Replace("$cd", (cooldownCassieGeneral - PluginManager.Manager.Server.Round.Duration).ToString());
-				return;
-			}
-			if (args.Count() >= 4)
-			{
-				if (PluginManager.Manager.Server.Round.Duration < cooldownMTF && !ev.Player.GetBypassMode())
-				{
-					ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", (cooldownMTF - PluginManager.Manager.Server.Round.Duration).ToString());
-					return;
-				}
-				if (ev.Player.Scp079Data.AP >= plugin.GetConfigInt("p079_mtf_cost") || ev.Player.GetBypassMode())
-				{
-					if (!int.TryParse(args[3], out int scpLeft) || !int.TryParse(args[2], out int mtfNum) || !char.IsLetter(args[1][0]))
-					{
-						ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
-						return;
-					}
-					if (scpLeft > plugin.GetConfigInt("p079_mtf_maxscp"))
-					{
-						ev.ReturnMessage = ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString()) +
-							plugin.GetTranslation("mtfmaxscp").Replace("$max", plugin.GetConfigInt("p079_mtf_maxscp").ToString());
-						return;
-					}
-					if (!ev.Player.GetBypassMode())
-					{
-						ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_mtf_cost");
+		}
 
-						cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
-						cooldownMTF = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_mtf_cooldown");
-						Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-						Timing.Run(CooldownMTF(plugin.GetConfigFloat("p079_mtf_cooldown")));
-					}
-					PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
-					ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-					ev.Player.Scp079Data.Exp += 2.8f * (ev.Player.Scp079Data.Level + 1);
+		public string Command => plugin.mtfcmd;
 
-					ev.ReturnMessage = plugin.GetTranslation("success");
-					return;
+		public string HelpInfo => plugin.extendedHelp;
 
-				}
-				else
-				{
-					ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
-				}
-				return;
-			}
-			else
+		public bool Cassie => true;
+
+		public int Cooldown => plugin.cooldown;
+
+		public int MinLevel => plugin.level;
+
+		public int APCost => plugin.cost;
+
+		public string CommandReady => plugin.mtfready;
+
+		public int CurrentCooldown { get; set; }
+
+		public string ExtraUsage => plugin.usage;
+
+		public string CallCommand(string[] args, Player player)
+		{
+			if (Disabled)
 			{
-				ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
-				return;
+				return Pro079.Configs.CommandDisabled;
 			}
+			if (args.Length >= 3)
+			{
+				if (!int.TryParse(args[2], out int scpLeft) || !int.TryParse(args[1], out int mtfNum) || !char.IsLetter(args[0][0]))
+				{
+					return plugin.mtfuse.Replace("$min", plugin.cost.ToString());
+				}
+				if (scpLeft > plugin.maxscp)
+				{
+					return plugin.mtfuse.Replace("$min", plugin.cost.ToString()) +
+						plugin.mtfmaxscp.Replace("$max", plugin.maxscp.ToString());
+				}
+				PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
+				Pro079.Manager.GiveExp(player, 5f, ExperienceType.CHEAT);
+				return Pro079.Configs.CommandSuccess;
+			}
+			else return plugin.mtfuse.Replace("$min", plugin.cost.ToString());
 		}
 	}
 }
