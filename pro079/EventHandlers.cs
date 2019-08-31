@@ -14,8 +14,8 @@ namespace Pro079
 	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole,
 		IEventHandlerPlayerDie,	IEventHandlerWaitingForPlayers
 	{
-		private readonly Pro079Plugin plugin;
-		public Pro79Handlers(Pro079Plugin plugin)
+		private readonly Pro079 plugin;
+		public Pro79Handlers(Pro079 plugin)
 		{
 			this.plugin = plugin;
 		}
@@ -42,8 +42,8 @@ namespace Pro079
 		}
 		private void FetchExternalHelp()
 		{
-			Help = new List<string>(Manager.Commands.Keys.Count);
-			foreach (KeyValuePair<string, ICommand079> kvp in Manager.Commands)
+			Help = new List<string>(Pro079.Manager.Commands.Keys.Count);
+			foreach (KeyValuePair<string, ICommand079> kvp in Pro079.Manager.Commands)
 			{
 				if (!kvp.Value.Disabled) Help.Add($"<b>.079 {kvp.Key}</b> - {kvp.Value.HelpInfo} {FormatEnergyLevel(kvp.Value.APCost, kvp.Value.MinLevel, plugin.energy, plugin.level)}");
 			}
@@ -51,7 +51,7 @@ namespace Pro079
 		private string GetHelp()
 		{
 			string help = plugin.basicHelp;
-			if (Help == null || Help.Count != Manager.Commands.Keys.Count) FetchExternalHelp();
+			if (Help == null || Help.Count != Pro079.Manager.Commands.Keys.Count) FetchExternalHelp();
 			foreach (string line in Help)
 			{
 				help += Environment.NewLine + line;
@@ -64,8 +64,8 @@ namespace Pro079
 		List<string> UltimateHelp;
 		private void FetchUltimates()
 		{
-			UltimateHelp = new List<string>(Manager.Ultimates.Keys.Count);
-			foreach (KeyValuePair<string, IUltimate079> kvp in Manager.Ultimates)
+			UltimateHelp = new List<string>(Pro079.Manager.Ultimates.Keys.Count);
+			foreach (KeyValuePair<string, IUltimate079> kvp in Pro079.Manager.Ultimates)
 			{
 				UltimateHelp.Add($"<b>.079 {kvp.Key}</b> - {kvp.Value.Info} {plugin.ultdata.Replace("$cd", kvp.Value.Cooldown.ToString()).Replace("$cost", kvp.Value.Cost.ToString())}");
 			}
@@ -73,7 +73,7 @@ namespace Pro079
 		private string GetUltimates()
 		{
 			string help = plugin.ultusageFirstline;
-			if (UltimateHelp == null || UltimateHelp.Count != Manager.Ultimates.Keys.Count) FetchUltimates();
+			if (UltimateHelp == null || UltimateHelp.Count != Pro079.Manager.Ultimates.Keys.Count) FetchUltimates();
 			foreach (string line in UltimateHelp)
 			{
 				help += Environment.NewLine + " - " + line;
@@ -170,12 +170,12 @@ namespace Pro079
 								ev.ReturnMessage = GetUltimates();
 								return;
 							}
-							if (Manager.UltimateCooldown > 0)
+							if (Pro079.Manager.UltimateCooldown > 0)
 							{
-								plugin.ultdown.Replace("$cd", Manager.UltimateCooldown.ToString());
+								plugin.ultdown.Replace("$cd", Pro079.Manager.UltimateCooldown.ToString());
 								return;
 							}
-							IUltimate079 ultimate = Manager.GetUltimate(string.Join(" ", args.Skip(1).ToArray()));
+							IUltimate079 ultimate = Pro079.Manager.GetUltimate(string.Join(" ", args.Skip(1).ToArray()));
 							if(ultimate == null)
 							{
 								ev.ReturnMessage = plugin.ulterror;
@@ -185,35 +185,35 @@ namespace Pro079
 						}
 
 						// When everything else wasn't caught, search for external commands //
-						if (!Manager.Commands.TryGetValue(args[0], out ICommand079 CommandHandler))
+						if (!Pro079.Manager.Commands.TryGetValue(args[0], out ICommand079 CommandHandler))
 						{
 							ev.ReturnMessage = plugin.unknowncmd;
 							return;
 						}
 						if(ev.Player.Scp079Data.Level + 1 < CommandHandler.MinLevel)
 						{
-							ev.ReturnMessage = Configs.LowLevel(CommandHandler.MinLevel);
+							ev.ReturnMessage = Pro079.Configs.LowLevel(CommandHandler.MinLevel);
 							return;
 						}
 						else if(ev.Player.Scp079Data.AP < CommandHandler.APCost)
 						{
-							ev.ReturnMessage = Configs.LowAP(CommandHandler.APCost);
+							ev.ReturnMessage = Pro079.Configs.LowAP(CommandHandler.APCost);
 							return;
 						}
 						int cooldown = CommandHandler.CurrentCooldown - PluginManager.Manager.Server.Round.Duration;
 						if (cooldown > 0)
 						{
-							ev.ReturnMessage = Configs.CmdOnCooldown(cooldown);
+							ev.ReturnMessage = Pro079.Configs.CmdOnCooldown(cooldown);
 							return;
 						}
 						if (CommandHandler.Cassie)
 						{
-							if (Manager.CassieCooldown > 0)
+							if (Pro079.Manager.CassieCooldown > 0)
 							{
-								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Manager.CassieCooldown.ToString()).Replace("$(cd)", Manager.CassieCooldown.ToString());
+								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Pro079.Manager.CassieCooldown.ToString()).Replace("$(cd)", Pro079.Manager.CassieCooldown.ToString());
 								return;
 							}
-							Manager.CassieCooldown = plugin.cassieCooldown;
+							Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
 							if (!string.IsNullOrEmpty(plugin.cassieready))
 							{
 								int p = (int)System.Environment.OSVersion.Platform;
@@ -226,7 +226,7 @@ namespace Pro079
 						try
 						{
 							ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player);
-							Manager.SetOnCooldown(CommandHandler);
+							Pro079.Manager.SetOnCooldown(CommandHandler);
 						}
 						catch (Exception e)
 						{
