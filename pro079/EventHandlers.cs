@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Pro079.API;
+using Pro079Core.API;
 using Smod2;
 using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
 using Smod2.EventSystem.Events;
 
-namespace Pro079
+namespace Pro079Core
 {
 	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole,
 		IEventHandlerPlayerDie,	IEventHandlerWaitingForPlayers

@@ -1,12 +1,13 @@
-﻿namespace Pro079
+﻿namespace Pro079Core
 {
-	public class Config079
+	public class Configs
 	{
+		public static Configs Instance;
 		private readonly Pro079 plugin;
-
-		public Config079(Pro079 plugin)
+		public Configs(Pro079 plugin)
 		{
 			this.plugin = plugin;
+			Instance = this;
 		}
 		//////////////////////////////////////////////////////
 		//					CONFIG OPTIONS					//

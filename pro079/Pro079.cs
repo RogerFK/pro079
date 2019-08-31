@@ -3,7 +3,7 @@ using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
 
-namespace Pro079
+namespace Pro079Core
 {
 	[PluginDetails(
         author = "RogerFK",
@@ -26,7 +26,7 @@ namespace Pro079
 		/// <summary>
 		/// User defined configurations and language options
 		/// </summary>
-		public static Config079 Configs { private set; get; }
+		public static Configs Configs { private set; get; }
 		// Config options //
 		
 		// Public options
@@ -135,7 +135,7 @@ namespace Pro079
 			//"\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 seconds, cooldown: 300 seconds)", lang));
 
 			Manager = new Manager(this);
-			Configs = new Config079(this);
+			Configs = new Configs(this);
 		}
     }
 }

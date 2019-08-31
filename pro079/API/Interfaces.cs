@@ -1,7 +1,7 @@
 ﻿using Smod2;
 using Smod2.API;
 
-namespace Pro079.API
+namespace Pro079Core.API
 {
 	public interface ICommand079
 	{
@@ -16,6 +16,10 @@ namespace Pro079.API
 		/// The name of the command
 		/// </summary>
 		string Command { get; }
+		/// <summary>
+		/// Can be <see cref="string.Empty"/> if not needed. Usage for the command that goes after the command itself, aka .079 [command] [usage]
+		/// </summary>
+		string ExtraUsage { get; }
 		/// <summary>
 		/// The string of info that will be displayed when ".079" is typed
 		/// </summary>

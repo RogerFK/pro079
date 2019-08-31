@@ -1,17 +1,22 @@
 ﻿using MEC;
 using System.Collections.Generic;
-using Pro079.API;
+using Pro079Core.API;
 using Smod2.API;
 using Smod2;
 using System;
 using System.Linq;
 
-namespace Pro079
+namespace Pro079Core
 {
 	public class Manager
 	{
+		public static Manager Instance;
 		private readonly Pro079 plugin;
-		public Manager(Pro079 plugin) => this.plugin = plugin;
+		public Manager(Pro079 plugin)
+		{
+			this.plugin = plugin;
+			Instance = this;
+		}
 		private int CassieCd = 0;
 		/// <summary>
 		/// The remaining seconds for CASSIE to be active.
