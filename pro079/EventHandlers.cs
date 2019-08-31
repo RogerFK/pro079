@@ -19,12 +19,9 @@ namespace Pro079
 		{
 			this.plugin = plugin;
 		}
-		private static IEnumerable<Room> rooms;
 		
 		public static FlickerableLight[] FlickerableLightsArray { get; private set; }
-		public static IEnumerable<Door> DoorArray { get; private set; }
-
-		private bool UltDoors = false;
+		public static Door[] DoorArray { get; private set; }
 
 		private List<string> Help;
 		private string FormatEnergyLevel(int energy, int level, string energStr, string lvlStr)
@@ -76,7 +73,7 @@ namespace Pro079
 		private string GetUltimates()
 		{
 			string help = plugin.ultusageFirstline;
-			if (UltimateHelp == null || UltimateHelp.Count != Pro079.Manager.Ultimates.Keys.Count) FetchExternalHelp();
+			if (UltimateHelp == null || UltimateHelp.Count != Pro079.Manager.Ultimates.Keys.Count) FetchUltimates();
 			foreach (string line in UltimateHelp)
 			{
 				help += Environment.NewLine + " - " + line;
@@ -173,14 +170,12 @@ namespace Pro079
 								ev.ReturnMessage = GetUltimates();
 								return;
 							}
-							int ultcd = Pro079.Manager.UltimateCooldown - PluginManager.Manager.Server.Round.Duration;
-							if (ultcd > 0)
+							if (Pro079.Manager.UltimateCooldown > 0)
 							{
-								plugin.ultdown.Replace("$cd", ultcd.ToString());
+								plugin.ultdown.Replace("$cd", Pro079.Manager.UltimateCooldown.ToString());
 								return;
 							}
-							string ultName = string.Join(" ", args.Skip(1).ToArray());
-							IUltimate079 ultimate = Pro079.Manager.GetUltimate(ultName);
+							IUltimate079 ultimate = Pro079.Manager.GetUltimate(string.Join(" ", args.Skip(1).ToArray()));
 							if(ultimate == null)
 							{
 								ev.ReturnMessage = plugin.ulterror;
@@ -213,13 +208,19 @@ namespace Pro079
 						}
 						if (CommandHandler.Cassie)
 						{
-							int cassieCD = Pro079.Manager.CassieCooldown - PluginManager.Manager.Server.Round.Duration;
-							if (cassieCD < 0)
+							if (Pro079.Manager.CassieCooldown > 0)
 							{
-								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", cassieCD.ToString()).Replace("$(cd)", cassieCD.ToString());
+								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Pro079.Manager.CassieCooldown.ToString()).Replace("$(cd)", Pro079.Manager.CassieCooldown.ToString());
 								return;
 							}
-							Pro079.Manager.CassieCooldown = PluginManager.Manager.Server.Round.Duration + plugin.cassieCooldown;
+							Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
+							if (!string.IsNullOrEmpty(plugin.cassieready))
+							{
+								int p = (int)System.Environment.OSVersion.Platform;
+								if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
+								else MEC.Timing.RunCoroutine(CooldownCassie(plugin.cassieCooldown), 1);
+								return;
+							}
 						}
 						// A try-catch statement since some plugins will throw an exception, I'm sure of it.
 						try
@@ -232,73 +233,6 @@ namespace Pro079
 							plugin.Error($"Error with command {args[0]} and literally not my problem:\n" + e.ToString());
 							ev.ReturnMessage = plugin.error + ": " + e.Message;
 						}
-						/*
-						case 7: // ultcmd
-							if (!plugin.GetConfigBool("p079_ult"))
-							{
-								ev.ReturnMessage = plugin.GetTranslation("disabled");
-								return;
-							}
-							string ultUsage = plugin.GetTranslation("ultusage").Replace("\\n", "\n");
-							// if it's our server, and by the way don't enter if you're a guiri
-							if (PluginManager.Manager.Server.Name.ToLower().Contains("world in chaos"))
-							{
-								ultUsage += "3. ... ¡Añade tu idea aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
-								+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
-							}
-
-							if (args.Count() == 1)
-							{
-								if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("ultlocked");
-								}
-								else
-								{
-									ev.ReturnMessage = ultUsage;
-									return;
-								}
-							}
-							else
-							{
-								if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("ultlocked");
-									return;
-								}
-								if (PluginManager.Manager.Server.Round.Duration < ultDown)
-								{
-									ev.ReturnMessage = plugin.GetTranslation("ultdown").Replace("$cd", (ultDown - PluginManager.Manager.Server.Round.Duration).ToString());
-									return;
-								}
-								if (!int.TryParse(args[1], out int ult))
-								{
-									ev.ReturnMessage = ultUsage;
-									return;
-								}
-								ev.ReturnMessage = plugin.GetTranslation("ultlaunched");
-								switch (ult)
-								{
-									case 1:
-										Timing.Run(ShamelessTimingRunLights());
-										ultDown = PluginManager.Manager.Server.Round.Duration + 180;
-										Timing.Run(CooldownUlt(180f));
-										return;
-									case 2:
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
-										Timing.Run(Ult2Toggle(30f));
-										ultDown = PluginManager.Manager.Server.Round.Duration + 300;
-										Timing.Run(CooldownUlt(300f));
-										return;
-									default:
-										ev.ReturnMessage = ultUsage;
-										return;
-								}
-							}
-							return;
-						default:
-							ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
-							return;*/
 					}
 				}
 			}
@@ -317,10 +251,10 @@ namespace Pro079
 
 			if (ev.Role == Role.SCP_079)
 			{
-				MEC.Timing.RunCoroutine(DelayMsg(ev.Player), 1);
+				MEC.Timing.RunCoroutine(DelaySpawnMsg(ev.Player), 1);
 			}
 		}
-		private IEnumerator<float> DelayMsg(Player player)
+		private IEnumerator<float> DelaySpawnMsg(Player player)
 		{
 			yield return 0.1f; // This value produces completely random outputs, but it's good enough for delaying the message a tiny bit so it doesn't overlap
 			if (player.TeamRole.Role == Role.SCP_079)
@@ -364,18 +298,11 @@ namespace Pro079
 			else MEC.Timing.RunCoroutine(FakeKillPC(null), 1);
 		}
 
-		/* Cooldowns could be substituted with float like I did in Stalky 106 (https://github.com/RogerFK/stalky106),
-		 * but it wouldn't matter anyways as there will always be
-		 * a coroutine for the broadcast
-
-		 * Also before you ask, no, you can't pass a bool as a reference in C#
-		 * or else I don't know the proper way to do it.*/
-
-		private IEnumerable<float> CooldownCassie(float time)
+		private IEnumerator<float> CooldownCassie(float time)
 		{
-			if (time > 4)
+			if (time > 5)
 			{
-				yield return (time);
+				yield return MEC.Timing.WaitForSeconds(time);
 
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
@@ -412,7 +339,6 @@ namespace Pro079
 		}
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
-			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType != ZoneType.ENTRANCE);
 			FlickerableLightsArray = UnityEngine.Object.FindObjectsOfType<FlickerableLight>();
 			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
 		}

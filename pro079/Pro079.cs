@@ -27,7 +27,8 @@ namespace Pro079
 		/// User defined configurations and language options
 		/// </summary>
 		public static Config079 Configs { private set; get; }
-		// Config options
+		// Config options //
+		
 		// Public options
 		[ConfigOption]
 		public readonly bool enable = true;
@@ -46,7 +47,8 @@ namespace Pro079
 		[ConfigOption]
 		public readonly int ultLevel = 4;
 
-		// Language options
+		// Language options //
+
 		// Public translations
 		[LangOption]
 		public readonly string disabled = "This command is disabled.";
@@ -121,27 +123,14 @@ namespace Pro079
 
         public override void OnEnable()
         {
-            this.Info("Pro079 Core enabled");
+			// Info string to ASSERT DOMINANCE.
+			Info("Pro079 Core enabled.\n╔═══╗╔═══╗╔═══╗╔═══╗╔═══╗╔═══╗\n║╔═╗║║╔═╗║║╔═╗║║╔═╗║║╔═╗║║╔═╗║\n║╚═╝║║╚═╝║║║─║║║║║║║╚╝╔╝║║╚═╝║\n║╔══╝║╔╗╔╝║║─║║║║║║║──║╔╝╚══╗║\n║║───║║║╚╗║╚═╝║║╚═╝║──║║─╔══╝║\n╚╝───╚╝╚═╝╚═══╝╚═══╝──╚╝─╚═══╝");
         }
 		
         public override void Register()
         {
 			this.Info("Loading Pro-079 Core configs and registering default commands...");
 			AddEventHandlers(new Pro79Handlers(this));
-			#region Specific configs
-            #endregion
-
-            // Translations
-            string lang = "pro079-core";
-
-			#region Cmds and Help strings
-			AddTranslation(new LangSetting("newteslacmd", "tesla", lang));
-			AddTranslation(new LangSetting(    "mtfcmd", "mtf", lang));
-			AddTranslation(new LangSetting(    "gencmd", "gen", lang));
-			AddTranslation(new LangSetting(    "scpcmd", "scp", lang));
-			AddTranslation(new LangSetting(   "infocmd", "info", lang));
-			AddTranslation(new LangSetting(  "chaoscmd", "chaos", lang));
-			#endregion
 
 			//"\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 seconds, cooldown: 300 seconds)", lang));
 

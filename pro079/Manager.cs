@@ -12,11 +12,23 @@ namespace Pro079
 	{
 		private readonly Pro079 plugin;
 		public Manager(Pro079 plugin) => this.plugin = plugin;
-
+		private int CassieCd = 0;
 		/// <summary>
-		/// 
+		/// The remaining seconds for CASSIE to be active.
 		/// </summary>
-		public int CassieCooldown { set; get; }
+		public int CassieCooldown
+		{
+			// The logic demands a high IQ or a lot of knowledge in C# to be understood.
+			set
+			{
+				CassieCd = PluginManager.Manager.Server.Round.Duration + value;
+			}
+			get
+			{
+				int cd = CassieCd - PluginManager.Manager.Server.Round.Duration;
+				return cd <= 0 ? 0 : cd;
+			}
+		}
 		/// <summary>
 		/// Dictionary with all the Commands and their respective handlers
 		/// </summary>
@@ -77,7 +89,23 @@ namespace Pro079
 				else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), 1);
 			}
 		}
-		public int UltimateCooldown { set; get; }
+		private int UltCooldown = 0;
+		/// <summary>
+		/// Remaining seconds for the ultimates to be ready, in seconds. 0 means it has no cooldown
+		/// </summary>
+		public int UltimateCooldown
+		{
+			// The logic demands a high IQ or a lot of knowledge in C# to be understood.
+			set
+			{
+				UltCooldown = PluginManager.Manager.Server.Round.Duration + value;
+			}
+			get
+			{
+				int cd = UltCooldown - PluginManager.Manager.Server.Round.Duration;
+				return cd <= 0 ? 0 : cd; 
+			}
+		}
 		public void SetOnCooldown(IUltimate079 Ultimate)
 		{
 			UltimateCooldown = Ultimate.Cooldown + PluginManager.Manager.Server.Round.Duration;
