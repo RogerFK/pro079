@@ -8,15 +8,17 @@ using System.Linq;
 
 namespace Pro079
 {
-	public class Manager
+	/// <summary>
+	/// Manager that contains all commands and useful functions
+	/// </summary>
+	public static class Manager
 	{
-		private readonly Pro079 plugin;
-		public Manager(Pro079 plugin) => this.plugin = plugin;
-		private int CassieCd = 0;
+		private static Pro079Plugin plugin = Pro079Plugin.Instance;
+		private static int CassieCd = 0;
 		/// <summary>
 		/// The remaining seconds for CASSIE to be active.
 		/// </summary>
-		public int CassieCooldown
+		public static int CassieCooldown
 		{
 			// The logic demands a high IQ or a lot of knowledge in C# to be understood.
 			set
@@ -32,13 +34,13 @@ namespace Pro079
 		/// <summary>
 		/// Dictionary with all the Commands and their respective handlers
 		/// </summary>
-		public readonly Dictionary<string, ICommand079> Commands = new Dictionary<string, ICommand079>();
+		public static readonly Dictionary<string, ICommand079> Commands = new Dictionary<string, ICommand079>();
 		/// <summary>
 		/// Function used to register the current command. Doesn't register EventHandlers, so be aware of that.
 		/// </summary>
 		/// <param name="CommandHandler">The class that implements ICommand079</param>
 		/// <returns></returns>
-		public string RegisterCommand(ICommand079 CommandHandler)
+		public static string RegisterCommand(ICommand079 CommandHandler)
 		{
 			if(CommandHandler == null || string.IsNullOrEmpty(CommandHandler.Command))
 			{
@@ -54,13 +56,13 @@ namespace Pro079
 		/// <summary>
 		/// Dictionary with all the Ultimates and their respective handlers
 		/// </summary>
-		public readonly Dictionary<string, IUltimate079> Ultimates = new Dictionary<string, IUltimate079>();
+		public static readonly Dictionary<string, IUltimate079> Ultimates = new Dictionary<string, IUltimate079>();
 		/// <summary>
 		/// Function used to register the current command. Doesn't register EventHandlers, so be aware of that.
 		/// </summary>
 		/// <param name="UltimateHandler">The class that implements ICommand079</param>
 		/// <returns></returns>
-		public string RegisterUltimate(IUltimate079 UltimateHandler)
+		public static string RegisterUltimate(IUltimate079 UltimateHandler)
 		{
 			if (UltimateHandler == null || string.IsNullOrEmpty(UltimateHandler.Name))
 			{
@@ -78,7 +80,7 @@ namespace Pro079
 		/// Properly sets the cooldown for the given command, and delays a broadcast to tell the user when it's ready if the property <see cref="CommandReady"/> has been set.
 		/// </summary>
 		/// <param name="Command"></param>
-		public void SetOnCooldown(ICommand079 Command)
+		public static void SetOnCooldown(ICommand079 Command)
 		{
 			Command.CurrentCooldown = PluginManager.Manager.Server.Round.Duration + Command.Cooldown;
 
@@ -89,11 +91,11 @@ namespace Pro079
 				else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), 1);
 			}
 		}
-		private int UltCooldown = 0;
+		private static int UltCooldown = 0;
 		/// <summary>
 		/// Remaining seconds for the ultimates to be ready, in seconds. 0 means it has no cooldown
 		/// </summary>
-		public int UltimateCooldown
+		public static int UltimateCooldown
 		{
 			// The logic demands a high IQ or a lot of knowledge in C# to be understood.
 			set
@@ -106,7 +108,7 @@ namespace Pro079
 				return cd <= 0 ? 0 : cd; 
 			}
 		}
-		public void SetOnCooldown(IUltimate079 Ultimate)
+		public static void SetOnCooldown(IUltimate079 Ultimate)
 		{
 			UltimateCooldown = Ultimate.Cooldown + PluginManager.Manager.Server.Round.Duration;
 
@@ -117,7 +119,7 @@ namespace Pro079
 				else MEC.Timing.RunCoroutine(DelayMessage(plugin.ultready, Ultimate.Cooldown), 1); 
 			}
 		}
-		private IEnumerator<float> DelayMessage(string message, int delay)
+		private static IEnumerator<float> DelayMessage(string message, int delay)
 		{
 			yield return MEC.Timing.WaitForSeconds(delay);
 			var pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
@@ -129,7 +131,7 @@ namespace Pro079
 		/// <param name="player">The player to give XP to</param>
 		/// <param name="XP">The amount of XP</param>
 		/// <param name="xptype">The experience type you want to show the player (optional)</param>
-		public void GiveExp(Player player, float XP, ExperienceType xptype = (ExperienceType)(-1))
+		public static void GiveExp(Player player, float XP, ExperienceType xptype = (ExperienceType)(-1))
 		{
 			player.Scp079Data.Exp += XP;
 			if (xptype != (ExperienceType)(-1)) player.Scp079Data.ShowGainExp(xptype);
@@ -139,7 +141,7 @@ namespace Pro079
 		/// </summary>
 		/// <param name="player"></param>
 		/// <param name="amount"></param>
-		public void DrainAP(Player player, float amount)
+		public static void DrainAP(Player player, float amount)
 		{
 			if (player.Scp079Data.AP < amount) player.Scp079Data.AP = 0;
 			else player.Scp079Data.AP -= amount;
@@ -149,18 +151,18 @@ namespace Pro079
 		/// </summary>
 		/// <param name="Name"></param>
 		/// <returns></returns>
-		public IUltimate079 GetUltimate(string Name)
+		public static IUltimate079 GetUltimate(string Name)
 		{
-			if (Pro079.Manager.Ultimates.TryGetValue(Name, out IUltimate079 ultimate))
+			if (Ultimates.TryGetValue(Name, out IUltimate079 ultimate))
 			{
 				return ultimate;
 			}
-			string name = Pro079.Manager.Ultimates.Keys.OrderBy(x => x.Length).FirstOrDefault(x => x.StartsWith(Name));
+			string name = Ultimates.Keys.OrderBy(x => x.Length).FirstOrDefault(x => x.StartsWith(Name));
 			if(name == null)
 			{
 				return null;
 			}
-			return Pro079.Manager.Ultimates[name];
+			return Ultimates[name];
 		}
 	}
 }

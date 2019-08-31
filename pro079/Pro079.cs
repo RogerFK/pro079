@@ -17,16 +17,9 @@ namespace Pro079
 		langFile = "pro079-core"
         )]
 
-    public class Pro079 : Plugin
+    public class Pro079Plugin : Plugin
     {
-		/// <summary>
-		/// Manager that contains all commands and useful functions
-		/// </summary>
-		public static Manager Manager { private set; get; }
-		/// <summary>
-		/// User defined configurations and language options
-		/// </summary>
-		public static Config079 Configs { private set; get; }
+		public static Pro079Plugin Instance;
 		// Config options //
 		
 		// Public options
@@ -134,8 +127,7 @@ namespace Pro079
 
 			//"\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 seconds, cooldown: 300 seconds)", lang));
 
-			Manager = new Manager(this);
-			Configs = new Config079(this);
+			Instance = this;
 		}
     }
 }

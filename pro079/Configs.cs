@@ -1,13 +1,11 @@
 ﻿namespace Pro079
 {
-	public class Config079
+	/// <summary>
+	/// User defined configurations and language options
+	/// </summary>
+	public static class Configs
 	{
-		private readonly Pro079 plugin;
-
-		public Config079(Pro079 plugin)
-		{
-			this.plugin = plugin;
-		}
+		private static Pro079Plugin plugin = Pro079Plugin.Instance;
 		//////////////////////////////////////////////////////
 		//					CONFIG OPTIONS					//
 		//////////////////////////////////////////////////////
@@ -15,7 +13,7 @@
 		/// <summary>
 		/// Bool to check if Pro-079 has been disabled through the config
 		/// </summary>
-		public bool Enabled
+		public static bool Enabled
 		{
 			get
 			{
@@ -25,7 +23,7 @@
 		/// <summary>
 		/// Checks if the suicide command is enabled or not
 		/// </summary>
-		public bool SuicideCommand
+		public static bool SuicideCommand
 		{
 			get
 			{
@@ -36,7 +34,7 @@
 		/// Checks if ultimates are enabled.
 		/// Useful if you're developing a ultimate that registers events to avoid causing unintentional lag.
 		/// </summary>
-		public bool UltimatesEnabled
+		public static bool UltimatesEnabled
 		{
 			get
 			{
@@ -53,7 +51,7 @@
 		/// <param name="Level">The number of the level</param>
 		/// <param name="Uppercase">If the first character should be uppercase</param>
 		/// <returns>The translated level string</returns>
-		public string LevelString(int Level, bool Uppercase)
+		public static string LevelString(int Level, bool Uppercase)
 		{
 			if(Uppercase || char.IsDigit(plugin.level[0])) return char.ToUpper(plugin.level[0])
 					+ plugin.level.Substring(1).Replace("$lvl", Level.ToString());
@@ -65,7 +63,7 @@
 		/// <param name="AP">The number of the AP</param>
 		/// <param name="Uppercase">If the first character should be uppercase</param>
 		/// <returns>The translated AP string</returns>
-		public string APString(int AP, bool Uppercase)
+		public static string APString(int AP, bool Uppercase)
 		{
 			if (Uppercase || char.IsDigit(plugin.level[0])) return char.ToUpper(plugin.level[0])
 					 + plugin.level.Substring(1).Replace("$ap", AP.ToString());
@@ -76,7 +74,7 @@
 		/// </summary>
 		/// <param name="MinAP">The minimum AP</param>
 		/// <returns>The translated string</returns>
-		public string LowAP(int MinAP)
+		public static string LowAP(int MinAP)
 		{
 			return Min(plugin.lowmana, MinAP);
 		}
@@ -85,18 +83,18 @@
 		/// </summary>
 		/// <param name="MinLevel">The required level</param>
 		/// <returns>The translated string</returns>
-		public string LowLevel(int MinLevel)
+		public static string LowLevel(int MinLevel)
 		{
 			return Min(plugin.level, MinLevel);
 		}
-		private string Min(string str, int number)
+		private static string Min(string str, int number)
 		{
 			return str.Replace("$min", number.ToString());
 		}
 		/// <summary>
 		/// Returns the cooldown translated
 		/// </summary>
-		public string CmdOnCooldown(int Cooldown)
+		public static string CmdOnCooldown(int Cooldown)
 		{
 			return plugin.cooldown.Replace("$cd", Cooldown.ToString());
 		}
@@ -104,7 +102,7 @@
 		/// <summary>
 		/// Translated "This command is disabled."
 		/// </summary>
-		public string CommandDisabled
+		public static string CommandDisabled
 		{
 			get
 			{
@@ -114,7 +112,7 @@
 		/// <summary>
 		/// Translated "Command succesfully launched".
 		/// </summary>
-		public string CommandSuccess
+		public static string CommandSuccess
 		{
 			get
 			{
@@ -124,7 +122,7 @@
 		/// <summary>
 		/// Translated "Ultimate succesfully used."
 		/// </summary>
-		public string UltimateLaunched
+		public static string UltimateLaunched
 		{
 			get
 			{
