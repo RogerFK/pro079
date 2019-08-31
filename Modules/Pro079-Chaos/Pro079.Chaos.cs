@@ -52,14 +52,5 @@ namespace ChaosCommand
 			this.Info("Loading Pro-079 Chaos configs and registering the command...");
 			Pro079.Manager.RegisterCommand(new ChaosCommand(this));
 		}
-
-		int Strlen(char[] str)
-		{
-			int i;
-
-			for (i = 0; str[i] != null; i++) ;
-
-			return i;
-		}
 	}
 }
