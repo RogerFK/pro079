@@ -47,10 +47,6 @@ namespace Pro079MTF
 
 		public string CallCommand(string[] args, Player player)
 		{
-			if (Disabled)
-			{
-				return Pro079.Configs.CommandDisabled;
-			}
 			if (args.Length >= 3)
 			{
 				if (!int.TryParse(args[2], out int scpLeft) || !int.TryParse(args[1], out int mtfNum) || !char.IsLetter(args[0][0]))
