@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Pro079-Core">
-      <HintPath>..\..\pro079\bin\Release\Pro079-Core.dll</HintPath>
+    <Reference Include="Pro079">
+      <HintPath>..\..\pro079\bin\Release\Pro079.dll</HintPath>
     </Reference>
     <Reference Include="Smod2">
       <HintPath>..\..\Lib\Smod2.dll</HintPath>

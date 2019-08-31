@@ -33,11 +33,11 @@ namespace Pro079Core
 				}
 				if (ev.Player.TeamRole.Role != Role.SCP_079)
 				{
-					ev.ReturnMessage = plugin.GetTranslation("notscp079");
+					ev.ReturnMessage = plugin.notscp079;
 					return;
 				}
 
-				ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
+				ev.ReturnMessage = plugin.error;
 				// this block is pasted from PlayerPrefs https://github.com/probe4aiur/PlayerPreferences/
 				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(ev.Command);
 				string[] args = new string[collection.Count - 1];
@@ -150,7 +150,6 @@ namespace Pro079Core
 								int p = (int)System.Environment.OSVersion.Platform;
 								if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Logic.CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
 								else MEC.Timing.RunCoroutine(Logic.CooldownCassie(plugin.cassieCooldown), 1);
-								return;
 							}
 						}
 					}

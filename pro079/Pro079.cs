@@ -112,7 +112,7 @@ namespace Pro079Core
 		[LangOption]
 		public readonly string ultcmd = "ultimate";
 		[LangOption]
-		public readonly string error = "There was an error processing your command";
+		public readonly string error = "There was an error with that command. Use another command, check the usage, or else contact the guy who made that command.";
 		[LangOption]
 		public readonly string ulterror = "Ultimate not found. Use <b>.079 ultimate</b> to check the names.";
 
