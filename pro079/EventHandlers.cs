@@ -157,9 +157,12 @@ namespace Pro079Core
 					try
 					{
 						ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player);
-						// Drains the AP and sets it on cooldown if the command wasn't set on cooldown before
-						Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
-						if (CommandHandler.CurrentCooldown > PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler);
+						// Drains the AP and sets it on cooldown if the command wasn't set on cooldown before (a.k.a. if you didn't do it manually)
+						if (!ev.Player.GetBypassMode())
+						{
+							Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
+							if (CommandHandler.CurrentCooldown > PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler); 
+						}
 					}
 					catch (Exception e)
 					{
