@@ -82,17 +82,31 @@ namespace Pro079Core
 		/// <summary>
 		/// Properly sets the cooldown for the given command, and delays a broadcast to tell the user when it's ready if the property <see cref="CommandReady"/> has been set.
 		/// </summary>
-		/// <param name="Command"></param>
-		public void SetOnCooldown(ICommand079 Command)
+		/// <param name="Command">Handler</param>
+		/// <param name="CustomValue">Change it customized, doesn't need to be set</param>
+		public void SetOnCooldown(ICommand079 Command, int CustomValue = -1)
 		{
-			Command.CurrentCooldown = PluginManager.Manager.Server.Round.Duration + Command.Cooldown;
-
-			if (!string.IsNullOrEmpty(Command.CommandReady))
+			if (CustomValue > -1)
+			{
+				Command.CurrentCooldown = PluginManager.Manager.Server.Round.Duration + CustomValue;
+				if (!string.IsNullOrEmpty(Command.CommandReady))
 			{
 				int p = (int) System.Environment.OSVersion.Platform;
-				if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), MEC.Segment.Update);
-				else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), 1);
+				if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, CustomValue), MEC.Segment.Update);
+				else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, CustomValue), 1);
 			}
+			}
+			else
+			{
+				Command.CurrentCooldown = PluginManager.Manager.Server.Round.Duration + Command.Cooldown;
+				if (!string.IsNullOrEmpty(Command.CommandReady))
+				{
+					int p = (int)System.Environment.OSVersion.Platform;
+					if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), MEC.Segment.Update);
+					else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), 1);
+				}
+			}
+			
 		}
 		private int UltCooldown = 0;
 		/// <summary>

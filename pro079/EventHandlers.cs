@@ -57,7 +57,7 @@ namespace Pro079Core
 
 				if (args.Length == 0)
 				{
-					ev.ReturnMessage = "<color=\"white\">" + Logic.GetHelp() + "</color>";
+					ev.ReturnMessage = "<color=\"white\">" + Pro079Logic.GetHelp() + "</color>";
 				}
 				else if (args.Length >= 1)
 				{
@@ -88,15 +88,15 @@ namespace Pro079Core
 						}
 						PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 						int p = (int)System.Environment.OSVersion.Platform;
-						if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Logic.FakeKillPC(ev.Player), MEC.Segment.Update);
-						else MEC.Timing.RunCoroutine(Logic.FakeKillPC(ev.Player), 1);
+						if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Pro079Logic.FakeDeath(ev.Player), MEC.Segment.Update);
+						else MEC.Timing.RunCoroutine(Pro079Logic.FakeDeath(ev.Player), 1);
 						return;
 					}
 					if (args[0] == plugin.ultcmd)
 					{
 						if (args.Length == 1)
 						{
-							ev.ReturnMessage = Logic.GetUltimates();
+							ev.ReturnMessage = Pro079Logic.GetUltimates();
 							return;
 						}
 						if (Pro079.Manager.UltimateCooldown > 0)
@@ -147,18 +147,19 @@ namespace Pro079Core
 							Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
 							if (!string.IsNullOrEmpty(plugin.cassieready))
 							{
-								int p = (int)System.Environment.OSVersion.Platform;
-								if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Logic.CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
-								else MEC.Timing.RunCoroutine(Logic.CooldownCassie(plugin.cassieCooldown), 1);
+								int p = (int) System.Environment.OSVersion.Platform;
+								if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
+								else MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), 1);
 							}
 						}
 					}
-					// A try-catch statement since some plugins will throw an exception, I'm sure of it.
+					// A try-catch statement in case any command malfunctions.
 					try
 					{
 						ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player);
-						Pro079.Manager.SetOnCooldown(CommandHandler);
+						// Drains the AP and sets it on cooldown if the command wasn't set on cooldown before
 						Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
+						if (CommandHandler.CurrentCooldown > PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler);
 					}
 					catch (Exception e)
 					{
@@ -178,7 +179,7 @@ namespace Pro079Core
 
 			if (ev.Role == Role.SCP_079)
 			{
-				MEC.Timing.RunCoroutine(Logic.DelaySpawnMsg(ev.Player), 1);
+				MEC.Timing.RunCoroutine(Pro079Logic.DelaySpawnMsg(ev.Player), 1);
 			}
 		}
 
@@ -191,7 +192,7 @@ namespace Pro079Core
 				if (pcs < 0) return;
 				if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs <= 1)
 				{
-					MEC.Timing.RunCoroutine(Logic.DelayKysMessage(PCplayers), 1);
+					MEC.Timing.RunCoroutine(Pro079Logic.DelayKysMessage(PCplayers), 1);
 				}
 			}
 		}

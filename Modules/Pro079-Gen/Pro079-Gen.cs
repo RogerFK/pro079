@@ -4,52 +4,64 @@ using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
 
-namespace LockdownUltimate
+namespace GeneratorCommand
 {
 	[PluginDetails(
 		author = "RogerFK",
-		name = "Pro 079 MTF",
-		description = "Tesla command for Pro-079.",
-		id = "rogerfk.pro079.tesla",
+		name = "Pro 079 Generator",
+		description = "Generator command for Pro-079.",
+		id = "rogerfk.pro079.gen",
 		version = "2.0",
-		configPrefix = "p079_info",
-		langFile = "p079info",
+		configPrefix = "p079_gen",
+		langFile = "p079gen",
 		SmodMajor = 3,
 		SmodMinor = 5,
 		SmodRevision = 0
 		)]
 
-	public class Pro079 : Plugin, I079Command
+	public class GeneratorPlugin : Plugin
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 Info disabled.");
+			this.Info("Pro079 Generator disabled.");
 		}
 		public override void OnEnable()
 		{
-			this.Info("Pro079 Info enabled");
+			this.Info("Pro079 Generator enabled");
 		}
+
+		[ConfigOption("p079_gen")]
+		public readonly bool enabled = true;
+		[ConfigOption]
+		public readonly int cooldown = 60;
+		[ConfigOption]
+		public readonly int cost = 40;
+		[ConfigOption]
+		public readonly int costBlackout = 40;
+		[ConfigOption]
+		public readonly int level = 2;
+		[ConfigOption]
+		public readonly int levelBlackout = 3;
+		[ConfigOption]
+		public readonly int penalty = 60;
+
+		[LangOption]
+		public readonly string gencmd = "gen";
+		[LangOption]
+		public readonly string genuse = "Usage: .079 gen (1-6) - Will announce there are X generator activated, or will fake your death if you type 6. 5 generators will fake your whole recontainment process. - $min AP";
+		[LangOption]
+		public readonly string gen5msg = "Success. Your recontainment procedure, including when lights are turned off and a message telling you died, will be played.";
+		[LangOption]
+		public readonly string gen6msg = "Fake death command launched.";
+		[LangOption]
+		public readonly string usage = "Announces that X generators are enabled, if it's 6 it will fake your suicide";
+		[LangOption]
+		public readonly string ready = "<b>Generator command ready</b>";
+
 		public override void Register()
 		{
-			this.Info("Loading Pro-079 MTF configs and registering the command...");
-
-			// Command configs
-			AddConfig(new ConfigSetting("p079_gen", true, true, "Enables/disables Pro-079's fake SCP death messages"));
-			AddConfig(new ConfigSetting("p079_gen_cooldown", 60f, true, "How many seconds the command will give a cooldown for itself"));
-			AddConfig(new ConfigSetting("p079_gen_cost", 40, true, "Cost for the command"));
-			AddConfig(new ConfigSetting("p079_gen_cost_blackout", 40, true, "Penalty for the Gen5 and Gen6 commands"));
-			AddConfig(new ConfigSetting("p079_gen_level", 2, true, "Minimum level for 079 to fake a generator"));
-			AddConfig(new ConfigSetting("p079_gen_level_blackout", 3, true, "Minimum level for 079 to fake gen 5 and gen 6"));
-			AddConfig(new ConfigSetting("p079_gen_penalty", 60f, true, "For how long there will be a penalty after using gen 5 or gen 6"));
-
-			// Cmds and Help strings
-			AddTranslation(new LangSetting("genuse", "Usage: .079 gen (1-6) - Will announce there are X generator activated, or will fake your death if you ttype 6. 5 generators will fake your whole recontainment process. - $min AP", lang));
-			AddTranslation(new LangSetting("gen5msg", "Success. Your recontainment procedure, including when lights are turned off and a message telling you died, will be played.", lang));
-			AddTranslation(new LangSetting("gen6msg", "Fake death command launched.", lang));
-
-			// registblabla
-
-			AddTranslation(new LangSetting("genhelp", "<b>.079 gen [1-5]</b> - Announces that X generators are enabled, if it's 6 it will fake your suicide", lang));
+			this.Info("Loading Pro-079 Generator configs and registering the command...");
+			Pro079Core.Pro079.Manager.RegisterCommand(new GenCommand(this));
 		}
 	}
 }

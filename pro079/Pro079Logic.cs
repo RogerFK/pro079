@@ -6,7 +6,7 @@ using Smod2.API;
 
 namespace Pro079Core
 {
-	internal static class Logic
+	public static class Pro079Logic
 	{
 		////////////////////////////////
 		//			  HELP			  //
@@ -36,7 +36,7 @@ namespace Pro079Core
 				if (!kvp.Value.Disabled) Help.Add($"<b>.079 {kvp.Key + (!string.IsNullOrEmpty(kvp.Value.ExtraUsage) ? " " + kvp.Value.ExtraUsage: string.Empty)}</b> - {kvp.Value.HelpInfo} {FormatEnergyLevel(kvp.Value.APCost, kvp.Value.MinLevel, Pro079.Instance.energy, Pro079.Instance.level)}");
 			}
 		}
-		public static string GetHelp()
+		internal static string GetHelp()
 		{
 			string help = Pro079.Instance.basicHelp;
 			if (Help == null || Help.Count != Pro079.Manager.Commands.Keys.Count) FetchExternalHelp();
@@ -58,7 +58,7 @@ namespace Pro079Core
 				UltimateHelp.Add($"<b>.079 {kvp.Key}</b> - {kvp.Value.Info} {Pro079.Instance.ultdata.Replace("$cd", kvp.Value.Cooldown.ToString()).Replace("$cost", kvp.Value.Cost.ToString())}");
 			}
 		}
-		public static string GetUltimates()
+		internal static string GetUltimates()
 		{
 			string help = Pro079.Instance.ultusageFirstline;
 			if (UltimateHelp == null || UltimateHelp.Count != Pro079.Manager.Ultimates.Keys.Count) FetchUltimates();
@@ -70,7 +70,7 @@ namespace Pro079Core
 		}
 
 		// This thing below was pasted from here: https://www.c-sharpcorner.com/blogs/first-letter-in-uppercase-in-c-sharp1
-		public static string FirstCharToUpper(string s)
+		internal static string FirstCharToUpper(string s)
 		{
 			// Check for empty string.
 			if (string.IsNullOrEmpty(s))
@@ -84,7 +84,7 @@ namespace Pro079Core
 		///////////////////////////////////////
 		//	 		LOGIC FUNCTIONS			 //
 		///////////////////////////////////////
-		public static IEnumerator<float> DelaySpawnMsg(Player player)
+		internal static IEnumerator<float> DelaySpawnMsg(Player player)
 		{
 			yield return 0.1f; // This value produces completely random outputs, but it's good enough for delaying the message a tiny bit so it doesn't overlap
 			if (player.TeamRole.Role == Role.SCP_079)
@@ -94,7 +94,10 @@ namespace Pro079Core
 				player.SendConsoleMessage(GetHelp(), "white");
 			}
 		}
-		public static IEnumerator<float> FakeKillPC(Player player)
+		/// <summary>
+		/// Does the fake 6th gen
+		/// </summary>
+		public static IEnumerator<float> FakeDeath(Player player = null)
 		{
 			yield return MEC.Timing.WaitForSeconds(7.3f);
 			foreach (FlickerableLight flickerableLight in EventHandlers.FlickerableLightsArray)
@@ -117,18 +120,20 @@ namespace Pro079Core
 			if (player != null) player.ChangeRole(Role.SPECTATOR);
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
 		}
-
+		/// <summary>
+		/// Does the whole recontainment process
+		/// </summary>
 		public static IEnumerable<float> Fake5Gens()
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
 			yield return MEC.Timing.WaitForSeconds(79.89f);
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 			int p = (int)System.Environment.OSVersion.Platform;
-			if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(FakeKillPC(null), MEC.Segment.Update);
-			else MEC.Timing.RunCoroutine(FakeKillPC(null), 1);
+			if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(FakeDeath(null), MEC.Segment.Update);
+			else MEC.Timing.RunCoroutine(FakeDeath(null), 1);
 		}
 
-		public static IEnumerator<float> CooldownCassie(float time)
+		internal static IEnumerator<float> CooldownCassie(float time)
 		{
 			if (time > 5)
 			{
@@ -141,7 +146,7 @@ namespace Pro079Core
 				}
 			}
 		}
-		public static IEnumerator<float> DelayKysMessage(List<Player> PCplayers)
+		internal static IEnumerator<float> DelayKysMessage(List<Player> PCplayers)
 		{
 			if (string.IsNullOrEmpty(Pro079.Instance.kys)) yield break;
 			yield return 0.3f;
