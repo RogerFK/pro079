@@ -11,7 +11,7 @@ This plugin take many configs. The basic ones, that work between features, are a
 | Config Option | Value Type | Default Value | Description |
 |:-----------------------:|:----------:|:-------------------------:|:------------------------------:|
 | pro079_enable | boolean | True | Enables/Disables this plugin |
-| pro079_feature | boolean | True | Enables X feature |
+| pro079_feature_enable | boolean | True | Enables X feature |
 | pro079_feature_cooldown | float | (Depends on each command) | Cooldown for the command |
 | pro079_feature_level | float | (Depends on each command) | Minimum level for that feature |
 | pro079_feature_cost | float | (Depends on each command) | Cost for that feature |
@@ -19,7 +19,7 @@ This plugin take many configs. The basic ones, that work between features, are a
 # Translations
 Just place one of the translations into your sm_translations folder and you're good to go! Defaults to english, this plugin will autogenerate the default translation if you're missing any
 
-# Upcoming features
-**Next release (v2.0) will come with custom command functionality, in the future it'll be used like Gamemode Manager and it'll take different .dll's in case you want to slap things like calling chaos as a custom ultimate, or if you just want to add new fake messages**
+# API Guide
 
-This is a hard task for me to do, so I'll do a pre-release with just ultimates. *Note: It'll probably be a dictionary with actions or something like that, but I'm not really sure how it should be done. I'm new at C#, so take it easy on me.*
+This plugin features an API with which you can add new commands/ultimates via plugins (similar to gamemodes/itemmanager)
+To do so, make sure to reference 0Pro079.dll beforehand, then take a reference from the commands that have already been made inside the `Modules` folder and guide yourself from there. I recommend looking at the Pro079.Chaos command, since it's the most simple one (hint: replace Chaos with Serpent's Hand in case you wanted to fake the Serpent's Hand coming but you couldn't before, but for starters, make sure to change the properties of the project and the id of the plugin and all of that beforehand or else you will not be able to run it)
