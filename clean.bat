@@ -1,0 +1,1 @@
+del /F /Q ModuleDLLs\Assembly-CSharp* ModuleDLLs\*.pdb ModuleDLLs\Smod2.dll ModuleDLLs\UnityEngine*

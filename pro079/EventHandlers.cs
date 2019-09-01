@@ -2,135 +2,45 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using scp4aiur; // Will get removed whenever MEC works properly
+using Pro079Core.API;
 using Smod2;
 using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
-using Smod2.EventSystem.Events;
 
-namespace pro079
+namespace Pro079Core
 {
-	internal class Pro79Handlers : IEventHandlerCallCommand, IEventHandlerSetRole, IEventHandlerSetConfig, IEventHandlerPlayerDie, IEventHandlerTeamRespawn, IEventHandlerDoorAccess, IEventHandlerWaitingForPlayers
+	internal class EventHandlers : IEventHandlerCallCommand, IEventHandlerSetRole,
+		IEventHandlerPlayerDie, IEventHandlerWaitingForPlayers
 	{
 		private readonly Pro079 plugin;
-		private string helpFormatted;
-		public Pro79Handlers(Pro079 plugin)
+		public EventHandlers(Pro079 plugin)
 		{
 			this.plugin = plugin;
 		}
-		private float cooldownGenerator;
-		private float cooldownCassieGeneral;
-		private float cooldownMTF;
-		private float cooldownChaos;
-		private float ultDown;
-		private float cooldownScp;
-		private static IEnumerable<Room> rooms;
-		private static bool DeconBool { get; set; }
-		private static float DeconTime { get; set; }
-		private static int MinMTF { get; set; }
-		private static int MaxMTF { get; set; }
-		private static float LastMtfSpawn { get; set; }
-		private bool UltDoors = false;
-
-		private string FormatEnergyLevel(int energy, int level, string energStr, string lvlStr)
-		{
-			string str;
-			if (energy > 0)
-			{
-				str = " (" + energStr.Replace("$ap", energy.ToString())
-					+ (level > 1 ? ", " + lvlStr.Replace("$lvl", level.ToString()) : "") + ')';
-				return str;
-			}
-			if (energy <= 0 && level > 1)
-			{
-				str = " (" + FirstCharToUpper(lvlStr.Replace("$lvl", level.ToString())) + ')';
-				return str;
-			}
-			return string.Empty;
-		}
-
-		// This thing below was pasted from here: https://www.c-sharpcorner.com/blogs/first-letter-in-uppercase-in-c-sharp1
-		public static string FirstCharToUpper(string s)
-		{
-			// Check for empty string.
-			if (string.IsNullOrEmpty(s))
-			{
-				return string.Empty;
-			}
-			// Return char and concat substring.
-			return char.ToUpper(s[0]) + s.Substring(1);
-		}
-		private string FormatHelp()
-		{
-			// Auxiliary stuff so you don't have to get the translations multiple times
-			string help = plugin.GetTranslation("help");
-			string lvlaux = plugin.GetTranslation("level"), energyaux = plugin.GetTranslation("energy");
-			if (plugin.GetConfigBool("p079_tesla"))
-			{
-				help += '\n' + plugin.GetTranslation("newteslahelp")
-				+ FormatEnergyLevel(plugin.GetConfigInt("p079_tesla_cost"), plugin.GetConfigInt("p079_tesla_level"), energyaux, lvlaux);
-			}
-			if (plugin.GetConfigBool("p079_mtf"))
-			{
-				help += '\n' + plugin.GetTranslation("mtfhelp")
-				+ FormatEnergyLevel(plugin.GetConfigInt("p079_mtf_cost"), plugin.GetConfigInt("p079_mtf_level"), energyaux, lvlaux);
-			}
-			if (plugin.GetConfigBool("p079_chaos"))
-			{
-				help += '\n' + plugin.GetTranslation("chaoshelp")
-				+ FormatEnergyLevel(plugin.GetConfigInt("p079_chaos_cost"), plugin.GetConfigInt("p079_chaos_level"), energyaux, lvlaux);
-			}
-			if (plugin.GetConfigBool("p079_gen"))
-			{
-				help += '\n' + plugin.GetTranslation("genhelp")
-				+ FormatEnergyLevel(plugin.GetConfigInt("p079_gen_cost"), plugin.GetConfigInt("p079_gen_level"), energyaux, lvlaux);
-			}
-			if (plugin.GetConfigBool("p079_scp"))
-			{
-				help += '\n' + plugin.GetTranslation("scphelp")
-				+ FormatEnergyLevel(plugin.GetConfigInt("p079_scp_cost"), plugin.GetConfigInt("p079_scp_level"), energyaux, lvlaux);
-			}
-			if (plugin.GetConfigBool("p079_suicide"))
-			{
-				help += '\n' + plugin.GetTranslation("suicidehelp");
-			}
-			if (plugin.GetConfigBool("p079_ult"))
-			{
-				help += '\n' + plugin.GetTranslation("ulthelp")
-				+ FormatEnergyLevel(0, 4, energyaux, lvlaux);
-			}
-			if (plugin.GetConfigBool("p079_info"))
-			{
-				help += '\n' + plugin.GetTranslation("infohelp") + FormatEnergyLevel(0, 0, energyaux, lvlaux);
-			}
-			if (plugin.GetConfigBool("p079_tips"))
-			{
-				help += '\n' + plugin.GetTranslation("tipshelp") + FormatEnergyLevel(0, 0, energyaux, lvlaux);
-			}
-			return help;
-		}
+		internal static Door[] DoorArray { get; private set; }
 
 		public void OnCallCommand(PlayerCallCommandEvent ev)
 		{
-			string command = ev.Command.ToLower();
-			if (command.StartsWith("079"))
+			if (ev.Command.StartsWith("079"))
 			{
-				if (!plugin.GetConfigBool("p079_enable"))
+				if (!plugin.enable)
 				{
 					return;
 				}
+				if (ev.Player.TeamRole.Role != Role.SCP_079)
+				{
+					ev.ReturnMessage = plugin.notscp079;
+					return;
+				}
 
-				ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
+				ev.ReturnMessage = plugin.error;
 				// this block is pasted from PlayerPrefs https://github.com/probe4aiur/PlayerPreferences/
-				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(command);
+				MatchCollection collection = new Regex("[^\\s\"\']+|\"([^\"]*)\"|\'([^\']*)\'").Matches(ev.Command);
 				string[] args = new string[collection.Count - 1];
 
 				for (int i = 1; i < collection.Count; i++)
 				{
-					// If the first char (0) and the last one (its length - 1) is ", that is the char (defined by ' ')
-					// that is \" (the \ is to define it's not a quote for a string), then take the substring that
-					// starts from the second character to the second last one. Pretty fucking clever.
 					if (collection[i].Value[0] == '\"' && collection[i].Value[collection[i].Value.Length - 1] == '\"')
 					{
 						args[i - 1] = collection[i].Value.Substring(1, collection[i].Value.Length - 2);
@@ -141,761 +51,158 @@ namespace pro079
 					}
 				}
 				// end of the paste thx
-				if (ev.Player.TeamRole.Role == Role.SCP_079)
+
+				if (args.Length == 0)
 				{
-					if (args.Length == 0)
+					ev.ReturnMessage = "<color=\"white\">" + Pro079Logic.GetHelp() + "</color>";
+				}
+				else if (args.Length >= 1)
+				{
+					if (args[0] == plugin.tipscmd)
 					{
-						ev.Player.SendConsoleMessage(helpFormatted, "white");
-						ev.ReturnMessage = plugin.GetTranslation("bugwarn") + " <Made by RogerFK#3679>";
-					}
-					else if (args.Length > 0)
-					{
-						// Most unclear way to do the switch statement, but anyways it's the most optimized way to do it.
-						switch (SwitchParser.ParseArg(args[0], plugin))
+						if (!plugin.tips)
 						{
-							case 9: // tipscmd
-								if (!plugin.GetConfigBool("p079_tips"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								ev.Player.SendConsoleMessage(plugin.GetTranslation("tips").Replace("\\n", "\n"), "white");
-								ev.ReturnMessage = "<Made by RogerFK#3679>";
+							ev.ReturnMessage = plugin.disabled;
+							return;
+						}
+						ev.Player.SendConsoleMessage(plugin.tipsMsg.Replace("\\n", "\n"), "white");
+						ev.ReturnMessage = "<Made by RogerFK#3679>";
+						return;
+					}
+					else if (args[0] == plugin.suicidecmd)
+					{
+						if (!plugin.suicide)
+						{
+							ev.ReturnMessage = plugin.disabled;
+							return;
+						}
+						List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+						int pcs = PCplayers.Count;
+						if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
+						{
+							ev.ReturnMessage = plugin.cantsuicide;
+							return;
+						}
+						MEC.Timing.RunCoroutine(Pro079Logic.SixthGen(ev.Player), MEC.Segment.FixedUpdate);
+						return;
+					}
+					if (args[0] == plugin.ultcmd)
+					{
+						if (args.Length == 1)
+						{
+							ev.ReturnMessage = "<color=\"white\">"+ Pro079Logic.GetUltimates() + "</color>" ;
+							return;
+						}
+						if (Pro079.Manager.UltimateCooldown > 0)
+						{
+							plugin.ultdown.Replace("$cd", Pro079.Manager.UltimateCooldown.ToString());
+							return;
+						}
+						IUltimate079 ultimate = Pro079.Manager.GetUltimate(string.Join(" ", args.Skip(1).ToArray()));
+						if (ultimate == null)
+						{
+							ev.ReturnMessage = plugin.ulterror;
+							return;
+						}
+						if (!ev.Player.GetBypassMode())
+						{
+							if (ev.Player.Scp079Data.Level + 1 < plugin.ultLevel)
+							{
+								ev.ReturnMessage = Pro079.Configs.LowLevel(plugin.ultLevel);
 								return;
-							
-							case 1: // teslacmd
-								if (!plugin.GetConfigBool("p079_tesla"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								if(args.Length < 2)
-								{
-									ev.ReturnMessage = plugin.GetTranslation("teslausage");
-									return;
-								}
-								float time;
-								if (!float.TryParse(args[1], out time))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("teslausage");
-									return;
-								}
-								if (!ev.Player.GetBypassMode())
-								{
-									if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_tesla_level") - 1 && !ev.Player.GetBypassMode())
-									{
-										ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_tesla_level").ToString());
-										return;
-									}
-									if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_tesla_cost") && !ev.Player.GetBypassMode())
-									{
-										ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_tesla_cost").ToString());
-										return;
-									}
-									ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_tesla_cost");
-								}
-								Timing.Run(DisableTeslas(time));
-								ev.Player.Scp079Data.Exp += 5.0f / (ev.Player.Scp079Data.Level + 1); //ignore these
-								ev.ReturnMessage = plugin.GetTranslation("globaltesla");
+							}
+							if (ev.Player.Scp079Data.AP < ultimate.Cost)
+							{
+								ev.ReturnMessage = Pro079.Configs.LowAP(ultimate.Cost);
 								return;
-							case 6: // suicidecmd
-								if (!plugin.GetConfigBool("p079_suicide"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-								int pcs = PCplayers.Count;
-								if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
-								{
-									ev.ReturnMessage = plugin.GetTranslation("cantsuicide");
-									return;
-								}
-								PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-								Timing.Run(FakeKillPC());
-								ev.Player.Kill(DamageType.NUKE);
+							}
+							Pro079.Manager.DrainAP(ev.Player, ultimate.Cost); 
+						}
+						ev.ReturnMessage = ultimate.TriggerUltimate(args.Skip(1).ToArray(), ev.Player);
+						return;
+					}
+
+					// When everything else wasn't caught, search for external commands //
+					if (!Pro079.Manager.Commands.TryGetValue(args[0], out ICommand079 CommandHandler))
+					{
+						ev.ReturnMessage = plugin.unknowncmd;
+						return;
+					}
+					if (!ev.Player.GetBypassMode())
+					{
+						if (ev.Player.Scp079Data.Level + 1 < CommandHandler.MinLevel)
+						{
+							ev.ReturnMessage = Pro079.Configs.LowLevel(CommandHandler.MinLevel);
+							return;
+						}
+						else if (ev.Player.Scp079Data.AP < CommandHandler.APCost)
+						{
+							ev.ReturnMessage = Pro079.Configs.LowAP(CommandHandler.APCost);
+							return;
+						}
+						int cooldown = CommandHandler.CurrentCooldown - PluginManager.Manager.Server.Round.Duration;
+						if (cooldown > 0)
+						{
+							ev.ReturnMessage = Pro079.Configs.CmdOnCooldown(cooldown);
+							return;
+						}
+						if (CommandHandler.Cassie)
+						{
+							if (Pro079.Manager.CassieCooldown > 0)
+							{
+								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Pro079.Manager.CassieCooldown.ToString()).Replace("$(cd)", Pro079.Manager.CassieCooldown.ToString());
 								return;
-							case 2: // mtfcmd
-								if (!plugin.GetConfigBool("p079_mtf"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_mtf_level") - 1)
-								{
-									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_mtf_level").ToString());
-									return;
-								}
-								if (PluginManager.Manager.Server.Round.Duration < cooldownCassieGeneral)
-								{
-									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie").Replace("$cd", (cooldownCassieGeneral - PluginManager.Manager.Server.Round.Duration).ToString());
-									return;
-								}
-								if (args.Count() >= 4)
-								{
-									if (PluginManager.Manager.Server.Round.Duration < cooldownMTF && !ev.Player.GetBypassMode())
-									{
-										ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", (cooldownMTF - PluginManager.Manager.Server.Round.Duration).ToString());
-										return;
-									}
-									if (ev.Player.Scp079Data.AP >= plugin.GetConfigInt("p079_mtf_cost") || ev.Player.GetBypassMode())
-									{
-										if (!int.TryParse(args[3], out int scpLeft) || !int.TryParse(args[2], out int mtfNum) || !char.IsLetter(args[1][0]))
-										{
-											ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
-											return;
-										}
-										if (scpLeft > plugin.GetConfigInt("p079_mtf_maxscp"))
-										{
-											ev.ReturnMessage = ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString()) +
-												plugin.GetTranslation("mtfmaxscp").Replace("$max", plugin.GetConfigInt("p079_mtf_maxscp").ToString());
-											return;
-										}
-										if (!ev.Player.GetBypassMode())
-										{
-											ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_mtf_cost");
-
-											cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
-											cooldownMTF = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_mtf_cooldown");
-											Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-											Timing.Run(CooldownMTF(plugin.GetConfigFloat("p079_mtf_cooldown")));
-										}
-										PluginManager.Manager.Server.Map.AnnounceNtfEntrance(scpLeft, mtfNum, args[1][0]);
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 2.8f * (ev.Player.Scp079Data.Level + 1);
-
-										ev.ReturnMessage = plugin.GetTranslation("success");
-										return;
-
-									}
-									else
-									{
-										ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
-									}
-									return;
-								}
-								else
-								{
-									ev.ReturnMessage = plugin.GetTranslation("mtfuse").Replace("$min", plugin.GetConfigInt("p079_mtf_cost").ToString());
-									return;
-								}
-							case 4: // scpcmd
-								if (!plugin.GetConfigBool("p079_scp"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								if (!ev.Player.GetBypassMode())
-								{
-									if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_scp_level") - 1)
-									{
-										ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_scp_level").ToString());
-										return;
-									}
-									if (PluginManager.Manager.Server.Round.Duration < cooldownScp)
-									{
-										ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", (cooldownScp - PluginManager.Manager.Server.Round.Duration).ToString());
-										return;
-									}
-									if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_scp_cost"))
-									{
-										ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
-										return;
-									}
-								}
-								if (args.Length >= 3)
-								{
-									if (!plugin.GetConfigList("p079_scp_list").Contains(args[1]))
-									{
-										ev.ReturnMessage = plugin.GetTranslation("scpexist") + " - " + plugin.GetTranslation("scpuse").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
-										return;
-									}
-									string scpNum = string.Join(" ", args[1].ToCharArray());
-									switch (args[2])
-									{
-										case "mtf":
-											Player dummy = null;
-											List<Role> mtf = new List<Role>
-										{
-											Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER, Role.SCIENTIST
-										};
-											foreach (Player player in PluginManager.Manager.Server.GetPlayers())
-											{
-												if (mtf.Contains(player.TeamRole.Role))
-												{
-													dummy = player;
-													break;
-												}
-											}
-											if (dummy == null)
-											{
-												ev.Player.SendConsoleMessage(plugin.GetTranslation("nomtfleft"), "red");
-											}
-
-											PluginManager.Manager.Server.Map.AnnounceScpKill(args[1], dummy);
-											ev.ReturnMessage = plugin.GetTranslation("success");
-											break;
-										case "unknown":
-											PluginManager.Manager.Server.Map.AnnounceScpKill(args[1], null);
-											ev.ReturnMessage = plugin.GetTranslation("success");
-											break;
-										case "tesla":
-											PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Successfully Terminated by automatic security systems");
-											ev.ReturnMessage = plugin.GetTranslation("success");
-											break;
-										case "decont":
-											PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Lost in Decontamination Sequence");
-											ev.ReturnMessage = plugin.GetTranslation("success");
-											break;
-										default:
-											ev.ReturnMessage = plugin.GetTranslation("scpway") + " .079 scp " + args[1] + " (unknown/tesla/mtf/decont)";
-											return;
-									}
-								}
-								else
-								{
-									ev.ReturnMessage = plugin.GetTranslation("scpuse").Replace("$min", plugin.GetConfigInt("p079_scp_cost").ToString());
-									return;
-								}
-								ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-								ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_scp_cost");
-								ev.Player.Scp079Data.Exp += 5.0f * (ev.Player.Scp079Data.Level + 1);
-								cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
-								cooldownScp = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_scp_cooldown");
-								Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-								Timing.Run(CooldownScp(plugin.GetConfigFloat("p079_scp_cooldown")));
-								return;
-							case 3: // gencmd
-								if (!plugin.GetConfigBool("p079_gen"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								if (args.Count() == 1)
-								{
-									ev.ReturnMessage = plugin.GetTranslation("genuse").Replace("$min", plugin.GetConfigInt("p079_gen_cost").ToString());
-									return;
-								}
-								// No need for a double check. The program already knows there are two arguments.
-								if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_gen_level") - 1 && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_gen_level").ToString());
-									return;
-								}
-								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_gen_cost") && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_gen_cost").ToString());
-									return;
-								}
-								if (PluginManager.Manager.Server.Round.Duration < cooldownGenerator && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", cooldownGenerator.ToString());
-									return;
-								}
-								int blackcost = plugin.GetConfigInt("p079_gen_cost") + plugin.GetConfigInt("p079_gen_cost_blackout");
-								switch (args[1])
-								{
-									case "1":
-									case "2":
-									case "3":
-									case "4":
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon" + args[1]);
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 20f;
-										ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_gen_cost");
-										cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
-										cooldownGenerator = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_cooldown");
-										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = plugin.GetTranslation("success");
-										return;
-									case "5":
-										if (!ev.Player.GetBypassMode())
-										{
-											if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_gen_level_blackout") - 1)
-											{
-												ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_gen_level_blackout").ToString());
-												return;
-											}
-											if (ev.Player.Scp079Data.AP < blackcost)
-											{
-												ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", blackcost.ToString());
-												return;
-											} 
-										}
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										Timing.Run(Fake5Gens());
-										ev.Player.Scp079Data.Exp += 80f;
-										ev.Player.Scp079Data.AP -= blackcost;
-										cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
-										cooldownGenerator = 70.3f + PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown");
-										Timing.Run(CooldownGen(70.3f + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										ev.ReturnMessage = plugin.GetTranslation("gen5msg");
-										return;
-									case "6":
-										if (!ev.Player.GetBypassMode())
-										{
-											if (ev.Player.Scp079Data.Level < plugin.GetConfigInt("p079_gen_level_blackout") - 1)
-											{
-												ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_gen_level_blackout").ToString());
-												return;
-											}
-											if (ev.Player.Scp079Data.AP < blackcost)
-											{
-												ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", blackcost.ToString());
-												return;
-											}
-										}
-										PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-										ev.Player.Scp079Data.ShowGainExp(ExperienceType.CHEAT);
-										ev.Player.Scp079Data.Exp += 50f;
-										ev.Player.Scp079Data.AP -= blackcost;
-										cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
-										cooldownGenerator = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown");
-										Timing.Run(CooldownGen(plugin.GetConfigFloat("p079_gen_penalty") + plugin.GetConfigFloat("p079_gen_cooldown")));
-										Timing.Run(CooldownCassie(plugin.GetConfigFloat("p079_cassie_cooldown")));
-										Timing.Run(FakeKillPC());
-										ev.ReturnMessage = plugin.GetTranslation("gen6msg");
-										return;
-									default:
-										ev.ReturnMessage = plugin.GetTranslation("genuse");
-										return;
-								}
-							case 5: // infocmd
-								if (!plugin.GetConfigBool("p079_info"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								int level = ev.Player.Scp079Data.Level + 1;
-								string humansAlive;
-								string decontTime;
-								string ScientistsEscaped;
-								string ClassDEscaped;
-								string ClassDAlive;
-								string ScientistsAlive;
-								string MTFAlive;
-								string CiAlive;
-								string estMTFtime;
-
-								if (level < plugin.GetConfigInt("p079_info_alive")) humansAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_alive").ToString()) + ']';
-								else humansAlive = (PluginManager.Manager.Server.Round.Stats.ClassDAlive + PluginManager.Manager.Server.Round.Stats.ScientistsAlive + PluginManager.Manager.Server.Round.Stats.CiAlive + PluginManager.Manager.Server.Round.Stats.NTFAlive).ToString();
-
-								if (level < plugin.GetConfigInt("p079_info_decont"))
-								{
-									decontTime = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_decont").ToString()) + ']';
-								}
-								else
-								{
-									if (DeconBool == true)
-									{
-										decontTime = plugin.GetTranslation("decontdisabled");
-									}
-									else if (PluginManager.Manager.Server.Map.LCZDecontaminated == true)
-									{
-										decontTime = plugin.GetTranslation("deconthappened");
-									}
-									else
-									{
-										float auxTime = (DeconTime - PluginManager.Manager.Server.Round.Duration / 60.0f);
-										decontTime = auxTime > 0 ? auxTime.ToString("0.00") : plugin.GetTranslation("decontbug");
-									}
-								}
-								if (level < plugin.GetConfigInt("p079_info_escaped"))
-								{
-									ScientistsEscaped = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_escaped").ToString()) + ']';
-									ClassDEscaped = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_escaped").ToString()) + ']';
-								}
-								else
-								{
-									ClassDEscaped = PluginManager.Manager.Server.Round.Stats.ClassDEscaped.ToString("00");
-									ScientistsEscaped = PluginManager.Manager.Server.Round.Stats.ScientistsEscaped.ToString("00");
-								}
-
-								if (level < plugin.GetConfigInt("p079_info_plebs"))
-								{
-									ClassDAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_plebs").ToString()) + ']';
-									ScientistsAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_plebs").ToString()) + ']';
-								}
-								else
-								{
-									ClassDAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive.ToString("00");
-									ScientistsAlive = PluginManager.Manager.Server.Round.Stats.ScientistsAlive.ToString("00");
-								}
-								if (level < plugin.GetConfigInt("p079_info_mtfci"))
-								{
-									MTFAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_mtfci").ToString()) + ']';
-									CiAlive = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_mtfci").ToString()) + ']';
-								}
-								else
-								{
-									MTFAlive = PluginManager.Manager.Server.Round.Stats.NTFAlive.ToString("00");
-									CiAlive = PluginManager.Manager.Server.Round.Stats.CiAlive.ToString("00");
-								}
-
-								if (level < plugin.GetConfigInt("p079_info_mtfest") || ev.Player.GetBypassMode())
-								{
-
-									if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MinMTF)
-									{
-										//estMTFtime = "entre " + (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " segundos y " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0") + " segundos.";
-										estMTFtime = plugin.GetTranslation("mtfest0").Replace("$(min)", (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0")).Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
-									}
-									else if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MaxMTF)
-									{
-										//estMTFtime = "menos de " + (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0");
-										estMTFtime = plugin.GetTranslation("mtfest1").Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
-									}
-									else
-									{
-										estMTFtime = plugin.GetTranslation("mtfest2");
-									}
-								}
-								else
-								{
-									estMTFtime = '[' + FirstCharToUpper(plugin.GetTranslation("level")).Replace("$lvl", plugin.GetConfigInt("p079_info_mtfest").ToString()) + ']';
-
-								}
-								/* Old method, just as a reference for me.
-                                ev.Player.SendConsoleMessage(
-								"\nSCP vivos: " + PluginManager.Manager.Server.Round.Stats.SCPAlive +
-								"\nHumanos vivos: " + humansAlive + " | Siguientes MTF/Chaos: " + estMTFtime +
-								"\nTiempo hasta la descontaminación: " + decontTime +
-								"\nClase D escapados: " + ClassDEscaped + " | Científicos escapados: " + ScientistsEscaped +
-								"\nClase D vivos:     " + ClassDAlive + " | Chaos vivos:           " + CiAlive +
-								"\nCientíficos vivos: " + ScientistsAlive + " | MTF vivos:             " + MTFAlive
-								, "white");*/
-								// This bs below can be optimized by using a dictionary or two arrays with its own function, but for now it's staying like this.
-								string infomsg = plugin.GetTranslation("infomsg")
-									.Replace("$scpalive", PluginManager.Manager.Server.Round.Stats.SCPAlive.ToString("0"))
-									.Replace("$humans", humansAlive).Replace("$estMTF", estMTFtime)
-									.Replace("$decont", decontTime)
-									.Replace("$cdesc", ClassDEscaped).Replace("$sciesc", ScientistsEscaped)
-									.Replace("$cdalive", ClassDAlive).Replace("$cialive", CiAlive)
-									.Replace("$scialive", ScientistsAlive).Replace("$mtfalive", MTFAlive);
-								ev.Player.SendConsoleMessage(infomsg.Replace("\\n", Environment.NewLine), "white");
-								if (level > plugin.GetConfigInt("p079_info_gens"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("generators");
-									foreach (Generator generator in PluginManager.Manager.Server.Map.GetGenerators())
-									{
-										ev.ReturnMessage += plugin.GetTranslation("generatorin").Replace("$room", generator.Room.RoomType.ToString()) + ' ';
-										if (generator.Engaged)
-										{
-											ev.ReturnMessage += plugin.GetTranslation("activated") + '\n';
-										}
-										else
-										{
-											ev.ReturnMessage += (generator.HasTablet ? plugin.GetTranslation("hastablet") : plugin.GetTranslation("notablet")) + ' ' + plugin.GetTranslation("timeleft").Replace("$sec", generator.TimeLeft.ToString("0")) + '\n';
-										}
-									}
-								}
-								else
-								{
-									ev.ReturnMessage = '[' + plugin.GetTranslation("lockeduntil").Replace("$lvl", plugin.GetConfigInt("p079_info_gens").ToString()) + ']';
-								}
-
-								return;
-							case 7: // ultcmd
-								if (!plugin.GetConfigBool("p079_ult"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								string ultUsage = plugin.GetTranslation("ultusage").Replace("\\n", "\n");
-								// if it's our server, and by the way don't enter if you're a guiri
-								if (PluginManager.Manager.Server.Name.ToLower().Contains("world in chaos"))
-								{
-									ultUsage += "3. ... ¡Añade tu idea aquí! Tan solo tienes que ponerlo en #sugerencias-debates o en #sugerencias (ve a #bots y pon ,suggest \"Tu idea\" en el Discord de World in Chaos.\n"
-									+ "Adicionalmente, si estás baneado, muteado o cualquier cosa, puedes contactar directamente con RogerFK#3679";
-								}
-
-								if (args.Count() == 1)
-								{
-									if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
-									{
-										ev.ReturnMessage = plugin.GetTranslation("ultlocked");
-									}
-									else
-									{
-										ev.ReturnMessage = ultUsage;
-										return;
-									}
-								}
-								else
-								{
-									if (ev.Player.Scp079Data.Level < 3 && !ev.Player.GetBypassMode())
-									{
-										ev.ReturnMessage = plugin.GetTranslation("ultlocked");
-										return;
-									}
-									if (PluginManager.Manager.Server.Round.Duration < ultDown)
-									{
-										ev.ReturnMessage = plugin.GetTranslation("ultdown").Replace("$cd", (ultDown - PluginManager.Manager.Server.Round.Duration).ToString());
-										return;
-									}
-									if (!int.TryParse(args[1], out int ult))
-									{
-										ev.ReturnMessage = ultUsage;
-										return;
-									}
-									ev.ReturnMessage = plugin.GetTranslation("ultlaunched");
-									switch (ult)
-									{
-										case 1:
-											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning . malfunction detected on heavy containment zone . Scp079Recon6 . . . light systems Disengaged");
-											Timing.Run(ShamelessTimingRunLights());
-											ultDown = PluginManager.Manager.Server.Round.Duration + 180;
-											Timing.Run(CooldownUlt(180f));
-											return;
-										case 2:
-											PluginManager.Manager.Server.Map.AnnounceCustomMessage("warning facility control lost . starting security lockdown");
-											Timing.Run(Ult2Toggle(30f));
-											ultDown = PluginManager.Manager.Server.Round.Duration + 300;
-											Timing.Run(CooldownUlt(300f));
-											return;
-										default:
-											ev.ReturnMessage = ultUsage;
-											return;
-									}
-								}
-								return;
-							case 8: // chaoscmd
-								if (!plugin.GetConfigBool("p079_chaos"))
-								{
-									ev.ReturnMessage = plugin.GetTranslation("disabled");
-									return;
-								}
-								if (PluginManager.Manager.Server.Round.Duration < cooldownCassieGeneral && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("cooldowncassie").Replace("$cd", (cooldownCassieGeneral - PluginManager.Manager.Server.Round.Duration).ToString());
-									return;
-								}
-								if (PluginManager.Manager.Server.Round.Duration < cooldownChaos && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("cooldown").Replace("$cd", (cooldownChaos - PluginManager.Manager.Server.Round.Duration).ToString());
-								}
-								if (ev.Player.Scp079Data.Level + 1 < plugin.GetConfigInt("p079_chaos_level") && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("lowlevel").Replace("$min", plugin.GetConfigInt("p079_chaos_level").ToString());
-									return;
-								}
-								if (ev.Player.Scp079Data.AP < plugin.GetConfigInt("p079_chaos_cost") && !ev.Player.GetBypassMode())
-								{
-									ev.ReturnMessage = plugin.GetTranslation("lowmana").Replace("$min", plugin.GetConfigInt("p079_chaos_cost").ToString());
-									return;
-								}
-								if (!ev.Player.GetBypassMode())
-								{
-									ev.Player.Scp079Data.AP -= plugin.GetConfigInt("p079_chaos_cost");
-									cooldownChaos = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigInt("p079_chaos_cooldown");
-								}
-								cooldownCassieGeneral = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_cassie_cooldown");
-								cooldownChaos = PluginManager.Manager.Server.Round.Duration + plugin.GetConfigFloat("p079_chaos_cooldown");
-								PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.GetConfigString("p079_chaos_msg"));
-								ev.ReturnMessage = plugin.GetTranslation("success");
-								return;
-							default:
-								ev.ReturnMessage = plugin.GetTranslation("unknowncmd");
-								return;
+							}
 						}
 					}
-				}
-				else
-				{
-					ev.ReturnMessage = plugin.GetTranslation("notscp079");
+					// A try-catch statement in case any command malfunctions.
+					try
+					{
+						CommandOutput output = new CommandOutput(true, true, true, false);
+						ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player, output);
+						// Drains the AP and sets it on cooldown if the command wasn't set on cooldown before (a.k.a. if you didn't do it manually)
+						// You should only change the value of Success if your command needs more argument the user didn't insert. If there's any bug, it's your fault.
+						if (!ev.Player.GetBypassMode() && output.Success)
+						{
+							if(output.DrainAp) Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
+
+							if (CommandHandler.CurrentCooldown < PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler);
+
+							if (CommandHandler.Cassie && output.CassieCooldown)
+							{
+								Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
+								if (!string.IsNullOrEmpty(plugin.cassieready))
+								{
+									int p = (int)System.Environment.OSVersion.Platform;
+									if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
+									else MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), 1);
+								} 
+							}
+						}
+						if (!output.CustomReturnColor)
+						{
+							ev.ReturnMessage = $"<color=\"{(output.Success ? "#30e330" : "red")}\">" + ev.ReturnMessage + "</color>";
+						}
+					}
+					catch (Exception e)
+					{
+						plugin.Error($"Error with command \"{args[0]}\" and literally not my problem:\n" + e.ToString());
+						ev.ReturnMessage = plugin.error + ": " + e.Message;
+					}
 				}
 			}
 		}
 
 		public void OnSetRole(PlayerSetRoleEvent ev)
 		{
-			if (!plugin.GetConfigBool("p079_broadcast_enable"))
+			if (!plugin.spawnBroadcast || !plugin.enable)
 			{
 				return;
 			}
 
 			if (ev.Role == Role.SCP_079)
 			{
-				ev.Player.PersonalClearBroadcasts();
-				ev.Player.PersonalBroadcast(20, plugin.GetTranslation("broadcast_msg"), true);
-				ev.Player.SendConsoleMessage(helpFormatted, "white");
-			}
-		}
-
-		private IEnumerable<float> DisableTeslas(float time)
-		{
-			TeslaGate[] teslas = UnityEngine.Object.FindObjectsOfType<TeslaGate>();
-			int length = teslas.Length;
-			float[] distances = new float[teslas.Length];
-			int i;
-
-			for (i=0; i<length; i++)
-			{
-				distances[i] = teslas[i].sizeOfTrigger;
-				teslas[i].sizeOfTrigger = -1f;
-			}
-			int remTime = plugin.GetConfigInt("p079_tesla_remaining");
-			yield return time - remTime;
-			foreach (Smod2.API.Player player in PluginManager.Manager.Server.GetPlayers())
-			{
-				string remainingStr = plugin.GetTranslation("teslarem");
-				if (player.TeamRole.Role == Role.SCP_079)
-				{
-					for(i=remTime; i>0; i--)
-					{
-						player.PersonalBroadcast(1, Environment.NewLine + remainingStr.Replace("$sec", "<b>" + i.ToString() + "</b>"), false);
-					}
-					player.PersonalBroadcast(5, Environment.NewLine + plugin.GetTranslation("teslarenabled"), false);
-				}
-			}
-			yield return remTime;
-
-			for (i = 0; i < length; i++)
-			{
-				teslas[i].sizeOfTrigger = distances[i];
-			}
-		}
-
-		public static IEnumerable<float> FakeKillPC()
-		{
-			// doesn't close doors but I'm not gonna do it lmao
-			yield return (7.3f);
-
-			foreach (Room room in rooms)
-			{
-				room.FlickerLights();
-			}
-			yield return (8f);
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
-		}
-
-		public static IEnumerable<float> Fake5Gens()
-		{
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
-			yield return (79.89f); // this value is fucking shit actually
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-			Timing.Run(FakeKillPC());
-		}
-
-		/* Cooldowns could be substituted with float like I did in Stalky 106 (https://github.com/RogerFK/stalky106),
-		 * but it wouldn't matter anyways as there will always be
-		 * a coroutine for the broadcast 
-		 
-		 * Also before you ask, no, you can't pass a bool as a reference in C#
-		 * or else I don't know the proper way to do it.*/
-		private IEnumerable<float> CooldownScp(float v)
-		{
-			if (v > 4)
-			{
-				yield return (v);
-				List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player pc in pcs)
-				{
-					pc.PersonalBroadcast(6, plugin.GetTranslation("scpready"), false);
-				}
-			}
-		}
-		private IEnumerable<float> CooldownUlt(float time)
-		{
-			if (time > 4)
-			{
-				yield return (time);
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player player in PCplayers)
-				{
-					player.PersonalBroadcast(3, plugin.GetTranslation("ultready"), false);
-				}
-			}
-		}
-
-		private IEnumerable<float> Ult2Toggle(float v)
-		{
-			UltDoors = true;
-			yield return (v);
-			UltDoors = false;
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
-		}
-
-		private IEnumerable<float> CooldownMTF(float time)
-		{
-			if (time > 4)
-			{
-				yield return (time);
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player player in PCplayers)
-				{
-					player.PersonalBroadcast(3, plugin.GetTranslation("mtfready"), false);
-				}
-			}
-		}
-
-		private IEnumerable<float> CooldownGen(float time)
-		{
-			if (time > 4)
-			{
-				yield return (time);
-
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player player in PCplayers)
-				{
-					player.PersonalBroadcast(3, plugin.GetTranslation("genready"), false);
-				}
-			}
-		}
-
-		private IEnumerable<float> CooldownCassie(float time)
-		{
-			if (time > 4)
-			{
-				yield return (time);
-
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
-				foreach (Player player in PCplayers)
-				{
-					player.PersonalBroadcast(3, plugin.GetTranslation("cassieready"), false);
-				}
-			}
-		}
-
-		/* pasted and slightly modified from here btw https://github.com/probe4aiur/Blackout
-		 * tbh that's what I was programming myself but then I had to check how many seconds
-		 * the lights were going to be turned off for, so I just actually copied that yield
-		 * thingy I swear to god I'm not just a copy paster (and if I were I would still give proper credit)
-		 */
-		private IEnumerable<float> ShamelessTimingRunLights()
-		{
-			yield return (12.1f);
-			float start = PluginManager.Manager.Server.Round.Duration;
-			while (start + 60f > PluginManager.Manager.Server.Round.Duration)
-			{
-				foreach (Room room in rooms)
-				{
-					room.FlickerLights();
-				}
-				yield return (8f);
-			}
-		}
-
-		public void OnSetConfig(SetConfigEvent ev)
-		{
-			switch (ev.Key)
-			{
-				case "disable_decontamination":
-					DeconBool = (bool)ev.Value;
-					return;
-				case "decontamination_time":
-					DeconTime = (float)ev.Value;
-					return;
-				case "minimum_MTF_time_to_spawn":
-					MinMTF = (int)ev.Value;
-					return;
-				case "maximum_MTF_time_to_spawn":
-					MaxMTF = (int)ev.Value;
-					return;
-				default:
-					return;
+				MEC.Timing.RunCoroutine(Pro079Logic.DelaySpawnMsg(ev.Player), 1);
 			}
 		}
 
@@ -906,52 +213,21 @@ namespace pro079
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				int pcs = PCplayers.Count;
 				if (pcs < 0) return;
-				if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs == 0)
+				if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs <= 1)
 				{
-					string kys = plugin.GetTranslation("kys");
-					foreach (Player player in PCplayers)
-					{
-						player.PersonalBroadcast(10, kys, false);
-					}
+					MEC.Timing.RunCoroutine(Pro079Logic.DelayKysMessage(PCplayers), 1);
 				}
 			}
 		}
 
-		public void OnTeamRespawn(TeamRespawnEvent ev)
-		{
-			LastMtfSpawn = PluginManager.Manager.Server.Round.Duration;
-		}
-
-		public void OnDoorAccess(PlayerDoorAccessEvent ev)
-		{
-			if (UltDoors == false || string.IsNullOrWhiteSpace(ev.Door.Permission))
-			{
-				return;
-			}
-			else
-			{
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
-				{
-					ev.Allow = true;
-				}
-				else
-				{
-					ev.Allow = false;
-				}
-			}
-		}
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
-			rooms = PluginManager.Manager.Server.Map.Get079InteractionRooms(Scp079InteractionType.CAMERA).Where(x => x.ZoneType != ZoneType.ENTRANCE);
-			helpFormatted = FormatHelp();
-			cooldownGenerator = 0f;
-			cooldownCassieGeneral = 0f;
-			cooldownMTF = 0f;
-			ultDown = 0f;
-			cooldownScp = 0f;
-			DeconBool = false;
-			UltDoors = false;
-			cooldownChaos = 0f;
+			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
+			foreach (KeyValuePair<string, ICommand079> Command in Pro079.Manager.Commands)
+			{
+				Command.Value.CurrentCooldown = 0;
+			}
+			Pro079.Manager.UltimateCooldown = 0;
 		}
 	}
 }
