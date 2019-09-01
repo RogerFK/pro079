@@ -1,6 +1,9 @@
 # pro079
 A plugin to enhance playing 079 by giving it some fancy commands to play with, becuase the whole spanish community agreed that playing SCP-079 is boring, this plugin gives him more stuff to not be bored to literal death.
 
+# Discord
+I now have a Discord where you can get pinged and all of that each time I do something cool, or where you can publish your own commands to: https://discord.gg/cBWuSrR
+
 # Configs
 
 *Wiki with **all** the configurations (you should check this one):* https://github.com/RogerFK/pro079/wiki
