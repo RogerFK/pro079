@@ -114,13 +114,13 @@ namespace Pro079Core
 					door.ChangeState(true);
 				}
 			}
+			if (player != null) player.ChangeRole(Role.SPECTATOR);
 			Recontainer079.isLocked = true;
 			for (int k = 0; k < 500; k++)
 			{
 				yield return 0f;
 			}
 			Recontainer079.isLocked = false;
-			if (player != null) player.ChangeRole(Role.SPECTATOR);
 		}
 		/// <summary>
 		/// Does the whole recontainment process the same way as main game does.
@@ -129,7 +129,7 @@ namespace Pro079Core
 		{
 			// People complained about it being "easy to be told apart". Not anymore.
 			MTFRespawn mtf = PlayerManager.localPlayer.GetComponent<MTFRespawn>();
-			NineTailedFoxAnnouncer annc = NineTailedFoxAnnouncer.singleton;
+			 NineTailedFoxAnnouncer annc = NineTailedFoxAnnouncer.singleton;
 			while (annc.queue.Count > 0 || AlphaWarheadController.host.inProgress)
 			{
 				yield return 0f;

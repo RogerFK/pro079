@@ -121,18 +121,35 @@ namespace InfoCommand
 			}
 			if (level > plugin.mtfest)
 			{
-
-				if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MinMTF)
+				if (plugin.mtfop)
 				{
-					estMTFtime = plugin.mtfest0.Replace("$(min)", (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0")).Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
-				}
-				else if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MaxMTF)
-				{
-					estMTFtime = plugin.mtfest1.Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
+					var cmp = PlayerManager.localPlayer.GetComponent<MTFRespawn>();
+					if (cmp.timeToNextRespawn > 0f)
+					{
+						if (plugin.longTime) estMTFtime = plugin.mtfRespawn.Replace("$time", SecondsToTime(cmp.timeToNextRespawn));
+						else estMTFtime = plugin.mtfRespawn.Replace("$time", cmp.timeToNextRespawn.ToString("XX.X"));
+					}
+					else
+					{
+						estMTFtime = plugin.mtfest2;
+					}
 				}
 				else
 				{
-					estMTFtime = plugin.mtfest2;
+					if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MinMTF)
+					{
+						if (plugin.longTime) estMTFtime = plugin.mtfest0.Replace("$(min)", SecondsToTime(MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn)).Replace("$(max)", SecondsToTime(MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn));
+						else estMTFtime = plugin.mtfest0.Replace("$(min)", (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0")).Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
+					}
+					else if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MaxMTF)
+					{
+						if (plugin.longTime) estMTFtime = plugin.mtfest1.Replace("$(max)", SecondsToTime(MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn));
+						else estMTFtime = plugin.mtfest1.Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
+					}
+					else
+					{
+						estMTFtime = plugin.mtfest2;
+					} 
 				}
 			}
 			else
@@ -170,6 +187,15 @@ namespace InfoCommand
 			{
 				return "<color=\"red\">[" + plugin.lockeduntil.Replace("$lvl", plugin.gens.ToString()) + "]</color>";
 			}
+		}
+
+		private string SecondsToTime(float sec)
+		{
+			int seconds = (int)sec % 60;
+			int mins = ((int)sec - seconds) / 60;
+			return (mins > 0 ? "<color=#F00>" + mins + $"</color> {plugin.minutes.Replace("$", (mins == 1 ? plugin.pluralSuffix : string.Empty))}" : string.Empty)
+				+ ((seconds > 0 && mins > 0) ? " " + plugin.and + " " : string.Empty) +
+				(seconds != 0 ? $" <color=#F00>{seconds}</color> {plugin.seconds.Replace("$", (seconds == 1 ? plugin.pluralSuffix : string.Empty))}" : string.Empty);
 		}
 
 		public void OnSetConfig(SetConfigEvent ev)

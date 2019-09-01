@@ -44,6 +44,10 @@ namespace InfoCommand
 		public readonly int gens = 1;
 		[ConfigOption]
 		public readonly int mtfest = 3;
+		[ConfigOption]
+		public readonly bool mtfop = true;
+		[ConfigOption]
+		public readonly bool longTime = true;
 
 		[LangOption]
 		public readonly string infocmd = "info";
@@ -53,6 +57,8 @@ namespace InfoCommand
 		public readonly string deconthappened = "LCZ is decontaminated";
 		[LangOption]
 		public readonly string decontbug = "should have happened";
+		[LangOption]
+		public readonly string mtfRespawn = "in $time";
 		[LangOption]
 		public readonly string mtfest0 = "between $(min)s and $(max)s";
 		[LangOption]
@@ -77,6 +83,16 @@ namespace InfoCommand
 		public readonly string timeleft = "and has $secs remaining";
 		[LangOption]
 		public readonly string infoextrahelp = "Shows stuff about the facility";
+		[LangOption]
+		public readonly string minutes = "minute$";
+		[LangOption]
+		public readonly string seconds = "second$";
+		[LangOption]
+		public readonly string and = "and";
+		// I think this thing fucks germans and others.
+		[LangOption]
+		public readonly string pluralSuffix = "s";
+
 		public override void Register()
 		{
 			Info("Loading Pro-079 Tesla configs and registering the command...");

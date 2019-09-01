@@ -83,7 +83,6 @@ namespace Pro079Core
 							ev.ReturnMessage = plugin.cantsuicide;
 							return;
 						}
-						PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
 						MEC.Timing.RunCoroutine(Pro079Logic.SixthGen(ev.Player), MEC.Segment.FixedUpdate);
 						return;
 					}
