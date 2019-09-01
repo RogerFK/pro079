@@ -16,7 +16,7 @@ namespace GeneratorCommand
 		public bool OverrideDisable = false;
 		public bool Disabled
 		{
-			get => OverrideDisable || !plugin.enabled;
+			get => OverrideDisable || !plugin.enable;
 			set => OverrideDisable = value;
 		}
 

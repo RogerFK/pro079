@@ -28,8 +28,8 @@ namespace InfoCommand
 		{
 			Info("Pro079 Info enabled.");
 		}
-		[ConfigOption("p079_info")]
-		public readonly bool enabled = true;
+		[ConfigOption]
+		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int alive = 1;
 		[ConfigOption]

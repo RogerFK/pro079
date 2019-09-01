@@ -26,7 +26,7 @@ namespace InfoCommand
 
 		public bool Disabled
 		{
-			get => OverrideDisable ? OverrideDisable : !plugin.enabled;
+			get => OverrideDisable ? OverrideDisable : !plugin.enable;
 			set => OverrideDisable = value;
 		}
 
@@ -49,12 +49,12 @@ namespace InfoCommand
 		public int CurrentCooldown
 		{
 			get => 0;
-			set => CurrentCooldown = 0;
+			set => _ = value;
 		}
 
 		public string CallCommand(string[] args, Player player)
 		{
-			if (!plugin.enabled)
+			if (!plugin.enable)
 			{
 				return Pro079.Configs.CommandDisabled;
 			}

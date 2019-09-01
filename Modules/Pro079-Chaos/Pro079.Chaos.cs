@@ -29,11 +29,11 @@ namespace ChaosCommand
 		{
 			Info("Pro079 Chaos enabled");
 		}
-		[ConfigOption("")]
+		[ConfigOption]
 		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int cooldown = 50;
-		[LangOption]
+		[ConfigOption]
 		public readonly int cost = 50;
 		[ConfigOption]
 		public readonly int level = 2;

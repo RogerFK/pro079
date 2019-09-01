@@ -16,7 +16,7 @@ namespace Pro079MTF
 		public bool OverrideDisable = false;
 		public bool Disabled
 		{
-			get => OverrideDisable ? OverrideDisable : !plugin.enabled;
+			get => OverrideDisable ? OverrideDisable : !plugin.enable;
 			set => OverrideDisable = value;
 		}
 

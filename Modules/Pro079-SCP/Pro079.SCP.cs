@@ -28,8 +28,8 @@ namespace SCPCommand
 		{
 			Info("Pro079 SCP command enabled");
 		}
-		[ConfigOption("p079_scp")]
-		public readonly bool enabled = true;
+		[ConfigOption]
+		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int cooldown = 30;
 		[ConfigOption]

@@ -28,8 +28,8 @@ namespace Pro079MTF
 		{
 			Info("Pro079 MTF enabled");
 		}
-		[ConfigOption("p079_mtf")]
-		public readonly bool enabled = true;
+		[ConfigOption]
+		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int cooldown = 60;
 		[ConfigOption]

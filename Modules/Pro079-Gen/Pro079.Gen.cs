@@ -29,8 +29,8 @@ namespace GeneratorCommand
 			Info("Pro079 Generator enabled");
 		}
 
-		[ConfigOption("p079_gen")]
-		public readonly bool enabled = true;
+		[ConfigOption]
+		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int cooldown = 60;
 		[ConfigOption]

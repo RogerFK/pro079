@@ -28,8 +28,8 @@ namespace BlackoutUltimate
 		{
 			Info("Pro079 Blackout enabled");
 		}
-		[ConfigOption("")]
-		public readonly bool enabled = true;
+		[ConfigOption]
+		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int cooldown = 180;
 		[ConfigOption]

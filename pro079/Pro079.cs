@@ -14,6 +14,7 @@ namespace Pro079Core
 		SmodMajor = 3,
 		SmodMinor = 5,
 		SmodRevision = 0,
+		configPrefix = "p079",
 		langFile = "pro079-core"
 		)]
 

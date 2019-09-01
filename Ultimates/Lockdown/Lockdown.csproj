@@ -35,7 +35,7 @@
       <HintPath>..\..\..\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Pro079">
-      <HintPath>..\..\ModuleDLLs\Pro079.dll</HintPath>
+      <HintPath>..\..\ModuleDLLs\0Pro079.dll</HintPath>
     </Reference>
     <Reference Include="Smod2">
       <HintPath>..\..\Lib\Smod2.dll</HintPath>

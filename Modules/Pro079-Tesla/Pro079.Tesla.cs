@@ -15,6 +15,7 @@ namespace TeslaCommand
 		id = "rogerfk.pro079.tesla",
 		version = "2.0",
 		langFile = "p079tesla",
+		configPrefix = "p079_tesla",
 		SmodMajor = 3,
 		SmodMinor = 5,
 		SmodRevision = 0
@@ -31,8 +32,8 @@ namespace TeslaCommand
 		{
 			Info("Pro079 Tesla enabled");
 		}
-		[ConfigOption("p079_tesla")]
-		public readonly bool enabled = true;
+		[ConfigOption]
+		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int cost = 40;
 		[ConfigOption]
@@ -71,7 +72,7 @@ namespace TeslaCommand
 		public bool OverrideDisable = false;
 		public bool Disabled
 		{
-			get => OverrideDisable || !plugin.enabled;
+			get => OverrideDisable || !plugin.enable;
 			set => OverrideDisable = value;
 		}
 

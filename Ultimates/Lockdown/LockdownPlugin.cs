@@ -28,7 +28,7 @@ namespace LockdownUltimate
 			Info("Pro079 Lockdown enabled");
 		}
 		[ConfigOption]
-		public readonly bool enabled = true;
+		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int time = 60;
 		[ConfigOption]
