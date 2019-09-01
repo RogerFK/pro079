@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Pro079Core.API;
 using Smod2;
+using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
 
 namespace LockdownUltimate
 {
-	class LockdownUltimate : IEventHandlerDoorAccess, IUltimate079
+	public class LockdownUltimate : IEventHandlerDoorAccess, IUltimate079
 	{
 		private LockdownPlugin plugin;
 		public bool CurrentlyRunning { get; private set; }
-
+		public string Name => "Lockdown";
+		public string Info => plugin.info;
+		public int Cooldown => plugin.cooldown;
+		public int Cost => plugin.cost;
 		public LockdownUltimate(LockdownPlugin plugin)
 		{
 			this.plugin = plugin;
@@ -40,12 +45,20 @@ namespace LockdownUltimate
 				}
 			}
 		}
-		private IEnumerable<float> Ult2Toggle(float v)
+		private IEnumerator<float> Ult2Toggle()
 		{
 			CurrentlyRunning = true;
-			yield return MEC.Timing.WaitForSeconds();
+			yield return MEC.Timing.WaitForSeconds(plugin.time);
 			CurrentlyRunning = false;
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage("attention all Personnel . doors lockdown finished");
+		}
+
+		public string TriggerUltimate(string[] args, Player Player)
+		{
+			int p = (int)System.Environment.OSVersion.Platform;
+			if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Ult2Toggle(), MEC.Segment.Update);
+			else MEC.Timing.RunCoroutine(Ult2Toggle(), 1);
+			return Pro079Core.Configs.Instance.UltimateLaunched;
 		}
 	}
 }

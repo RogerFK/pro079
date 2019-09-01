@@ -110,6 +110,7 @@ namespace Pro079Core
 							ev.ReturnMessage = plugin.ulterror;
 							return;
 						}
+
 						ultimate.TriggerUltimate(args.Skip(1).ToArray(), ev.Player);
 					}
 

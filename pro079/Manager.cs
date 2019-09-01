@@ -71,11 +71,12 @@ namespace Pro079Core
 			{
 				return "Trying to register a \"null\" or an empty name is not allowed!";
 			}
-			if (Ultimates.ContainsKey(UltimateHandler.Name))
+			string name = UltimateHandler.Name.ToLower();
+			if (Ultimates.ContainsKey(name))
 			{
 				return "An ultimate called " + UltimateHandler.Name + " was already added!";
 			}
-			Ultimates.Add(UltimateHandler.Name, UltimateHandler);
+			Ultimates.Add(name, UltimateHandler);
 			return "Ultimate succesfully added";
 		}
 
