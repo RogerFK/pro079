@@ -85,7 +85,7 @@ namespace InfoCommand
 				else
 				{
 					float auxTime = (DeconTime - PluginManager.Manager.Server.Round.Duration / 60.0f);
-					decontTime = auxTime > 0 ? auxTime.ToString("0.00") : plugin.decontbug;
+					decontTime = auxTime > 0 ? Stylize(auxTime.ToString("0.00")) : plugin.decontbug;
 				}
 			}
 			if (level < plugin.escaped)
@@ -95,8 +95,8 @@ namespace InfoCommand
 			}
 			else
 			{
-				ClassDEscaped = PluginManager.Manager.Server.Round.Stats.ClassDEscaped.ToString("00");
-				ScientistsEscaped = PluginManager.Manager.Server.Round.Stats.ScientistsEscaped.ToString("00");
+				ClassDEscaped = Stylize(PluginManager.Manager.Server.Round.Stats.ClassDEscaped.ToString("00"));
+				ScientistsEscaped = Stylize(PluginManager.Manager.Server.Round.Stats.ScientistsEscaped.ToString("00"));
 			}
 
 			if (level < plugin.plebs)
@@ -106,8 +106,8 @@ namespace InfoCommand
 			}
 			else
 			{
-				ClassDAlive = PluginManager.Manager.Server.Round.Stats.ClassDAlive.ToString("00");
-				ScientistsAlive = PluginManager.Manager.Server.Round.Stats.ScientistsAlive.ToString("00");
+				ClassDAlive = Stylize(PluginManager.Manager.Server.Round.Stats.ClassDAlive.ToString("00"));
+				ScientistsAlive = Stylize(PluginManager.Manager.Server.Round.Stats.ScientistsAlive.ToString("00"));
 			}
 			if (level < plugin.mtfci)
 			{
@@ -116,8 +116,8 @@ namespace InfoCommand
 			}
 			else
 			{
-				MTFAlive = PluginManager.Manager.Server.Round.Stats.NTFAlive.ToString("00");
-				CiAlive = PluginManager.Manager.Server.Round.Stats.CiAlive.ToString("00");
+				MTFAlive = Stylize(PluginManager.Manager.Server.Round.Stats.NTFAlive.ToString("00"));
+				CiAlive = Stylize(PluginManager.Manager.Server.Round.Stats.CiAlive.ToString("00"));
 			}
 			if (level > plugin.mtfest)
 			{
@@ -127,7 +127,7 @@ namespace InfoCommand
 					if (cmp.timeToNextRespawn > 0f)
 					{
 						if (plugin.longTime) estMTFtime = plugin.mtfRespawn.Replace("$time", SecondsToTime(cmp.timeToNextRespawn));
-						else estMTFtime = plugin.mtfRespawn.Replace("$time", cmp.timeToNextRespawn.ToString("XX.X"));
+						else estMTFtime = plugin.mtfRespawn.Replace("$time", Stylize(cmp.timeToNextRespawn.ToString("0")));
 					}
 					else
 					{
@@ -139,12 +139,12 @@ namespace InfoCommand
 					if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MinMTF)
 					{
 						if (plugin.longTime) estMTFtime = plugin.mtfest0.Replace("$(min)", SecondsToTime(MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn)).Replace("$(max)", SecondsToTime(MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn));
-						else estMTFtime = plugin.mtfest0.Replace("$(min)", (MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0")).Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
+						else estMTFtime = plugin.mtfest0.Replace("$(min)", Stylize(MinMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn.ToString("0"))).Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
 					}
 					else if (PluginManager.Manager.Server.Round.Duration - LastMtfSpawn < MaxMTF)
 					{
 						if (plugin.longTime) estMTFtime = plugin.mtfest1.Replace("$(max)", SecondsToTime(MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn));
-						else estMTFtime = plugin.mtfest1.Replace("$(max)", (MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn).ToString("0"));
+						else estMTFtime = plugin.mtfest1.Replace("$(max)", Stylize(MaxMTF - PluginManager.Manager.Server.Round.Duration + LastMtfSpawn.ToString("0")));
 					}
 					else
 					{
@@ -178,14 +178,14 @@ namespace InfoCommand
 					}
 					else
 					{
-						ReturnMessage += (generator.HasTablet ? plugin.hastablet : plugin.notablet) + ' ' + plugin.timeleft.Replace("$sec", generator.TimeLeft.ToString("0")) + '\n';
+						ReturnMessage += (generator.HasTablet ? plugin.hastablet : plugin.notablet) + ' ' + plugin.timeleft.Replace("$sec", Stylize((int) generator.TimeLeft)) + '\n';
 					}
 				}
 				return "<color=\"white\">" + ReturnMessage + "</color>";
 			}
 			else
 			{
-				return "<color=\"red\">[" + plugin.lockeduntil.Replace("$lvl", plugin.gens.ToString()) + "]</color>";
+				return "<color=\"red\">[" + plugin.lockeduntil.Replace("$lvl", Stylize(plugin.gens)) + "]</color>";
 			}
 		}
 
@@ -193,11 +193,14 @@ namespace InfoCommand
 		{
 			int seconds = (int)sec % 60;
 			int mins = ((int)sec - seconds) / 60;
-			return (mins > 0 ? "<color=#F00>" + mins + $"</color> {plugin.minutes.Replace("$", (mins == 1 ? plugin.pluralSuffix : string.Empty))}" : string.Empty)
-				+ ((seconds > 0 && mins > 0) ? " " + plugin.and + " " : string.Empty) +
-				(seconds != 0 ? $" <color=#F00>{seconds}</color> {plugin.seconds.Replace("$", (seconds == 1 ? plugin.pluralSuffix : string.Empty))}" : string.Empty);
+			return (mins > 0 ? Stylize(mins.ToString()) + $" {plugin.minutes.Replace("$", (mins != 1 ? plugin.pluralSuffix : string.Empty))}" : string.Empty)
+				+ ((seconds > 0 && mins > 0) ? $" {plugin.and} ": string.Empty) +
+				(seconds != 0 ? $"<b><color=#F00>{Stylize(seconds)} {plugin.seconds.Replace("$", (seconds != 1 ? plugin.pluralSuffix : string.Empty))}" : string.Empty);
 		}
-
+		private string Stylize(object obj)
+		{
+			return $"<b><color={plugin.color}>{obj.ToString()}</color></b>";
+		}
 		public void OnSetConfig(SetConfigEvent ev)
 		{
 			switch (ev.Key)

@@ -48,6 +48,8 @@ namespace InfoCommand
 		public readonly bool mtfop = true;
 		[ConfigOption]
 		public readonly bool longTime = true;
+		[ConfigOption]
+		public readonly string color = "red";
 
 		[LangOption]
 		public readonly string infocmd = "info";
