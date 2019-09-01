@@ -38,16 +38,18 @@ namespace Pro079MTF
 
 		public string ExtraArguments => plugin.usage;
 
-		public string CallCommand(string[] args, Player player)
+		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
 			if (args.Length >= 3)
 			{
 				if (!int.TryParse(args[2], out int scpLeft) || !int.TryParse(args[1], out int mtfNum) || !char.IsLetter(args[0][0]))
 				{
+					output.Success = false;
 					return plugin.mtfuse.Replace("$min", plugin.cost.ToString());
 				}
 				if (scpLeft > plugin.maxscp)
 				{
+					output.Success = false;
 					return plugin.mtfuse.Replace("$min", plugin.cost.ToString()) +
 						plugin.mtfmaxscp.Replace("$max", plugin.maxscp.ToString());
 				}
@@ -57,6 +59,7 @@ namespace Pro079MTF
 			}
 			else
 			{
+				output.Success = false;
 				return plugin.mtfuse.Replace("$min", plugin.cost.ToString());
 			}
 		}

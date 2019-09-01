@@ -92,9 +92,9 @@ namespace TeslaCommand
 
 		public string CommandReady => string.Empty;
 
-		public int CurrentCooldown { get => 0; set => CurrentCooldown = 0; }
+		public int CurrentCooldown { get => 0; set => _ = value; }
 
-		public string CallCommand(string[] args, Player player)
+		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
 			if (args.Length < 2)
 			{

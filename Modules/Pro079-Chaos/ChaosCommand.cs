@@ -38,7 +38,7 @@ namespace ChaosCommand
 
 		public int CurrentCooldown { get; set; }
 
-		public string CallCommand(string[] args, Player player)
+		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
 			PluginManager.Manager.Server.Map.AnnounceCustomMessage(plugin.msg);
 			return Pro079Core.Pro079.Configs.CommandSuccess;

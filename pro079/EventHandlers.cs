@@ -18,8 +18,6 @@ namespace Pro079Core
 		{
 			this.plugin = plugin;
 		}
-
-		internal static FlickerableLight[] FlickerableLightsArray { get; private set; }
 		internal static Door[] DoorArray { get; private set; }
 
 		public void OnCallCommand(PlayerCallCommandEvent ev)
@@ -86,16 +84,14 @@ namespace Pro079Core
 							return;
 						}
 						PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-						int p = (int)System.Environment.OSVersion.Platform;
-						if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Pro079Logic.FakeDeath(ev.Player), MEC.Segment.Update);
-						else MEC.Timing.RunCoroutine(Pro079Logic.FakeDeath(ev.Player), 1);
+						MEC.Timing.RunCoroutine(Pro079Logic.SixthGen(ev.Player), MEC.Segment.FixedUpdate);
 						return;
 					}
 					if (args[0] == plugin.ultcmd)
 					{
 						if (args.Length == 1)
 						{
-							ev.ReturnMessage = Pro079Logic.GetUltimates();
+							ev.ReturnMessage = "<color=\"white\">"+ Pro079Logic.GetUltimates() + "</color>" ;
 							return;
 						}
 						if (Pro079.Manager.UltimateCooldown > 0)
@@ -109,8 +105,22 @@ namespace Pro079Core
 							ev.ReturnMessage = plugin.ulterror;
 							return;
 						}
-
-						ultimate.TriggerUltimate(args.Skip(1).ToArray(), ev.Player);
+						if (!ev.Player.GetBypassMode())
+						{
+							if (ev.Player.Scp079Data.Level + 1 < plugin.ultLevel)
+							{
+								ev.ReturnMessage = Pro079.Configs.LowLevel(plugin.ultLevel);
+								return;
+							}
+							if (ev.Player.Scp079Data.AP < ultimate.Cost)
+							{
+								ev.ReturnMessage = Pro079.Configs.LowAP(ultimate.Cost);
+								return;
+							}
+							Pro079.Manager.DrainAP(ev.Player, ultimate.Cost); 
+						}
+						ev.ReturnMessage = ultimate.TriggerUltimate(args.Skip(1).ToArray(), ev.Player);
+						return;
 					}
 
 					// When everything else wasn't caught, search for external commands //
@@ -144,29 +154,40 @@ namespace Pro079Core
 								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Pro079.Manager.CassieCooldown.ToString()).Replace("$(cd)", Pro079.Manager.CassieCooldown.ToString());
 								return;
 							}
-							Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
-							if (!string.IsNullOrEmpty(plugin.cassieready))
-							{
-								int p = (int)System.Environment.OSVersion.Platform;
-								if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
-								else MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), 1);
-							}
 						}
 					}
 					// A try-catch statement in case any command malfunctions.
 					try
 					{
-						ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player);
+						CommandOutput output = new CommandOutput(true, true, true, false);
+						ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player, output);
 						// Drains the AP and sets it on cooldown if the command wasn't set on cooldown before (a.k.a. if you didn't do it manually)
-						if (!ev.Player.GetBypassMode())
+						// You should only change the value of Success if your command needs more argument the user didn't insert. If there's any bug, it's your fault.
+						if (!ev.Player.GetBypassMode() && output.Success)
 						{
-							Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
-							if (CommandHandler.CurrentCooldown > PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler);
+							if(output.DrainAp) Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
+
+							if (CommandHandler.CurrentCooldown < PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler);
+
+							if (CommandHandler.Cassie && output.CassieCooldown)
+							{
+								Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
+								if (!string.IsNullOrEmpty(plugin.cassieready))
+								{
+									int p = (int)System.Environment.OSVersion.Platform;
+									if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
+									else MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), 1);
+								} 
+							}
+						}
+						if (!output.CustomReturnColor)
+						{
+							ev.ReturnMessage = $"<color=\"{(output.Success ? "#30e330" : "red")}\">" + ev.ReturnMessage + "</color>";
 						}
 					}
 					catch (Exception e)
 					{
-						plugin.Error($"Error with command {args[0]} and literally not my problem:\n" + e.ToString());
+						plugin.Error($"Error with command \"{args[0]}\" and literally not my problem:\n" + e.ToString());
 						ev.ReturnMessage = plugin.error + ": " + e.Message;
 					}
 				}
@@ -202,7 +223,6 @@ namespace Pro079Core
 
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
-			FlickerableLightsArray = UnityEngine.Object.FindObjectsOfType<FlickerableLight>();
 			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
 			foreach (KeyValuePair<string, ICommand079> Command in Pro079.Manager.Commands)
 			{

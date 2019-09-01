@@ -64,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\CommandOutput.cs" />
     <Compile Include="API\Interfaces.cs" />
     <Compile Include="Config079.cs" />
     <Compile Include="Pro079Logic.cs" />

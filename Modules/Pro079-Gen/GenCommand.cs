@@ -38,9 +38,14 @@ namespace GeneratorCommand
 
 		public int CurrentCooldown { get; set; }
 
-		public string CallCommand(string[] args, Player player)
+		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
 			int blackcost = plugin.cost + plugin.costBlackout;
+			if(args.Length == 0)
+			{
+				output.Success = false;
+				return plugin.genuse;
+			}
 			switch (args[0])
 			{
 				case "1":
@@ -55,15 +60,17 @@ namespace GeneratorCommand
 					{
 						if (player.Scp079Data.Level < plugin.levelBlackout - 1)
 						{
+							output.Success = false;
 							return Pro079.Configs.LowLevel(plugin.levelBlackout);
 						}
 						if (player.Scp079Data.AP < blackcost)
 						{
+							output.Success = false;
 							return Pro079.Configs.LowAP(blackcost);
 						}
 						Pro079.Manager.DrainAP(player, plugin.costBlackout);
 					}
-					Pro079Logic.Fake5Gens();
+					MEC.Timing.RunCoroutine(Pro079Logic.Fake5Gens(), MEC.Segment.FixedUpdate);
 					Pro079.Manager.GiveExp(player, 80f, ExperienceType.CHEAT);
 					Pro079.Manager.DrainAP(player, blackcost);
 					Pro079.Manager.SetOnCooldown(this, 70 + plugin.penalty + plugin.cooldown);
@@ -73,20 +80,23 @@ namespace GeneratorCommand
 					{
 						if (player.Scp079Data.Level < plugin.levelBlackout - 1)
 						{
+							output.Success = false;
 							return Pro079.Configs.LowLevel(plugin.levelBlackout);
 						}
 						if (player.Scp079Data.AP < blackcost)
 						{
+							output.Success = false;
 							return Pro079.Configs.LowAP(blackcost);
 						}
 						Pro079.Manager.DrainAP(player, plugin.costBlackout);
 					}
-					Pro079Logic.FakeDeath();
+					MEC.Timing.RunCoroutine(Pro079Logic.SixthGen(), MEC.Segment.FixedUpdate);
 					Pro079.Manager.GiveExp(player, 50f, ExperienceType.CHEAT);
 					Pro079.Manager.DrainAP(player, blackcost);
 					Pro079.Manager.SetOnCooldown(this, plugin.penalty + plugin.cooldown);
 					return plugin.gen5msg;
 				default:
+					output.Success = false;
 					return plugin.genuse;
 			}
 		}

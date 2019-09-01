@@ -55,7 +55,7 @@ namespace Pro079Core
 			UltimateHelp = new List<string>(Pro079.Manager.Ultimates.Keys.Count);
 			foreach (KeyValuePair<string, IUltimate079> kvp in Pro079.Manager.Ultimates)
 			{
-				UltimateHelp.Add($"<b>.079 {kvp.Key}</b> - {kvp.Value.Info} {Pro079.Instance.ultdata.Replace("$cd", kvp.Value.Cooldown.ToString()).Replace("$cost", kvp.Value.Cost.ToString())}");
+				UltimateHelp.Add($"<b>.079 {Pro079.Instance.ultcmd} {kvp.Key}</b> - {kvp.Value.Info} {Pro079.Instance.ultdata.Replace("$cd", kvp.Value.Cooldown.ToString()).Replace("$cost", kvp.Value.Cost.ToString())}");
 			}
 		}
 		internal static string GetUltimates()
@@ -64,7 +64,7 @@ namespace Pro079Core
 			if (UltimateHelp == null || UltimateHelp.Count != Pro079.Manager.Ultimates.Keys.Count) FetchUltimates();
 			foreach (string line in UltimateHelp)
 			{
-				help += Environment.NewLine + " - " + line;
+				help += Environment.NewLine + line;
 			}
 			return help;
 		}
@@ -95,20 +95,63 @@ namespace Pro079Core
 			}
 		}
 		/// <summary>
-		/// Does the fake 6th gen
+		/// Fakes a suicide/suicides the given player (6th generator)
 		/// </summary>
-		public static IEnumerator<float> FakeDeath(Player player = null)
+		public static IEnumerator<float> SixthGen(Player player = null)
 		{
-			yield return MEC.Timing.WaitForSeconds(7.3f);
-			foreach (FlickerableLight flickerableLight in EventHandlers.FlickerableLightsArray)
+			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP079RECON6");
+			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 CONTAINEDSUCCESSFULLY");
+			for (int j = 0; j < 350; j++)
 			{
-				Scp079Interactable component = flickerableLight.GetComponent<Scp079Interactable>();
-				if (component == null || component.currentZonesAndRooms[0].currentZone == "HeavyRooms")
+				yield return 0f;
+			}
+			Generator079.generators[0].CallRpcOvercharge();
+			foreach (Door door in EventHandlers.DoorArray)
+			{
+				Scp079Interactable component = door.GetComponent<Scp079Interactable>();
+				if (component.currentZonesAndRooms[0].currentZone == "HeavyRooms" && door.isOpen && !door.locked && !door.destroyed)
 				{
-					flickerableLight.EnableFlickering(10f);
+					door.ChangeState(true);
 				}
 			}
-			foreach (Door door in EventHandlers.DoorArray)
+			Recontainer079.isLocked = true;
+			for (int k = 0; k < 500; k++)
+			{
+				yield return 0f;
+			}
+			Recontainer079.isLocked = false;
+			if (player != null) player.ChangeRole(Role.SPECTATOR);
+		}
+		/// <summary>
+		/// Does the whole recontainment process the same way as main game does.
+		/// </summary>
+		public static IEnumerator<float> Fake5Gens()
+		{
+			// People complained about it being "easy to be told apart". Not anymore.
+			MTFRespawn mtf = PlayerManager.localPlayer.GetComponent<MTFRespawn>();
+			NineTailedFoxAnnouncer annc = NineTailedFoxAnnouncer.singleton;
+			while (annc.queue.Count > 0 || AlphaWarheadController.host.inProgress)
+			{
+				yield return 0f;
+			}
+			mtf.CallRpcPlayCustomAnnouncement("SCP079RECON5", false);
+			// This massive for loop jank is what the main game does. Go complain to them.
+			for (int i = 0; i < 2750; i++)
+			{
+				yield return 0f;
+			}
+			while (annc.queue.Count > 0 || AlphaWarheadController.host.inProgress)
+			{
+				yield return 0f;
+			}
+			mtf.CallRpcPlayCustomAnnouncement("SCP079RECON6", true);
+			mtf.CallRpcPlayCustomAnnouncement("SCP 0 7 9 CONTAINEDSUCCESSFULLY", false);
+			for (int j = 0; j < 350; j++)
+			{
+				yield return 0f;
+			}
+			Generator079.generators[0].CallRpcOvercharge();
+			foreach (Door door in UnityEngine.Object.FindObjectsOfType<Door>())
 			{
 				Scp079Interactable component = door.GetComponent<Scp079Interactable>();
 				if (component.currentZonesAndRooms[0].currentZone == "HeavyRooms" && door.isOpen && !door.locked)
@@ -116,21 +159,12 @@ namespace Pro079Core
 					door.ChangeState(true);
 				}
 			}
-			yield return MEC.Timing.WaitForSeconds(11f);
-			if (player != null) player.ChangeRole(Role.SPECTATOR);
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("SCP 0 7 9 ContainedSuccessfully"); // thanks to "El n*z* jud*o" (uh...) for helping me with this
-		}
-		/// <summary>
-		/// Does the whole recontainment process
-		/// </summary>
-		public static IEnumerable<float> Fake5Gens()
-		{
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon5");
-			yield return MEC.Timing.WaitForSeconds(79.89f);
-			PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon6");
-			int p = (int)System.Environment.OSVersion.Platform;
-			if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(FakeDeath(null), MEC.Segment.Update);
-			else MEC.Timing.RunCoroutine(FakeDeath(null), 1);
+			Recontainer079.isLocked = true;
+			for (int k = 0; k < 500; k++)
+			{
+				yield return 0f;
+			}
+			Recontainer079.isLocked = false;
 		}
 
 		internal static IEnumerator<float> CooldownCassie(float time)

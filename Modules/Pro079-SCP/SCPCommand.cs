@@ -39,15 +39,17 @@ namespace SCPCommand
 
 		public int CurrentCooldown { get; set; }
 
-		public string CallCommand(string[] args, Player player)
+		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
 			if (args.Length < 3)
 			{
+				output.Success = false;
 				return plugin.scpuse.Replace("$min", plugin.cost.ToString());
 			}
 
 			if (!plugin.GetConfigList("p079_scp_list").Contains(args[1]))
 			{
+				output.Success = false;
 				return plugin.scpexist + " - " + plugin.scpuse.Replace("$min", plugin.cost.ToString());
 			}
 			string scpNum = string.Join(" ", args[1].ToCharArray());

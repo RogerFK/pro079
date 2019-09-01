@@ -52,12 +52,9 @@ namespace InfoCommand
 			set => _ = value;
 		}
 
-		public string CallCommand(string[] args, Player player)
+		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
-			if (!plugin.enable)
-			{
-				return Pro079.Configs.CommandDisabled;
-			}
+			output.CustomReturnColor = true;
 			int level = player.GetBypassMode() ? 5 : player.Scp079Data.Level + 1;
 			string humansAlive;
 			string decontTime;
@@ -152,7 +149,7 @@ namespace InfoCommand
 				.Replace("$cdalive", ClassDAlive).Replace("$cialive", CiAlive)
 				.Replace("$scialive", ScientistsAlive).Replace("$mtfalive", MTFAlive);
 			player.SendConsoleMessage(infomsg.Replace("\\n", Environment.NewLine), "white");
-			if (level > plugin.gens)
+			if (level >= plugin.gens)
 			{
 				string ReturnMessage = plugin.generators;
 				foreach (Generator generator in PluginManager.Manager.Server.Map.GetGenerators())
@@ -167,11 +164,11 @@ namespace InfoCommand
 						ReturnMessage += (generator.HasTablet ? plugin.hastablet : plugin.notablet) + ' ' + plugin.timeleft.Replace("$sec", generator.TimeLeft.ToString("0")) + '\n';
 					}
 				}
-				return ReturnMessage;
+				return "<color=\"white\">" + ReturnMessage + "</color>";
 			}
 			else
 			{
-				return '[' + plugin.lockeduntil.Replace("$lvl", plugin.gens.ToString()) + ']';
+				return "<color=\"red\">[" + plugin.lockeduntil.Replace("$lvl", plugin.gens.ToString()) + "]</color>";
 			}
 		}
 
