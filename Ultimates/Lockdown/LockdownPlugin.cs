@@ -42,7 +42,10 @@ namespace LockdownUltimate
 		public override void Register()
 		{
 			this.Info("Loading Pro-079 Chaos configs and registering the command...");
-			Pro079Core.Pro079.Manager.RegisterUltimate(new LockdownUltimate(this));
+
+			var reference = new LockdownUltimate(this);
+			this.AddEventHandlers(reference);
+			Pro079Core.Manager.Instance.RegisterUltimate(reference);
 		}
 	}
 }

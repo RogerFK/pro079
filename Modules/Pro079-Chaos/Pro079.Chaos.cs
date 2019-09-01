@@ -30,7 +30,7 @@ namespace ChaosCommand
 		{
 			this.Info("Pro079 Chaos enabled");
 		}
-		[ConfigOption("p079_chaos")]
+		[ConfigOption("")]
 		public readonly bool enable = true;
 		[ConfigOption]
 		public readonly int cooldown = 50;

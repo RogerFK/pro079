@@ -43,7 +43,9 @@ namespace BlackoutUltimate
 
 		public override void Register()
 		{
-			Pro079Core.Manager.Instance.RegisterUltimate(new BlackoutLogic(this));
+			var reference = new BlackoutLogic(this);
+			this.AddEventHandlers(reference);
+			Pro079Core.Manager.Instance.RegisterUltimate(reference);
 			this.Info("Registed Pro-079 Blackout.");
 		}
 	}

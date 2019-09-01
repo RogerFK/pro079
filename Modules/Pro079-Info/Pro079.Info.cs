@@ -82,7 +82,9 @@ namespace InfoCommand
 		{
 			this.Info("Loading Pro-079 Tesla configs and registering the command...");
 
-			Pro079Core.Manager.Instance.RegisterCommand(new InfoCommand(this));
+			InfoCommand reference = new InfoCommand(this);
+			AddEventHandlers(reference);
+			Pro079Core.Manager.Instance.RegisterCommand(reference);
 		}
 	}
 }
