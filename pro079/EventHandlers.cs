@@ -7,7 +7,6 @@ using Smod2;
 using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
-using Smod2.EventSystem.Events;
 
 namespace Pro079Core
 {
@@ -148,7 +147,7 @@ namespace Pro079Core
 							Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
 							if (!string.IsNullOrEmpty(plugin.cassieready))
 							{
-								int p = (int) System.Environment.OSVersion.Platform;
+								int p = (int)System.Environment.OSVersion.Platform;
 								if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), MEC.Segment.Update);
 								else MEC.Timing.RunCoroutine(Pro079Logic.CooldownCassie(plugin.cassieCooldown), 1);
 							}
@@ -162,7 +161,7 @@ namespace Pro079Core
 						if (!ev.Player.GetBypassMode())
 						{
 							Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
-							if (CommandHandler.CurrentCooldown > PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler); 
+							if (CommandHandler.CurrentCooldown > PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler);
 						}
 					}
 					catch (Exception e)
@@ -205,7 +204,7 @@ namespace Pro079Core
 		{
 			FlickerableLightsArray = UnityEngine.Object.FindObjectsOfType<FlickerableLight>();
 			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
-			foreach (var Command in Pro079.Manager.Commands)
+			foreach (KeyValuePair<string, ICommand079> Command in Pro079.Manager.Commands)
 			{
 				Command.Value.CurrentCooldown = 0;
 			}

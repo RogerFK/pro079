@@ -1,9 +1,7 @@
 ﻿using Smod2;
-using Smod2.API;
 using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
-using Pro079Core.API;
 
 namespace BlackoutUltimate
 {
@@ -24,11 +22,11 @@ namespace BlackoutUltimate
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 Blackout disabled.");
+			Info("Pro079 Blackout disabled.");
 		}
 		public override void OnEnable()
 		{
-			this.Info("Pro079 Blackout enabled");
+			Info("Pro079 Blackout enabled");
 		}
 		[ConfigOption("")]
 		public readonly bool enabled = true;
@@ -43,10 +41,10 @@ namespace BlackoutUltimate
 
 		public override void Register()
 		{
-			var reference = new BlackoutLogic(this);
-			this.AddEventHandlers(reference);
+			BlackoutLogic reference = new BlackoutLogic(this);
+			AddEventHandlers(reference);
 			Pro079Core.Manager.Instance.RegisterUltimate(reference);
-			this.Info("Registed Pro-079 Blackout.");
+			Info("Registed Pro-079 Blackout.");
 		}
 	}
 }

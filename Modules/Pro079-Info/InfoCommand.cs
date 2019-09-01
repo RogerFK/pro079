@@ -1,23 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Pro079Core;
+using Pro079Core.API;
 using Smod2;
 using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
 using Smod2.EventSystem.Events;
-using Pro079Core.API;
-using Pro079Core;
 
 namespace InfoCommand
 {
-	class InfoCommand : IEventHandlerTeamRespawn, IEventHandlerSetConfig, ICommand079
+	internal class InfoCommand : IEventHandlerTeamRespawn, IEventHandlerSetConfig, ICommand079
 	{
 		private int LastMtfSpawn;
 		private readonly InfoPlugin plugin;
-		public InfoCommand(InfoPlugin plugin) => this.plugin = plugin;
+		public InfoCommand(InfoPlugin plugin)
+		{
+			this.plugin = plugin;
+		}
 
 		public bool OverrideDisable = false;
 		private bool DeconBool;
@@ -27,14 +26,8 @@ namespace InfoCommand
 
 		public bool Disabled
 		{
-			get
-			{
-				return OverrideDisable ? OverrideDisable : !plugin.enabled;
-			}
-			set
-			{
-				OverrideDisable = value;
-			}
+			get => OverrideDisable ? OverrideDisable : !plugin.enabled;
+			set => OverrideDisable = value;
 		}
 
 		public string Command => plugin.infocmd;

@@ -1,5 +1,4 @@
 ﻿using Smod2;
-using Smod2.API;
 using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
@@ -23,11 +22,11 @@ namespace InfoCommand
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 Info disabled.");
+			Info("Pro079 Info disabled.");
 		}
 		public override void OnEnable()
 		{
-			this.Info("Pro079 Info enabled.");
+			Info("Pro079 Info enabled.");
 		}
 		[ConfigOption("p079_info")]
 		public readonly bool enabled = true;
@@ -80,7 +79,7 @@ namespace InfoCommand
 		public readonly string infoextrahelp = "Shows stuff about the facility";
 		public override void Register()
 		{
-			this.Info("Loading Pro-079 Tesla configs and registering the command...");
+			Info("Loading Pro-079 Tesla configs and registering the command...");
 
 			InfoCommand reference = new InfoCommand(this);
 			AddEventHandlers(reference);

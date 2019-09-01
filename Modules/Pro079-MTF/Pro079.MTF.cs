@@ -1,9 +1,7 @@
 ﻿using Smod2;
-using Smod2.API;
 using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
-using Pro079Core;
 
 namespace Pro079MTF
 {
@@ -24,11 +22,11 @@ namespace Pro079MTF
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 MTF disabled.");
+			Info("Pro079 MTF disabled.");
 		}
 		public override void OnEnable()
 		{
-			this.Info("Pro079 MTF enabled");
+			Info("Pro079 MTF enabled");
 		}
 		[ConfigOption("p079_mtf")]
 		public readonly bool enabled = true;
@@ -55,7 +53,7 @@ namespace Pro079MTF
 		public readonly string mtfready = "<b><color=\"blue\">MTF command ready!</color></b>";
 		public override void Register()
 		{
-			this.Info("Loading Pro-079 MTF configs and registering the command...");
+			Info("Loading Pro-079 MTF configs and registering the command...");
 			Pro079Core.Pro079.Manager.RegisterCommand(new MTFCommand(this));
 		}
 	}

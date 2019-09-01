@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Pro079Core.API;
 using Smod2;
 using Smod2.API;
@@ -13,7 +9,7 @@ namespace LockdownUltimate
 {
 	public class LockdownUltimate : IEventHandlerDoorAccess, IUltimate079
 	{
-		private LockdownPlugin plugin;
+		private readonly LockdownPlugin plugin;
 		public bool CurrentlyRunning { get; private set; }
 		public string Name => "Lockdown";
 		public string Info => plugin.info;

@@ -1,30 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Pro079Core.API;
 using Smod2;
 using Smod2.API;
 
 namespace SCPCommand
 {
-	class SCPCommand : ICommand079
+	internal class SCPCommand : ICommand079
 	{
 		private readonly SCPPlugin plugin;
-		public SCPCommand(SCPPlugin plugin) => this.plugin = plugin;
+		public SCPCommand(SCPPlugin plugin)
+		{
+			this.plugin = plugin;
+		}
 
 		public bool OverrideDisable = false;
 		public bool Disabled
 		{
-			get
-			{
-				return OverrideDisable ? OverrideDisable : !plugin.enabled;
-			}
-			set
-			{
-				OverrideDisable = value;
-			}
+			get => OverrideDisable ? OverrideDisable : !plugin.enabled;
+			set => OverrideDisable = value;
 		}
 
 		public string Command => plugin.scpcmd;

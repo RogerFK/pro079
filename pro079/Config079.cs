@@ -12,38 +12,20 @@
 		//////////////////////////////////////////////////////
 		//					CONFIG OPTIONS					//
 		//////////////////////////////////////////////////////
-		
+
 		/// <summary>
 		/// Bool to check if Pro-079 has been disabled through the config
 		/// </summary>
-		public bool Enabled
-		{
-			get
-			{
-				return plugin.enable;
-			}
-		}
+		public bool Enabled => plugin.enable;
 		/// <summary>
 		/// Checks if the suicide command is enabled or not
 		/// </summary>
-		public bool SuicideCommand
-		{
-			get
-			{
-				return plugin.suicide;
-			}
-		}
+		public bool SuicideCommand => plugin.suicide;
 		/// <summary>
 		/// Checks if ultimates are enabled.
 		/// Useful if you're developing a ultimate that registers events to avoid causing unintentional lag.
 		/// </summary>
-		public bool UltimatesEnabled
-		{
-			get
-			{
-				return plugin.ult;
-			}
-		}
+		public bool UltimatesEnabled => plugin.ult;
 		//////////////////////////////////////////////////////
 		//				   LANGUAGE OPTIONS					//
 		//////////////////////////////////////////////////////
@@ -56,8 +38,12 @@
 		/// <returns>The translated level string</returns>
 		public string LevelString(int Level, bool Uppercase)
 		{
-			if(Uppercase || char.IsDigit(plugin.level[0])) return char.ToUpper(plugin.level[0])
+			if (Uppercase || char.IsDigit(plugin.level[0]))
+			{
+				return char.ToUpper(plugin.level[0])
 					+ plugin.level.Substring(1).Replace("$lvl", Level.ToString());
+			}
+
 			return plugin.level.Replace("$lvl", Level.ToString());
 		}
 		/// <summary>
@@ -68,8 +54,12 @@
 		/// <returns>The translated AP string</returns>
 		public string APString(int AP, bool Uppercase)
 		{
-			if (Uppercase || char.IsDigit(plugin.level[0])) return char.ToUpper(plugin.level[0])
+			if (Uppercase || char.IsDigit(plugin.level[0]))
+			{
+				return char.ToUpper(plugin.level[0])
 					 + plugin.level.Substring(1).Replace("$ap", AP.ToString());
+			}
+
 			return plugin.level.Replace("$ap", AP.ToString());
 		}
 		/// <summary>
@@ -105,32 +95,14 @@
 		/// <summary>
 		/// Translated "This command is disabled."
 		/// </summary>
-		public string CommandDisabled
-		{
-			get
-			{
-				return plugin.disabled;
-			}
-		}
+		public string CommandDisabled => plugin.disabled;
 		/// <summary>
 		/// Translated "Command succesfully launched".
 		/// </summary>
-		public string CommandSuccess
-		{
-			get
-			{
-				return plugin.success;
-			}
-		}
+		public string CommandSuccess => plugin.success;
 		/// <summary>
 		/// Translated "Ultimate succesfully used."
 		/// </summary>
-		public string UltimateLaunched
-		{
-			get
-			{
-				return plugin.ultlaunched;
-			}
-		}
+		public string UltimateLaunched => plugin.ultlaunched;
 	}
 }

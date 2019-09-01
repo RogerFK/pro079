@@ -1,9 +1,8 @@
-﻿using Smod2;
-using Smod2.API;
+﻿using Pro079Core;
+using Smod2;
 using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
-using Pro079Core;
 
 namespace ChaosCommand
 {
@@ -24,11 +23,11 @@ namespace ChaosCommand
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 Chaos disabled.");
+			Info("Pro079 Chaos disabled.");
 		}
 		public override void OnEnable()
 		{
-			this.Info("Pro079 Chaos enabled");
+			Info("Pro079 Chaos enabled");
 		}
 		[ConfigOption("")]
 		public readonly bool enable = true;
@@ -49,7 +48,7 @@ namespace ChaosCommand
 
 		public override void Register()
 		{
-			this.Info("Loading Pro-079 Chaos configs and registering the command...");
+			Info("Loading Pro-079 Chaos configs and registering the command...");
 			Pro079.Manager.RegisterCommand(new ChaosCommand(this));
 		}
 	}

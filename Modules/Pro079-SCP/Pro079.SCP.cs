@@ -1,5 +1,4 @@
 ﻿using Smod2;
-using Smod2.API;
 using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
@@ -23,11 +22,11 @@ namespace SCPCommand
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 SCP command disabled.");
+			Info("Pro079 SCP command disabled.");
 		}
 		public override void OnEnable()
 		{
-			this.Info("Pro079 SCP command enabled");
+			Info("Pro079 SCP command enabled");
 		}
 		[ConfigOption("p079_scp")]
 		public readonly bool enabled = true;
@@ -58,7 +57,7 @@ namespace SCPCommand
 
 		public override void Register()
 		{
-			this.Info("Loading Pro-079 SCP command configs and registering the command...");
+			Info("Loading Pro-079 SCP command configs and registering the command...");
 
 			Pro079Core.Pro079.Manager.RegisterCommand(new SCPCommand(this));
 		}

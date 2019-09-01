@@ -24,12 +24,12 @@ namespace TeslaCommand
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 Tesla disabled.");
+			Info("Pro079 Tesla disabled.");
 		}
 
 		public override void OnEnable()
 		{
-			this.Info("Pro079 Tesla enabled");
+			Info("Pro079 Tesla enabled");
 		}
 		[ConfigOption("p079_tesla")]
 		public readonly bool enabled = true;
@@ -55,7 +55,7 @@ namespace TeslaCommand
 		public readonly string teslarenabled = "<color=#66F>Teslas re-enabled</color>";
 		public override void Register()
 		{
-			this.Info("Loading Pro-079 Tesla configs and registering the command...");
+			Info("Loading Pro-079 Tesla configs and registering the command...");
 
 			Pro079.Manager.RegisterCommand(new TeslaCommand(this));
 		}
@@ -71,14 +71,8 @@ namespace TeslaCommand
 		public bool OverrideDisable = false;
 		public bool Disabled
 		{
-			get
-			{
-				return OverrideDisable || !plugin.enabled;
-			}
-			set
-			{
-				OverrideDisable = value;
-			}
+			get => OverrideDisable || !plugin.enabled;
+			set => OverrideDisable = value;
 		}
 
 		public string Command => plugin.teslacmd;

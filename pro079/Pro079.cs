@@ -6,19 +6,19 @@ using Smod2.Lang;
 namespace Pro079Core
 {
 	[PluginDetails(
-        author = "RogerFK",
-        name = "Pro 079 Core",
-        description = "Core plugin for Pro-079.",
-        id = "rogerfk.pro079",
-        version = "2.0",
-        SmodMajor = 3,
-        SmodMinor = 5,
-        SmodRevision = 0,
+		author = "RogerFK",
+		name = "Pro 079 Core",
+		description = "Core plugin for Pro-079.",
+		id = "rogerfk.pro079",
+		version = "2.0",
+		SmodMajor = 3,
+		SmodMinor = 5,
+		SmodRevision = 0,
 		langFile = "pro079-core"
-        )]
+		)]
 
-    public class Pro079 : Plugin
-    {
+	public class Pro079 : Plugin
+	{
 		/// <summary>
 		/// Manager that contains all commands and useful functions
 		/// </summary>
@@ -28,7 +28,7 @@ namespace Pro079Core
 		/// </summary>
 		public static Configs Configs { private set; get; }
 		// Config options //
-		
+
 		// Public options
 		[ConfigOption]
 		public readonly bool enable = true;
@@ -117,27 +117,24 @@ namespace Pro079Core
 		public readonly string ulterror = "Ultimate not found. Use <b>.079 ultimate</b> to check the names.";
 
 		public override void OnDisable()
-        {
-            this.Info("Pro079 Core disabled.");
-        }
+		{
+			Info("Pro079 Core disabled.");
+		}
 
-        public override void OnEnable()
-        {
+		public override void OnEnable()
+		{
 			// Info string to ASSERT DOMINANCE.
 			Info("Pro079 Core enabled.\n      ╔═══╗╔═══╗╔═══╗╔═══╗╔═══╗╔═══╗\n      ║╔═╗║║╔═╗║║╔═╗║║╔═╗║║╔═╗║║╔═╗║\n      ║╚═╝║║╚═╝║║║─║║║║║║║╚╝╔╝║║╚═╝║\n      ║╔══╝║╔╗╔╝║║─║║║║║║║──║╔╝╚══╗║\n      ║║───║║║╚╗║╚═╝║║╚═╝║──║║─╔══╝║\n      ╚╝───╚╝╚═╝╚═══╝╚═══╝──╚╝─╚═══╝");
-        }
+		}
 
 		internal static Pro079 Instance;
 		public override void Register()
-        {
-			this.Info("Loading Pro-079 Core configs and registering default commands...");
+		{
+			Info("Loading Pro-079 Core configs and registering default commands...");
 			AddEventHandlers(new EventHandlers(this));
-
-			//"\\n1. Lights out: shuts the HCZ down for 1 minute (cooldown: 180 seconds)\\n2. Lockdown: makes humans unable to open big doors, but SCPs can open any (duration: 30 seconds, cooldown: 300 seconds)", lang));
-
 			Manager = new Manager(this);
 			Configs = new Configs(this);
 			Instance = this;
 		}
-    }
+	}
 }

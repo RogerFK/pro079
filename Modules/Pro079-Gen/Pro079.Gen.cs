@@ -1,5 +1,4 @@
 ﻿using Smod2;
-using Smod2.API;
 using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
@@ -23,11 +22,11 @@ namespace GeneratorCommand
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 Generator disabled.");
+			Info("Pro079 Generator disabled.");
 		}
 		public override void OnEnable()
 		{
-			this.Info("Pro079 Generator enabled");
+			Info("Pro079 Generator enabled");
 		}
 
 		[ConfigOption("p079_gen")]
@@ -60,7 +59,7 @@ namespace GeneratorCommand
 
 		public override void Register()
 		{
-			this.Info("Loading Pro-079 Generator configs and registering the command...");
+			Info("Loading Pro-079 Generator configs and registering the command...");
 			Pro079Core.Pro079.Manager.RegisterCommand(new GenCommand(this));
 		}
 	}

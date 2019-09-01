@@ -1,31 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pro079Core;
 using Pro079Core.API;
-using Smod2.API;
-using Pro079Core;
 using Smod2;
+using Smod2.API;
 
 namespace GeneratorCommand
 {
-	class GenCommand : ICommand079
+	internal class GenCommand : ICommand079
 	{
-		private GeneratorPlugin plugin;
-		public GenCommand(GeneratorPlugin plugin) => this.plugin = plugin;
+		private readonly GeneratorPlugin plugin;
+		public GenCommand(GeneratorPlugin plugin)
+		{
+			this.plugin = plugin;
+		}
 
 		public bool OverrideDisable = false;
 		public bool Disabled
 		{
-			get
-			{
-				return OverrideDisable || !plugin.enabled;
-			}
-			set
-			{
-				OverrideDisable = value;
-			}
+			get => OverrideDisable || !plugin.enabled;
+			set => OverrideDisable = value;
 		}
 
 		public string Command => plugin.gencmd;

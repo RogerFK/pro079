@@ -1,10 +1,8 @@
-﻿using MEC;
-using System.Collections.Generic;
-using Pro079Core.API;
-using Smod2.API;
-using Smod2;
-using System;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Pro079Core.API;
+using Smod2;
+using Smod2.API;
 
 namespace Pro079Core
 {
@@ -24,10 +22,7 @@ namespace Pro079Core
 		public int CassieCooldown
 		{
 			// The logic demands a high IQ or a lot of knowledge in C# to be understood.
-			set
-			{
-				CassieCd = PluginManager.Manager.Server.Round.Duration + value;
-			}
+			set => CassieCd = PluginManager.Manager.Server.Round.Duration + value;
 			get
 			{
 				int cd = CassieCd - PluginManager.Manager.Server.Round.Duration;
@@ -45,7 +40,7 @@ namespace Pro079Core
 		/// <returns></returns>
 		public string RegisterCommand(ICommand079 CommandHandler)
 		{
-			if(CommandHandler == null || string.IsNullOrEmpty(CommandHandler.Command))
+			if (CommandHandler == null || string.IsNullOrEmpty(CommandHandler.Command))
 			{
 				return "Trying to register a \"null\" or an empty Command is not allowed!";
 			}
@@ -91,11 +86,11 @@ namespace Pro079Core
 			{
 				Command.CurrentCooldown = PluginManager.Manager.Server.Round.Duration + CustomValue;
 				if (!string.IsNullOrEmpty(Command.CommandReady))
-			{
-				int p = (int) System.Environment.OSVersion.Platform;
-				if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, CustomValue), MEC.Segment.Update);
-				else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, CustomValue), 1);
-			}
+				{
+					int p = (int)System.Environment.OSVersion.Platform;
+					if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, CustomValue), MEC.Segment.Update);
+					else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, CustomValue), 1);
+				}
 			}
 			else
 			{
@@ -107,7 +102,7 @@ namespace Pro079Core
 					else MEC.Timing.RunCoroutine(DelayMessage(Command.CommandReady, Command.Cooldown), 1);
 				}
 			}
-			
+
 		}
 		private int UltCooldown = 0;
 		/// <summary>
@@ -116,14 +111,11 @@ namespace Pro079Core
 		public int UltimateCooldown
 		{
 			// The logic demands a high IQ or a lot of knowledge in C# to be understood.
-			set
-			{
-				UltCooldown = PluginManager.Manager.Server.Round.Duration + value;
-			}
+			set => UltCooldown = PluginManager.Manager.Server.Round.Duration + value;
 			get
 			{
 				int cd = UltCooldown - PluginManager.Manager.Server.Round.Duration;
-				return cd <= 0 ? 0 : cd; 
+				return cd <= 0 ? 0 : cd;
 			}
 		}
 		public void SetOnCooldown(IUltimate079 Ultimate)
@@ -134,13 +126,13 @@ namespace Pro079Core
 			{
 				int p = (int)System.Environment.OSVersion.Platform;
 				if ((p == 4) || (p == 6) || (p == 128)) MEC.Timing.RunCoroutine(DelayMessage(plugin.ultready, Ultimate.Cooldown), MEC.Segment.Update);
-				else MEC.Timing.RunCoroutine(DelayMessage(plugin.ultready, Ultimate.Cooldown), 1); 
+				else MEC.Timing.RunCoroutine(DelayMessage(plugin.ultready, Ultimate.Cooldown), 1);
 			}
 		}
 		private IEnumerator<float> DelayMessage(string message, int delay)
 		{
 			yield return MEC.Timing.WaitForSeconds(delay);
-			var pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+			List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 			foreach (Player pc in pcs) pc.PersonalBroadcast(6, message, false);
 		}
 		/// <summary>
@@ -176,7 +168,7 @@ namespace Pro079Core
 				return ultimate;
 			}
 			string name = Pro079.Manager.Ultimates.Keys.OrderBy(x => x.Length).FirstOrDefault(x => x.StartsWith(Name));
-			if(name == null)
+			if (name == null)
 			{
 				return null;
 			}

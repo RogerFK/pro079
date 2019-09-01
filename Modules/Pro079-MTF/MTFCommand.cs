@@ -1,30 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pro079Core;
 using Pro079Core.API;
-using Smod2.API;
-using Pro079Core;
 using Smod2;
+using Smod2.API;
 
 namespace Pro079MTF
 {
-	class MTFCommand : ICommand079
+	internal class MTFCommand : ICommand079
 	{
-		private MTFPlugin plugin;
-		public MTFCommand(MTFPlugin plugin) => this.plugin = plugin;
+		private readonly MTFPlugin plugin;
+		public MTFCommand(MTFPlugin plugin)
+		{
+			this.plugin = plugin;
+		}
+
 		public bool OverrideDisable = false;
 		public bool Disabled
 		{
-			get
-			{
-				return OverrideDisable ? OverrideDisable : !plugin.enabled;
-			}
-			set
-			{
-				OverrideDisable = value;
-			}
+			get => OverrideDisable ? OverrideDisable : !plugin.enabled;
+			set => OverrideDisable = value;
 		}
 
 		public string Command => plugin.mtfcmd;
@@ -62,7 +55,10 @@ namespace Pro079MTF
 				Pro079.Manager.GiveExp(player, 5f, ExperienceType.CHEAT);
 				return Pro079.Configs.CommandSuccess;
 			}
-			else return plugin.mtfuse.Replace("$min", plugin.cost.ToString());
+			else
+			{
+				return plugin.mtfuse.Replace("$min", plugin.cost.ToString());
+			}
 		}
 	}
 }

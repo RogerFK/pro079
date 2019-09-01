@@ -1,8 +1,6 @@
 ﻿using Smod2;
-using Smod2.API;
 using Smod2.Attributes;
 using Smod2.Config;
-using Smod2.Lang;
 
 namespace LockdownUltimate
 {
@@ -23,11 +21,11 @@ namespace LockdownUltimate
 	{
 		public override void OnDisable()
 		{
-			this.Info("Pro079 Lockdown disabled.");
+			Info("Pro079 Lockdown disabled.");
 		}
 		public override void OnEnable()
 		{
-			this.Info("Pro079 Lockdown enabled");
+			Info("Pro079 Lockdown enabled");
 		}
 		[ConfigOption]
 		public readonly bool enabled = true;
@@ -41,10 +39,10 @@ namespace LockdownUltimate
 		public readonly int cost = 50;
 		public override void Register()
 		{
-			this.Info("Loading Pro-079 Chaos configs and registering the command...");
+			Info("Loading Pro-079 Chaos configs and registering the command...");
 
-			var reference = new LockdownUltimate(this);
-			this.AddEventHandlers(reference);
+			LockdownUltimate reference = new LockdownUltimate(this);
+			AddEventHandlers(reference);
 			Pro079Core.Manager.Instance.RegisterUltimate(reference);
 		}
 	}

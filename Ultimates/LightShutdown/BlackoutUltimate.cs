@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Pro079Core.API;
 using Smod2;
+using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
-using Pro079Core.API;
-using Smod2.API;
 
 namespace BlackoutUltimate
 {
-	class BlackoutLogic : IEventHandlerWaitingForPlayers, IUltimate079
+	internal class BlackoutLogic : IEventHandlerWaitingForPlayers, IUltimate079
 	{
-		private BlackoutUltimate plugin;
+		private readonly BlackoutUltimate plugin;
 		public BlackoutLogic(BlackoutUltimate plugin)
 		{
 			this.plugin = plugin;

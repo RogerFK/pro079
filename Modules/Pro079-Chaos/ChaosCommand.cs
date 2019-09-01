@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Pro079Core.API;
+﻿using Pro079Core.API;
 using Smod2;
 using Smod2.API;
 
 namespace ChaosCommand
 {
-	class ChaosCommand : ICommand079
+	internal class ChaosCommand : ICommand079
 	{
-		private ChaosPlugin plugin;
+		private readonly ChaosPlugin plugin;
 
 		public ChaosCommand(ChaosPlugin plugin)
 		{
@@ -21,14 +16,8 @@ namespace ChaosCommand
 		public bool OverrideDisable = false;
 		public bool Disabled
 		{
-			get
-			{
-				return OverrideDisable || !plugin.enable;
-			}
-			set
-			{
-				OverrideDisable = value;
-			}
+			get => OverrideDisable || !plugin.enable;
+			set => OverrideDisable = value;
 		}
 
 		public string Command => plugin.chaoscmd;
