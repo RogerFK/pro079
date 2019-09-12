@@ -52,7 +52,7 @@ namespace GeneratorCommand
 				case "2":
 				case "3":
 				case "4":
-					PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon" + args[1]);
+					PluginManager.Manager.Server.Map.AnnounceCustomMessage("Scp079Recon" + args[0]);
 					Pro079.Manager.GiveExp(player, 20f, ExperienceType.CHEAT);
 					return Pro079.Configs.CommandSuccess;
 				case "5":
