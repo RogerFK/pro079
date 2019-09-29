@@ -41,7 +41,7 @@ namespace SCPCommand
 
 		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
-			if (args.Length < 3)
+			if (args.Length < 2)
 			{
 				output.Success = false;
 				return plugin.scpuse.Replace("$min", plugin.cost.ToString());
