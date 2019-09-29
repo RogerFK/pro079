@@ -116,7 +116,9 @@ namespace Pro079Core
 								ev.ReturnMessage = Pro079.Configs.LowAP(ultimate.Cost);
 								return;
 							}
-							Pro079.Manager.DrainAP(ev.Player, ultimate.Cost); 
+							Pro079.Manager.DrainAP(ev.Player, ultimate.Cost);
+
+                            Pro079.Manager.UltimateCooldown += ultimate.Cooldown;
 						}
 						ev.ReturnMessage = ultimate.TriggerUltimate(args.Skip(1).ToArray(), ev.Player);
 						return;
@@ -228,6 +230,7 @@ namespace Pro079Core
 				Command.Value.CurrentCooldown = 0;
 			}
 			Pro079.Manager.UltimateCooldown = 0;
+            Pro079.Manager.CassieCooldown = 0;
 		}
 	}
 }

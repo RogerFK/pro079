@@ -1,6 +1,7 @@
 ﻿using Smod2;
 using Smod2.Attributes;
 using Smod2.Config;
+using Smod2.Lang;
 
 namespace LockdownUltimate
 {
@@ -32,12 +33,12 @@ namespace LockdownUltimate
 		[ConfigOption]
 		public readonly int time = 60;
 		[ConfigOption]
-		public readonly string info = "makes humans unable to open doors that require a keycard, but SCPs can open any";
-		[ConfigOption]
 		public readonly int cooldown = 180;
 		[ConfigOption]
 		public readonly int cost = 50;
-		public override void Register()
+        [LangOption]
+        public readonly string info = "makes humans unable to open doors that require a keycard, but SCPs can open any";
+        public override void Register()
 		{
 			Info("Loading Pro-079 Chaos configs and registering the command...");
 

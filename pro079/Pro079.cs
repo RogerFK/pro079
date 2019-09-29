@@ -20,14 +20,14 @@ namespace Pro079Core
 
 	public class Pro079 : Plugin
 	{
-		/// <summary>
-		/// Manager that contains all commands and useful functions
-		/// </summary>
-		public static Manager Manager { private set; get; }
-		/// <summary>
-		/// User defined configurations and language options
-		/// </summary>
-		public static Configs Configs { private set; get; }
+        /// <summary>
+        /// <para>Manager that contains all commands and useful functions</para>
+        /// </summary>
+        public static Manager Manager { private set; get; }
+        /// <summary>
+        /// User defined configurations and language options
+        /// </summary>
+        public static Configs Configs { private set; get; }
 		// Config options //
 
 		// Public options
