@@ -18,7 +18,7 @@ namespace Pro079Core
 		langFile = "pro079-core"
 		)]
 
-	public class Pro079 : Plugin
+	public class Pro079Plugin : Plugin
 	{
         /// <summary>
         /// <para>Manager that contains all commands and useful functions</para>
@@ -128,7 +128,7 @@ namespace Pro079Core
 			Info("Pro079 Core enabled.\n      ╔═══╗╔═══╗╔═══╗╔═══╗╔═══╗╔═══╗\n      ║╔═╗║║╔═╗║║╔═╗║║╔═╗║║╔═╗║║╔═╗║\n      ║╚═╝║║╚═╝║║║─║║║║║║║╚╝╔╝║║╚═╝║\n      ║╔══╝║╔╗╔╝║║─║║║║║║║──║╔╝╚══╗║\n      ║║───║║║╚╗║╚═╝║║╚═╝║──║║─╔══╝║\n      ╚╝───╚╝╚═╝╚═══╝╚═══╝──╚╝─╚═══╝");
 		}
 
-		internal static Pro079 Instance;
+		internal static Pro079Plugin Instance;
 		public override void Register()
 		{
 			Info("Loading Pro-079 Core configs and registering default commands...");

@@ -13,8 +13,8 @@ namespace Pro079Core
 	internal class EventHandlers : IEventHandlerCallCommand, IEventHandlerSetRole,
 		IEventHandlerPlayerDie, IEventHandlerWaitingForPlayers
 	{
-		private readonly Pro079 plugin;
-		public EventHandlers(Pro079 plugin)
+		private readonly Pro079Plugin plugin;
+		public EventHandlers(Pro079Plugin plugin)
 		{
 			this.plugin = plugin;
 		}
@@ -93,12 +93,12 @@ namespace Pro079Core
 							ev.ReturnMessage = "<color=\"white\">"+ Pro079Logic.GetUltimates() + "</color>" ;
 							return;
 						}
-						if (Pro079.Manager.UltimateCooldown > 0)
+						if (Pro079Plugin.Manager.UltimateCooldown > 0)
 						{
-							plugin.ultdown.Replace("$cd", Pro079.Manager.UltimateCooldown.ToString());
+							plugin.ultdown.Replace("$cd", Pro079Plugin.Manager.UltimateCooldown.ToString());
 							return;
 						}
-						IUltimate079 ultimate = Pro079.Manager.GetUltimate(string.Join(" ", args.Skip(1).ToArray()));
+						IUltimate079 ultimate = Pro079Plugin.Manager.GetUltimate(string.Join(" ", args.Skip(1).ToArray()));
 						if (ultimate == null)
 						{
 							ev.ReturnMessage = plugin.ulterror;
@@ -108,24 +108,24 @@ namespace Pro079Core
 						{
 							if (ev.Player.Scp079Data.Level + 1 < plugin.ultLevel)
 							{
-								ev.ReturnMessage = Pro079.Configs.LowLevel(plugin.ultLevel);
+								ev.ReturnMessage = Pro079Plugin.Configs.LowLevel(plugin.ultLevel);
 								return;
 							}
 							if (ev.Player.Scp079Data.AP < ultimate.Cost)
 							{
-								ev.ReturnMessage = Pro079.Configs.LowAP(ultimate.Cost);
+								ev.ReturnMessage = Pro079Plugin.Configs.LowAP(ultimate.Cost);
 								return;
 							}
-							Pro079.Manager.DrainAP(ev.Player, ultimate.Cost);
+							Pro079Plugin.Manager.DrainAP(ev.Player, ultimate.Cost);
 
-                            Pro079.Manager.UltimateCooldown += ultimate.Cooldown;
+                            Pro079Plugin.Manager.UltimateCooldown += ultimate.Cooldown;
 						}
 						ev.ReturnMessage = ultimate.TriggerUltimate(args.Skip(1).ToArray(), ev.Player);
 						return;
 					}
 
 					// When everything else wasn't caught, search for external commands //
-					if (!Pro079.Manager.Commands.TryGetValue(args[0], out ICommand079 CommandHandler))
+					if (!Pro079Plugin.Manager.Commands.TryGetValue(args[0], out ICommand079 CommandHandler))
 					{
 						ev.ReturnMessage = plugin.unknowncmd;
 						return;
@@ -134,25 +134,25 @@ namespace Pro079Core
 					{
 						if (ev.Player.Scp079Data.Level + 1 < CommandHandler.MinLevel)
 						{
-							ev.ReturnMessage = Pro079.Configs.LowLevel(CommandHandler.MinLevel);
+							ev.ReturnMessage = Pro079Plugin.Configs.LowLevel(CommandHandler.MinLevel);
 							return;
 						}
 						else if (ev.Player.Scp079Data.AP < CommandHandler.APCost)
 						{
-							ev.ReturnMessage = Pro079.Configs.LowAP(CommandHandler.APCost);
+							ev.ReturnMessage = Pro079Plugin.Configs.LowAP(CommandHandler.APCost);
 							return;
 						}
 						int cooldown = CommandHandler.CurrentCooldown - PluginManager.Manager.Server.Round.Duration;
 						if (cooldown > 0)
 						{
-							ev.ReturnMessage = Pro079.Configs.CmdOnCooldown(cooldown);
+							ev.ReturnMessage = Pro079Plugin.Configs.CmdOnCooldown(cooldown);
 							return;
 						}
 						if (CommandHandler.Cassie)
 						{
-							if (Pro079.Manager.CassieCooldown > 0)
+							if (Pro079Plugin.Manager.CassieCooldown > 0)
 							{
-								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Pro079.Manager.CassieCooldown.ToString()).Replace("$(cd)", Pro079.Manager.CassieCooldown.ToString());
+								ev.ReturnMessage = plugin.cassieOnCooldown.Replace("$cd", Pro079Plugin.Manager.CassieCooldown.ToString()).Replace("$(cd)", Pro079Plugin.Manager.CassieCooldown.ToString());
 								return;
 							}
 						}
@@ -166,13 +166,13 @@ namespace Pro079Core
 						// You should only change the value of Success if your command needs more argument the user didn't insert. If there's any bug, it's your fault.
 						if (!ev.Player.GetBypassMode() && output.Success)
 						{
-							if(output.DrainAp) Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
+							if(output.DrainAp) Pro079Plugin.Manager.DrainAP(ev.Player, CommandHandler.APCost);
 
-							if (CommandHandler.CurrentCooldown < PluginManager.Manager.Server.Round.Duration) Pro079.Manager.SetOnCooldown(CommandHandler);
+							if (CommandHandler.CurrentCooldown < PluginManager.Manager.Server.Round.Duration) Pro079Plugin.Manager.SetOnCooldown(CommandHandler);
 
 							if (CommandHandler.Cassie && output.CassieCooldown)
 							{
-								Pro079.Manager.CassieCooldown = plugin.cassieCooldown;
+								Pro079Plugin.Manager.CassieCooldown = plugin.cassieCooldown;
 								if (!string.IsNullOrEmpty(plugin.cassieready))
 								{
 									int p = (int)System.Environment.OSVersion.Platform;
@@ -225,12 +225,12 @@ namespace Pro079Core
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
 			DoorArray = UnityEngine.Object.FindObjectsOfType<Door>();
-			foreach (KeyValuePair<string, ICommand079> Command in Pro079.Manager.Commands)
+			foreach (KeyValuePair<string, ICommand079> Command in Pro079Plugin.Manager.Commands)
 			{
 				Command.Value.CurrentCooldown = 0;
 			}
-			Pro079.Manager.UltimateCooldown = 0;
-            Pro079.Manager.CassieCooldown = 0;
+			Pro079Plugin.Manager.UltimateCooldown = 0;
+            Pro079Plugin.Manager.CassieCooldown = 0;
 		}
 	}
 }

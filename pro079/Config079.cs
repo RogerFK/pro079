@@ -3,8 +3,8 @@
 	public class Configs
 	{
 		public static Configs Instance;
-		private readonly Pro079 plugin;
-		public Configs(Pro079 plugin)
+		private readonly Pro079Plugin plugin;
+		public Configs(Pro079Plugin plugin)
 		{
 			this.plugin = plugin;
 			Instance = this;

@@ -6,11 +6,11 @@ using Smod2.API;
 
 namespace Pro079Core
 {
-	public class Manager
+	public class Pro079Manager
 	{
-		public static Manager Instance;
-		private readonly Pro079 plugin;
-		public Manager(Pro079 plugin)
+		public static Pro079Manager Instance;
+		private readonly Pro079Plugin plugin;
+		public Pro079Manager(Pro079Plugin plugin)
 		{
 			this.plugin = plugin;
 			Instance = this;

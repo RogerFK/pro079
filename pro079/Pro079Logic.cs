@@ -30,38 +30,38 @@ namespace Pro079Core
 		}
 		private static void FetchExternalHelp()
 		{
-			Help = new List<string>(Pro079.Manager.Commands.Keys.Count);
-			foreach (KeyValuePair<string, ICommand079> kvp in Pro079.Manager.Commands)
+			Help = new List<string>(Pro079Plugin.Manager.Commands.Keys.Count);
+			foreach (KeyValuePair<string, ICommand079> kvp in Pro079Plugin.Manager.Commands)
 			{
-				if (!kvp.Value.Disabled) Help.Add($"<b>.079 {kvp.Key + (!string.IsNullOrEmpty(kvp.Value.ExtraArguments) ? " " + kvp.Value.ExtraArguments : string.Empty)}</b> - {kvp.Value.HelpInfo} {FormatEnergyLevel(kvp.Value.APCost, kvp.Value.MinLevel, Pro079.Instance.energy, Pro079.Instance.level)}");
+				if (!kvp.Value.Disabled) Help.Add($"<b>.079 {kvp.Key + (!string.IsNullOrEmpty(kvp.Value.ExtraArguments) ? " " + kvp.Value.ExtraArguments : string.Empty)}</b> - {kvp.Value.HelpInfo} {FormatEnergyLevel(kvp.Value.APCost, kvp.Value.MinLevel, Pro079Plugin.Instance.energy, Pro079Plugin.Instance.level)}");
 			}
 		}
 		internal static string GetHelp()
 		{
-			string help = Pro079.Instance.basicHelp;
-			if (Help == null || Help.Count != Pro079.Manager.Commands.Keys.Count) FetchExternalHelp();
+			string help = Pro079Plugin.Instance.basicHelp;
+			if (Help == null || Help.Count != Pro079Plugin.Manager.Commands.Keys.Count) FetchExternalHelp();
 			foreach (string line in Help)
 			{
 				help += Environment.NewLine + line;
 			}
-			if (Pro079.Instance.suicide) help += System.Environment.NewLine + $"<b>.079 {Pro079.Instance.suicidecmd}</b> - " + Pro079.Instance.suicidehelp;
-			if (Pro079.Instance.ult) help += System.Environment.NewLine + $"<b>.079 {Pro079.Instance.ultcmd}</b> - " + Pro079.Instance.ulthelp;
-			if (Pro079.Instance.tips) help += System.Environment.NewLine + $"<b>.079 {Pro079.Instance.tipscmd}</b> - " + Pro079.Instance.tipshelp;
+			if (Pro079Plugin.Instance.suicide) help += System.Environment.NewLine + $"<b>.079 {Pro079Plugin.Instance.suicidecmd}</b> - " + Pro079Plugin.Instance.suicidehelp;
+			if (Pro079Plugin.Instance.ult) help += System.Environment.NewLine + $"<b>.079 {Pro079Plugin.Instance.ultcmd}</b> - " + Pro079Plugin.Instance.ulthelp;
+			if (Pro079Plugin.Instance.tips) help += System.Environment.NewLine + $"<b>.079 {Pro079Plugin.Instance.tipscmd}</b> - " + Pro079Plugin.Instance.tipshelp;
 			return help;
 		}
 		private static List<string> UltimateHelp;
 		private static void FetchUltimates()
 		{
-			UltimateHelp = new List<string>(Pro079.Manager.Ultimates.Keys.Count);
-			foreach (KeyValuePair<string, IUltimate079> kvp in Pro079.Manager.Ultimates)
+			UltimateHelp = new List<string>(Pro079Plugin.Manager.Ultimates.Keys.Count);
+			foreach (KeyValuePair<string, IUltimate079> kvp in Pro079Plugin.Manager.Ultimates)
 			{
-				UltimateHelp.Add($"<b>.079 {Pro079.Instance.ultcmd} {kvp.Key}</b> - {kvp.Value.Info} {Pro079.Instance.ultdata.Replace("$cd", kvp.Value.Cooldown.ToString()).Replace("$cost", kvp.Value.Cost.ToString())}");
+				UltimateHelp.Add($"<b>.079 {Pro079Plugin.Instance.ultcmd} {kvp.Key}</b> - {kvp.Value.Info} {Pro079Plugin.Instance.ultdata.Replace("$cd", kvp.Value.Cooldown.ToString()).Replace("$cost", kvp.Value.Cost.ToString())}");
 			}
 		}
 		internal static string GetUltimates()
 		{
-			string help = Pro079.Instance.ultusageFirstline;
-			if (UltimateHelp == null || UltimateHelp.Count != Pro079.Manager.Ultimates.Keys.Count) FetchUltimates();
+			string help = Pro079Plugin.Instance.ultusageFirstline;
+			if (UltimateHelp == null || UltimateHelp.Count != Pro079Plugin.Manager.Ultimates.Keys.Count) FetchUltimates();
 			foreach (string line in UltimateHelp)
 			{
 				help += Environment.NewLine + line;
@@ -90,7 +90,7 @@ namespace Pro079Core
 			if (player.TeamRole.Role == Role.SCP_079)
 			{
 				player.PersonalClearBroadcasts();
-				player.PersonalBroadcast(20, Pro079.Instance.broadcastMsg, true);
+				player.PersonalBroadcast(20, Pro079Plugin.Instance.broadcastMsg, true);
 				player.SendConsoleMessage(GetHelp(), "white");
 			}
 		}
@@ -176,19 +176,19 @@ namespace Pro079Core
 				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
 				foreach (Player player in PCplayers)
 				{
-					player.PersonalBroadcast(3, Pro079.Instance.cassieready, false);
+					player.PersonalBroadcast(3, Pro079Plugin.Instance.cassieready, false);
 				}
 			}
 		}
 		internal static IEnumerator<float> DelayKysMessage(List<Player> PCplayers)
 		{
-			if (string.IsNullOrEmpty(Pro079.Instance.kys)) yield break;
+			if (string.IsNullOrEmpty(Pro079Plugin.Instance.kys)) yield break;
 			yield return 0.3f;
 			if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - PCplayers.Count == 0)
 			{
 				foreach (Player player in PCplayers)
 				{
-					player.PersonalBroadcast(20, Pro079.Instance.kys, false);
+					player.PersonalBroadcast(20, Pro079Plugin.Instance.kys, false);
 				}
 			}
 		}
