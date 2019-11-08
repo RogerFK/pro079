@@ -43,7 +43,7 @@ namespace BlackoutUltimate
 		{
 			BlackoutLogic reference = new BlackoutLogic(this);
 			AddEventHandlers(reference);
-			Pro079Core.Manager.Instance.RegisterUltimate(reference);
+			Pro079Core.Pro079.Manager.RegisterUltimate(reference);
 			Info("Registed Pro-079 Blackout.");
 		}
 	}

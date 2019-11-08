@@ -8,12 +8,12 @@ namespace Pro079Core
 {
 	public class Pro079Manager
 	{
-		public static Pro079Manager Instance;
-		private readonly Pro079Plugin plugin;
-		public Pro079Manager(Pro079Plugin plugin)
+		public static Pro079Manager Manager;
+		private readonly Pro079 plugin;
+		public Pro079Manager(Pro079 plugin)
 		{
 			this.plugin = plugin;
-			Instance = this;
+			Manager = this;
 		}
 		private int CassieCd = 0;
 		/// <summary>

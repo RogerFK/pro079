@@ -2,6 +2,7 @@
 using Smod2.Attributes;
 using Smod2.Config;
 using Smod2.Lang;
+using Pro079Core;
 
 namespace InfoCommand
 {
@@ -101,7 +102,7 @@ namespace InfoCommand
 
 			InfoCommand reference = new InfoCommand(this);
 			AddEventHandlers(reference);
-			Pro079Core.Manager.Instance.RegisterCommand(reference);
+			Pro079.Manager.RegisterCommand(reference);
 		}
 	}
 }

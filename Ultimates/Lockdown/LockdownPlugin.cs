@@ -44,7 +44,7 @@ namespace LockdownUltimate
 
 			LockdownUltimate reference = new LockdownUltimate(this);
 			AddEventHandlers(reference);
-			Pro079Core.Manager.Instance.RegisterUltimate(reference);
+			Pro079Core.Pro079Manager.Manager.RegisterUltimate(reference);
 		}
 	}
 }
