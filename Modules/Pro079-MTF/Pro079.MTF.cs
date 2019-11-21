@@ -46,7 +46,7 @@ namespace Pro079MTF
 		[LangOption]
 		public readonly string mtfmaxscp = "Maximum SCPs: $max";
 		[LangOption]
-		public readonly string usage = "<character> <number> <alive-scps>";
+		public readonly string mtfusage = "<character> <number> <alive-scps>";
 		[LangOption]
 		public readonly string extendedHelp = "Announces that a new MTF squad arrived, with your own custom number of SCPs";
 		[LangOption]

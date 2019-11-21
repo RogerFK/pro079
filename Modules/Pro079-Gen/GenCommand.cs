@@ -24,7 +24,7 @@ namespace GeneratorCommand
 
 		public string ExtraArguments => "[1-6]";
 
-		public string HelpInfo => plugin.usage;
+		public string HelpInfo => plugin.genusage;
 
 		public bool Cassie => true;
 

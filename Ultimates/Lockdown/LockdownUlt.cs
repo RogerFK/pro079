@@ -12,7 +12,7 @@ namespace LockdownUltimate
 		private readonly LockdownPlugin plugin;
 		public bool CurrentlyRunning { get; private set; }
 		public string Name => "Lockdown";
-		public string Info => plugin.info.Replace("{min}", plugin.time.ToString());
+		public string Info => plugin.lockdownInfo.Replace("{min}", plugin.time.ToString());
 		public int Cooldown => plugin.cooldown;
 		public int Cost => plugin.cost;
 		public LockdownUltimate(LockdownPlugin plugin)

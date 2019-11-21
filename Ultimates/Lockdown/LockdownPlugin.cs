@@ -37,7 +37,7 @@ namespace LockdownUltimate
 		[ConfigOption]
 		public readonly int cost = 50;
         [LangOption]
-        public readonly string info = "makes humans unable to open doors that require a keycard, but SCPs can open any";
+        public readonly string lockdownInfo = "makes humans unable to open doors that require a keycard, but SCPs can open any";
         public override void Register()
 		{
 			Info("Loading Pro-079 Chaos configs and registering the command...");

@@ -36,7 +36,7 @@ namespace Pro079MTF
 
 		public int CurrentCooldown { get; set; }
 
-		public string ExtraArguments => plugin.usage;
+		public string ExtraArguments => plugin.mtfusage;
 
 		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{

@@ -53,7 +53,7 @@ namespace GeneratorCommand
 		[LangOption]
 		public readonly string gen6msg = "Fake death command launched.";
 		[LangOption]
-		public readonly string usage = "Announces that X generators are enabled, if it's 6 it will fake your suicide";
+		public readonly string genusage = "Announces that X generators are enabled, if it's 6 it will fake your suicide";
 		[LangOption]
 		public readonly string ready = "<b>Generator command ready</b>";
 
