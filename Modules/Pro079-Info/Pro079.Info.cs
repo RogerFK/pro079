@@ -87,11 +87,11 @@ namespace InfoCommand
 		[LangOption]
 		public readonly string infoextrahelp = "Shows stuff about the facility";
 		[LangOption]
-		public readonly string minutes = "minute$";
+		public readonly string iminutes = "minute$";
 		[LangOption]
-		public readonly string seconds = "second$";
+		public readonly string iseconds = "second$";
 		[LangOption]
-		public readonly string and = "and";
+		public readonly string iand = "and";
 		// I think this thing fucks germans and others.
 		[LangOption]
 		public readonly string pluralSuffix = "s";

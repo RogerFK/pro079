@@ -39,7 +39,7 @@ namespace SCPCommand
 		[ConfigOption]
 		public readonly string[] list = new string[] { "173", "096", "106", "049", "939" };
 		[LangOption]
-		public readonly string extrainfo = "<###> <reason>";
+		public readonly string scpextrainfo = "<###> <reason>";
 		[LangOption]
 		public readonly string scpusage = "Fakes an SCP(173, 096...) death, the reason can be: unknown, tesla, mtf, decon";
 		[LangOption]
@@ -49,11 +49,11 @@ namespace SCPCommand
 		[LangOption]
 		public readonly string scpway = "Type a method that exists";
 		[LangOption]
-		public readonly string nomtfleft = "No MTF's alive. Sending as \"unknown\"";
+		public readonly string scpnomtfleft = "No MTF's alive. Sending as \"unknown\"";
 		[LangOption]
 		public readonly string scpcmd = "scp";
 		[LangOption]
-		public readonly string ready = "<b><color=\"red\">SCP command ready</color></b>";
+		public readonly string scpready = "<b><color=\"red\">SCP command ready</color></b>";
 
 		public override void Register()
 		{

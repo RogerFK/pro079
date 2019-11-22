@@ -34,7 +34,7 @@ namespace GeneratorCommand
 
 		public int APCost => plugin.cost;
 
-		public string CommandReady => plugin.ready;
+		public string CommandReady => plugin.genready;
 
 		public int CurrentCooldown { get; set; }
 

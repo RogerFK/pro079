@@ -48,7 +48,7 @@ namespace Pro079MTF
 		[LangOption]
 		public readonly string mtfusage = "<character> <number> <alive-scps>";
 		[LangOption]
-		public readonly string extendedHelp = "Announces that a new MTF squad arrived, with your own custom number of SCPs";
+		public readonly string mtfextendedHelp = "Announces that a new MTF squad arrived, with your own custom number of SCPs";
 		[LangOption]
 		public readonly string mtfready = "<b><color=\"blue\">MTF command ready!</color></b>";
 		public override void Register()

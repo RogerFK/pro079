@@ -23,7 +23,7 @@ namespace SCPCommand
 
 		public string Command => plugin.scpcmd;
 
-		public string ExtraArguments => plugin.extrainfo;
+		public string ExtraArguments => plugin.scpextrainfo;
 
 		public string HelpInfo => plugin.scpusage;
 
@@ -35,7 +35,7 @@ namespace SCPCommand
 
 		public int APCost => plugin.cost;
 
-		public string CommandReady => plugin.ready;
+		public string CommandReady => plugin.scpready;
 
 		public int CurrentCooldown { get; set; }
 
@@ -71,7 +71,7 @@ namespace SCPCommand
 					}
 					if (dummy == null)
 					{
-						player.SendConsoleMessage(plugin.nomtfleft, "red");
+						player.SendConsoleMessage(plugin.scpnomtfleft, "red");
 					}
 
 					PluginManager.Manager.Server.Map.AnnounceScpKill(args[0], dummy);

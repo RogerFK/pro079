@@ -17,7 +17,7 @@ namespace BlackoutUltimate
 		}
 		public string Name => "Blackout";
 
-		public string Info => plugin.info.Replace("$", plugin.minutes != 1 ? "s" : string.Empty).Replace("{min}", plugin.minutes.ToString());
+		public string Info => plugin.p0blackoutinfo.Replace("$", plugin.minutes != 1 ? "s" : string.Empty).Replace("{min}", plugin.minutes.ToString());
 
 		public int Cooldown => plugin.cooldown;
 

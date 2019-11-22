@@ -37,7 +37,7 @@ namespace BlackoutUltimate
 		[ConfigOption]
 		public readonly int cost = 50;
 		[LangOption]
-		public readonly string info = "Shuts the facility down for {min} minute$";
+		public readonly string p0blackoutinfo = "Shuts the facility down for {min} minute$";
 
 		public override void Register()
 		{

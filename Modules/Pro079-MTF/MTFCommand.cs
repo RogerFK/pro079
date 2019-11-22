@@ -22,7 +22,7 @@ namespace Pro079MTF
 
 		public string Command => plugin.mtfcmd;
 
-		public string HelpInfo => plugin.extendedHelp;
+		public string HelpInfo => plugin.mtfextendedHelp;
 
 		public bool Cassie => true;
 
