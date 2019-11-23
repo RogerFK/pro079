@@ -13,8 +13,11 @@ namespace SCPCommand
 		{
 			this.plugin = plugin;
 		}
-
-		public bool OverrideDisable = false;
+        Role[] mtf = new Role[]
+        {
+            Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER, Role.SCIENTIST
+        };
+        public bool OverrideDisable = false;
 		public bool Disabled
 		{
 			get => OverrideDisable ? OverrideDisable : !plugin.enable;
@@ -38,7 +41,16 @@ namespace SCPCommand
 		public string CommandReady => plugin.scpready;
 
 		public int CurrentCooldown { get; set; }
-
+        private string SpaceTheScp(string scp)
+        {
+            int length = scp.Length * 2 - 1;
+            char[] spacedScp = new char[length];
+            for(int i = 0; i < length; i++)
+            {
+                spacedScp[i] = (i % 2 == 0) ? scp[i/2] : ' ';
+            }
+            return new string(spacedScp);
+        }
 		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
 			if (args.Length < 2)
@@ -47,43 +59,29 @@ namespace SCPCommand
 				return plugin.scpuse.Replace("$min", plugin.cost.ToString());
 			}
 
-			if (!plugin.GetConfigList("p079_scp_list").Contains(args[1]))
+			if (!plugin.GetConfigList("p079_scp_list").Contains(args[0]))
 			{
 				output.Success = false;
 				return plugin.scpexist + " - " + plugin.scpuse.Replace("$min", plugin.cost.ToString());
 			}
-			string scpNum = string.Join(" ", args[1].ToCharArray());
 			switch (args[1])
 			{
 				case "mtf":
-					Player dummy = null;
-					List<Role> mtf = new List<Role>
-										{
-											Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER, Role.SCIENTIST
-										};
-					foreach (Player ply in PluginManager.Manager.Server.GetPlayers())
-					{
-						if (mtf.Contains(ply.TeamRole.Role))
-						{
-							dummy = ply;
-							break;
-						}
-					}
+                    Player dummy = PluginManager.Manager.Server.GetPlayers(mtf).FirstOrDefault();
 					if (dummy == null)
 					{
 						player.SendConsoleMessage(plugin.scpnomtfleft, "red");
 					}
-
 					PluginManager.Manager.Server.Map.AnnounceScpKill(args[0], dummy);
 					break;
 				case "unknown":
 					PluginManager.Manager.Server.Map.AnnounceScpKill(args[0], null);
 					break;
 				case "tesla":
-					PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Successfully Terminated by automatic security system");
+					PluginManager.Manager.Server.Map.AnnounceCustomMessage($"scp {SpaceTheScp(args[0])} Successfully Terminated by automatic security system");
 					break;
 				case "decont":
-					PluginManager.Manager.Server.Map.AnnounceCustomMessage("scp " + scpNum + " Lost in Decontamination Sequence");
+					PluginManager.Manager.Server.Map.AnnounceCustomMessage($"scp {SpaceTheScp(args[0])} Lost in Decontamination Sequence");
 					break;
 				default:
 					return plugin.scpway + " .079 scp " + args[0] + " (unknown/tesla/mtf/decont)";
