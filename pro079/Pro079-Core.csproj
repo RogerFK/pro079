@@ -41,6 +41,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="Mirror">
+      <HintPath>..\..\References\Mirror.dll</HintPath>
+    </Reference>
     <Reference Include="Smod2, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Smod2.dll</HintPath>
@@ -58,9 +61,6 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Lib\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>..\Lib\UnityEngine.Networking.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

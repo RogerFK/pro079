@@ -3,7 +3,7 @@ using System.Linq;
 using Pro079Core.API;
 using Smod2;
 using Smod2.API;
-
+using SMRole = Smod2.API.RoleType;
 namespace Pro079Core
 {
 	public class Pro079Manager
@@ -132,7 +132,7 @@ namespace Pro079Core
 		private IEnumerator<float> DelayMessage(string message, int delay)
 		{
 			yield return MEC.Timing.WaitForSeconds(delay);
-			List<Player> pcs = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+			List<Player> pcs = PluginManager.Manager.Server.GetPlayers(SMRole.SCP_079);
 			foreach (Player pc in pcs) pc.PersonalBroadcast(6, message, false);
 		}
 		/// <summary>

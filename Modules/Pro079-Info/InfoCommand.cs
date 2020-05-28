@@ -55,7 +55,7 @@ namespace InfoCommand
 		public string CallCommand(string[] args, Player player, CommandOutput output)
 		{
 			output.CustomReturnColor = true;
-			int level = player.GetBypassMode() ? 5 : player.Scp079Data.Level + 1;
+			int level = player.BypassMode ? 5 : player.Scp079Data.Level + 1;
 			string humansAlive;
 			string decontTime;
 			string ScientistsEscaped;

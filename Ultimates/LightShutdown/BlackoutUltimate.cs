@@ -47,7 +47,7 @@ namespace BlackoutUltimate
 			{
 				foreach (var room in Rooms)
 				{
-					room.FlickerLights();
+					room.FlickerLights(8f);
 				}
 				yield return MEC.Timing.WaitForSeconds(8f);
 			}

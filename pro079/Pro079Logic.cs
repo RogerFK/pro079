@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Pro079Core.API;
 using Smod2;
 using Smod2.API;
+using SMRole = Smod2.API.RoleType;
 
 namespace Pro079Core
 {
@@ -87,7 +88,7 @@ namespace Pro079Core
 		internal static IEnumerator<float> DelaySpawnMsg(Player player)
 		{
 			yield return 0.1f; // This value produces completely random outputs, but it's good enough for delaying the message a tiny bit so it doesn't overlap
-			if (player.TeamRole.Role == Role.SCP_079)
+			if (player.TeamRole.Role == SMRole.SCP_079)
 			{
 				player.PersonalClearBroadcasts();
 				player.PersonalBroadcast(20, Pro079.Instance.broadcastMsg, true);
@@ -114,7 +115,7 @@ namespace Pro079Core
 					door.ChangeState(true);
 				}
 			}
-			if (player != null) player.ChangeRole(Role.SPECTATOR);
+			if (player != null) player.ChangeRole(SMRole.SPECTATOR);
 			Recontainer079.isLocked = true;
 			for (int k = 0; k < 500; k++)
 			{
@@ -130,22 +131,22 @@ namespace Pro079Core
 			// People complained about it being "easy to be told apart". Not anymore.
 			MTFRespawn mtf = PlayerManager.localPlayer.GetComponent<MTFRespawn>();
 			 NineTailedFoxAnnouncer annc = NineTailedFoxAnnouncer.singleton;
-			while (annc.queue.Count > 0 || AlphaWarheadController.host.inProgress)
+			while (annc.queue.Count > 0 || AlphaWarheadController.Host.inProgress)
 			{
 				yield return 0f;
 			}
-			mtf.CallRpcPlayCustomAnnouncement("SCP079RECON5", false);
+			mtf.CallRpcPlayCustomAnnouncement("SCP079RECON5", false, false);
 			// This massive for loop jank is what the main game does. Go complain to them.
 			for (int i = 0; i < 2750; i++)
 			{
 				yield return 0f;
 			}
-			while (annc.queue.Count > 0 || AlphaWarheadController.host.inProgress)
+			while (annc.queue.Count > 0 || AlphaWarheadController.Host.inProgress)
 			{
 				yield return 0f;
 			}
-			mtf.CallRpcPlayCustomAnnouncement("SCP079RECON6", true);
-			mtf.CallRpcPlayCustomAnnouncement("SCP 0 7 9 CONTAINEDSUCCESSFULLY", false);
+			mtf.CallRpcPlayCustomAnnouncement("SCP079RECON6", true, false);
+			mtf.CallRpcPlayCustomAnnouncement("SCP 0 7 9 CONTAINEDSUCCESSFULLY", false, false);
 			for (int j = 0; j < 350; j++)
 			{
 				yield return 0f;
@@ -173,7 +174,7 @@ namespace Pro079Core
 			{
 				yield return MEC.Timing.WaitForSeconds(time);
 
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(SMRole.SCP_079);
 				foreach (Player player in PCplayers)
 				{
 					player.PersonalBroadcast(3, Pro079.Instance.cassieready, false);

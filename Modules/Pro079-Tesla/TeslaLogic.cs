@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Smod2;
 using Smod2.API;
+using SMRole = Smod2.API.RoleType;
 
 namespace TeslaCommand
 {
@@ -24,7 +25,7 @@ namespace TeslaCommand
 			foreach (Smod2.API.Player player in PluginManager.Manager.Server.GetPlayers())
 			{
 				string remainingStr = plugin.teslarem;
-				if (player.TeamRole.Role == Role.SCP_079)
+				if (player.TeamRole.Role == SMRole.SCP_079)
 				{
 					for (i = remTime; i > 0; i--)
 					{

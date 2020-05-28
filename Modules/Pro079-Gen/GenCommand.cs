@@ -56,7 +56,7 @@ namespace GeneratorCommand
 					Pro079.Manager.GiveExp(player, 20f, ExperienceType.CHEAT);
 					return Pro079.Configs.CommandSuccess;
 				case "5":
-					if (!player.GetBypassMode())
+					if (!player.BypassMode)
 					{
 						if (player.Scp079Data.Level < plugin.levelBlackout - 1)
 						{
@@ -76,7 +76,7 @@ namespace GeneratorCommand
 					Pro079.Manager.SetOnCooldown(this, 70 + plugin.penalty + plugin.cooldown);
 					return plugin.gen5msg;
 				case "6":
-					if (!player.GetBypassMode())
+					if (!player.BypassMode)
 					{
 						if (player.Scp079Data.Level < plugin.levelBlackout - 1)
 						{

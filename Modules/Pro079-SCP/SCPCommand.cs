@@ -13,9 +13,9 @@ namespace SCPCommand
 		{
 			this.plugin = plugin;
 		}
-        Role[] mtf = new Role[]
+        RoleType[] mtf = new RoleType[]
         {
-            Role.FACILITY_GUARD, Role.NTF_CADET, Role.NTF_LIEUTENANT, Role.NTF_SCIENTIST, Role.NTF_COMMANDER, Role.SCIENTIST
+			RoleType.FACILITY_GUARD, RoleType.NTF_CADET, RoleType.NTF_LIEUTENANT, RoleType.NTF_SCIENTIST, RoleType.NTF_COMMANDER, RoleType.SCIENTIST
         };
         public bool OverrideDisable = false;
 		public bool Disabled

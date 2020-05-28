@@ -31,7 +31,7 @@ namespace LockdownUltimate
 			}
 			else
 			{
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
+				if (ev.Player.TeamRole.Team == Smod2.API.TeamType.SCP)
 				{
 					ev.Allow = true;
 				}

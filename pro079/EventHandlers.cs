@@ -7,6 +7,8 @@ using Smod2;
 using Smod2.API;
 using Smod2.EventHandlers;
 using Smod2.Events;
+using SMRole = Smod2.API.RoleType;
+using SMTeam = Smod2.API.TeamType;
 
 namespace Pro079Core
 {
@@ -28,7 +30,7 @@ namespace Pro079Core
 				{
 					return;
 				}
-				if (ev.Player.TeamRole.Role != Role.SCP_079)
+				if (ev.Player.TeamRole.Role != SMRole.SCP_079)
 				{
 					ev.ReturnMessage = plugin.notscp079;
 					return;
@@ -76,7 +78,7 @@ namespace Pro079Core
 							ev.ReturnMessage = plugin.disabled;
 							return;
 						}
-						List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+						List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(SMRole.SCP_079);
 						int pcs = PCplayers.Count;
 						if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs != 0)
 						{
@@ -104,7 +106,7 @@ namespace Pro079Core
 							ev.ReturnMessage = plugin.ulterror;
 							return;
 						}
-						if (!ev.Player.GetBypassMode())
+						if (!ev.Player.BypassMode)
 						{
 							if (ev.Player.Scp079Data.Level + 1 < plugin.ultLevel)
 							{
@@ -130,7 +132,7 @@ namespace Pro079Core
 						ev.ReturnMessage = plugin.unknowncmd;
 						return;
 					}
-					if (!ev.Player.GetBypassMode())
+					if (!ev.Player.BypassMode)
 					{
 						if (ev.Player.Scp079Data.Level + 1 < CommandHandler.MinLevel)
 						{
@@ -164,7 +166,7 @@ namespace Pro079Core
 						ev.ReturnMessage = CommandHandler.CallCommand(args.Skip(1).ToArray(), ev.Player, output);
 						// Drains the AP and sets it on cooldown if the command wasn't set on cooldown before (a.k.a. if you didn't do it manually)
 						// You should only change the value of Success if your command needs more argument the user didn't insert. If there's any bug, it's your fault.
-						if (!ev.Player.GetBypassMode() && output.Success)
+						if (!ev.Player.BypassMode && output.Success)
 						{
 							if(output.DrainAp) Pro079.Manager.DrainAP(ev.Player, CommandHandler.APCost);
 
@@ -202,7 +204,7 @@ namespace Pro079Core
 				return;
 			}
 
-			if (ev.Role == Role.SCP_079)
+			if (ev.Role == SMRole.SCP_079)
 			{
 				MEC.Timing.RunCoroutine(Pro079Logic.DelaySpawnMsg(ev.Player), 1);
 			}
@@ -210,9 +212,9 @@ namespace Pro079Core
 
 		public void OnPlayerDie(PlayerDeathEvent ev)
 		{
-			if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP && ev.Player.TeamRole.Role != Role.SCP_079)
+			if (ev.Player.TeamRole.Team == SMTeam.SCP && ev.Player.TeamRole.Role != SMRole.SCP_079)
 			{
-				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(Role.SCP_079);
+				List<Player> PCplayers = PluginManager.Manager.Server.GetPlayers(SMRole.SCP_079);
 				int pcs = PCplayers.Count;
 				if (pcs < 0) return;
 				if (PluginManager.Manager.Server.Round.Stats.SCPAlive + PluginManager.Manager.Server.Round.Stats.Zombies - pcs <= 1)

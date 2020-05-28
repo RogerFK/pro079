@@ -37,6 +37,10 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\References\Mirror.dll</HintPath>
+    </Reference>
     <Reference Include="Pro079">
       <HintPath>..\..\ModuleDLLs\0Pro079.dll</HintPath>
     </Reference>
@@ -56,9 +60,6 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\Lib\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>..\..\Lib\UnityEngine.Networking.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

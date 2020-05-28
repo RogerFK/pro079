@@ -57,9 +57,6 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\Lib\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>..\..\Lib\UnityEngine.Networking.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\Lib\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
